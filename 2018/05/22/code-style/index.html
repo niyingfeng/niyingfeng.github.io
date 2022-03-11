@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="编写可维护的 JavaScript 读书笔记尼古拉斯（作者）： 前端大牛工程师，目前在 Box 公司任职，之前是在雅虎将近工作 5 年。在雅虎期间，他是雅虎首页的前端技术主管，并且是 YUI 库的贡献者。 Nicholas 编写的技术书有：《Maintainable JavaScript | 编写可维护的 JavaScript》、《Professional JavaScript for Web D">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编写可维护性的前端代码">
+<meta property="og:url" content="http://freefe.cc/2018/05/22/code-style/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="编写可维护的 JavaScript 读书笔记尼古拉斯（作者）： 前端大牛工程师，目前在 Box 公司任职，之前是在雅虎将近工作 5 年。在雅虎期间，他是雅虎首页的前端技术主管，并且是 YUI 库的贡献者。 Nicholas 编写的技术书有：《Maintainable JavaScript | 编写可维护的 JavaScript》、《Professional JavaScript for Web D">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.freefe.cc/Snipaste_2018-04-11_10-12-32.png">
+<meta property="article:published_time" content="2018-05-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-11T14:46:23.624Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="可维护性,高质量代码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.freefe.cc/Snipaste_2018-04-11_10-12-32.png">
+
+<link rel="canonical" href="http://freefe.cc/2018/05/22/code-style/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>编写可维护性的前端代码 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2018/05/22/code-style/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          编写可维护性的前端代码
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-05-23 00:00:00" itemprop="dateCreated datePublished" datetime="2018-05-23T00:00:00+08:00">2018-05-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-11 22:46:23" itemprop="dateModified" datetime="2022-03-11T22:46:23+08:00">2022-03-11</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="编写可维护的-JavaScript-读书笔记"><a href="#编写可维护的-JavaScript-读书笔记" class="headerlink" title="编写可维护的 JavaScript 读书笔记"></a>编写可维护的 JavaScript 读书笔记</h1><p><strong>尼古拉斯（作者）</strong>： 前端大牛工程师，目前在 Box 公司任职，之前是在雅虎将近工作 5 年。在雅虎期间，他是雅虎首页的前端技术主管，并且是 YUI 库的贡献者。 Nicholas 编写的技术书有：《Maintainable JavaScript | 编写可维护的 JavaScript》、《Professional JavaScript for Web Developers | JavaScript高级程序设计》、《High Performance JavaScript | 高性能JavaScript》、《Professional Ajax》。</p>
+<p><strong>任何开发者都不在乎某个文件的作者是谁，也没有必要花费额外的精力去理解代码的逻辑并且重新排版，因为所有代码的排版风格都是非常一致的，因为风格不一致会导致我们打开代码文件的第一件事情不是立即工作，而是进行缩进的排版整理。</strong></p>
+<p><strong>能很容易的辨别出有问题的代码并且发现错误，如果所有的代码风格很像，当看到一段与众不同的代码时，很肯能问题就出在这里。</strong></p>
+<blockquote>
+<p>  “程序是写给人读的，只是偶尔让计算机执行一下” - Donald Knuth</p>
+</blockquote>
+<h2 id="基本的格式化"><a href="#基本的格式化" class="headerlink" title="基本的格式化"></a>基本的格式化</h2><p><strong>1.1 缩进层级</strong><br>建议4个空格，或在编辑器中设置一个 制表符 替换为 4个空格。</p>
+<p><strong>1.2 语句结尾</strong><br>强制规定，语句结束插入分号。</p>
+<p><strong>1.3 行的长度</strong><br>很多语言都建议行的字数不超过 80 字</p>
+<p><strong>1.4 换行</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 百度代码规范</span><br><span class="line">// good</span><br><span class="line">if (user.isAuthenticated()</span><br><span class="line">    &amp;&amp; user.isInRole(&#x27;admin&#x27;)</span><br><span class="line">    &amp;&amp; user.hasAuthority(&#x27;add-admin&#x27;)</span><br><span class="line">    || user.hasAuthority(&#x27;delete-admin&#x27;)</span><br><span class="line">) &#123;</span><br><span class="line">    // Code</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var result = number1 + number2 + number3</span><br><span class="line">    + number4 + number5;</span><br></pre></td></tr></table></figure>
+
+<p><strong>1.5 空行</strong>  </p>
+<p>如何通过空行让代码感觉更透气</p>
+<pre><code>1. 方法之间  
+2. 方法中局部变量和第一条语句之间。  
+3. 多行或者单行注释之前。  
+4. 在方法内的逻辑片段之前。
+</code></pre>
+<p><strong>空行常常被忽略，但是空行也是提高代码可读性的强大武器。</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">if(wl &amp;&amp; wl.length)&#123;</span><br><span class="line">    for(var i=0; i&lt;wl.length; i++)&#123;</span><br><span class="line">        p = wl[i];</span><br><span class="line">        type=Y.Lang.type(wl[i]);</span><br><span class="line">        if(a)&#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if(wl &amp;&amp; wl.length)&#123;</span><br><span class="line"></span><br><span class="line">    // 循环的业务逻辑注释</span><br><span class="line">    for(var i=0; i&lt;wl.length; i++)&#123;</span><br><span class="line">        </span><br><span class="line">        // 赋值逻辑注释</span><br><span class="line">        p = wl[i];</span><br><span class="line">        type=Y.Lang.type(wl[i]);</span><br><span class="line">        </span><br><span class="line">        // 条件判定逻辑注释</span><br><span class="line">        if(a)&#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>1.6 命名</strong></p>
+<p>1 变量和函数<br>变量名总是应该遵循驼峰大小写命名法，并且命名的前缀应当是名词，使得可以将变量和函数区分开。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 以下OK</span><br><span class="line">var count = 10;</span><br><span class="line">var myName = &quot;Ni&quot;;</span><br><span class="line">var found = true;</span><br><span class="line"></span><br><span class="line">// 以下就需要重新命名</span><br><span class="line">var getCount = 10;</span><br><span class="line">var isFound = true;</span><br><span class="line"></span><br><span class="line">//函数应当以动词开头</span><br><span class="line">var getName  = function()&#123;</span><br><span class="line">    return myName;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>还有一点示范  </p>
+<pre><code>can        函数返回布尔值
+has        函数返回布尔值
+is         函数返回布尔值
+get        函数返回非布尔值
+set        函数用来保存值
+</code></pre>
+<p>2 常量<br>使用大写字母并且使用下划线命名</p>
+<p>3 构造函数<br>大驼峰命名法</p>
+<p>1.7 直接量</p>
+<h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p><strong>2.1 单行注释</strong>  </p>
+<pre><code>1. 独占一行，用来解释下一行，并且这行注释之前总有一行空行，缩进的层级与下一行代码保持一致。  
+2. 在代码行的尾部注释。代码与注释之间至少有一个缩进。注释包括之前本行的代码不应该超过最大字符数限制。  
+3. 注释掉大块代码。  
+</code></pre>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// 好的注释方法</span><br><span class="line">if ( condition ) &#123;</span><br><span class="line">    </span><br><span class="line">    // 解释下一行代码</span><br><span class="line">    func();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if ( condition ) &#123;</span><br><span class="line">    func(); // 解释该代码功能</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if ( condition ) &#123;</span><br><span class="line"></span><br><span class="line">    // 多行解释代码</span><br><span class="line">    // 多行解释代码</span><br><span class="line">    func();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.2 多行注释</strong></p>
+<p><strong>2.3 使用注释</strong>   </p>
+<pre><code>1. 当代码不够清晰的时候使用注释，当代码很明了的时候不应当添加注释。  
+2. 注释不应该只是解释变量名称或者函数名称式的那种废话。  
+3. 当代码很难理解或者代码可能被误认为错误的代码的时候，需要添加注释。  
+</code></pre>
+<p><strong>2.4 文档注释</strong>   </p>
+<p>技术角度来说，文档注释并不是JS的组成部分，但是是一种普遍的实践。  </p>
+<pre><code>1. 应当对所有的方法和可能的返回值添加描述。  
+2. 对自定义的构造函数类型和期望的参数添加描述。  
+3. 对于包含对象或者方法的对象进行描述。
+</code></pre>
+<h2 id="语句和表达式"><a href="#语句和表达式" class="headerlink" title="语句和表达式"></a>语句和表达式</h2><p><strong>3.1 花括号对齐方式</strong></p>
+<p><strong>3.2 块语句间隔</strong>  </p>
+<p>语句块间隔有3中形式：  </p>
+<pre><code>1. 语句名 圆括号 左花括号间没有空格间隔。  
+2. 左圆括号之前 右圆括号之后添加一个空格。  
+3. 左圆括号 右圆括号前后都添加一个空格。 
+</code></pre>
+<p><strong>3.3 switch 语句 缩进&amp;case语句的连续执行（贯穿）</strong><br>JS的switch缩进一致是有争议的话题。</p>
+<pre><code>1. 每个case相对于switch都有一个缩进层。  
+2. 第二个case开始之前都有一个空行。
+</code></pre>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">    case &quot;a&quot;:</span><br><span class="line">        //代码</span><br><span class="line">        break；</span><br><span class="line"></span><br><span class="line">    case &quot;b&quot;:</span><br><span class="line">        //代码</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    default :</span><br><span class="line">        // 代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另一种 Crockford 和Dojo编程风格为  </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">case &quot;a&quot;:</span><br><span class="line">    //代码</span><br><span class="line">    break；</span><br><span class="line">case &quot;b&quot;:</span><br><span class="line">    //代码</span><br><span class="line">    break;</span><br><span class="line">default :</span><br><span class="line">    // 代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">    case &quot;a&quot;:</span><br><span class="line">    case &quot;b&quot;:</span><br><span class="line">        //代码</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    default :</span><br><span class="line">        // 代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Douglas 在 Crockford中禁止出现贯穿现象，但是Nichlas认为只要程序逻辑很清楚，贯穿完全是一个可以接受的编程方式。Jquery 编程风格中也是允许的。</p>
+<p><strong>3.4 with</strong></p>
+<p><strong>3.5 for 循环</strong>  </p>
+<p>对于for循环中的break和return会改变循环的方向，尽量避免使用，但是不禁止。</p>
+<p><strong>3.6 for-in 循环</strong>  </p>
+<p>for-in循环建议与 hasOwnProperty 一起检测属性，除非你需要检查原型。</p>
+<h2 id="变量，函数和运算符"><a href="#变量，函数和运算符" class="headerlink" title="变量，函数和运算符"></a>变量，函数和运算符</h2><p><strong>4.1 变量声明</strong>  </p>
+<p>变量声明是通过 var 语句来完成的。变量声明不管是在何处声明，所有的 var 语句都会提前到代码顶部执行。</p>
+<p>由而产生了一种单一的 var 风格声明。<br>尼古拉斯推荐 合并var声明，可以清晰看到所有变量名 以及缩小代码量。并且建议每个变量都独占一行，统一缩进。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function doSomeThing (item)&#123;</span><br><span class="line">    var i,</span><br><span class="line">    len,</span><br><span class="line">    value = 10,</span><br><span class="line">    result = value+10;</span><br><span class="line">    </span><br><span class="line">    for(i=10, len=item.length; i&lt;len; i++)&#123;</span><br><span class="line">        do(item[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>百度JS规范</p>
+<pre><code>[强制] [RULE071] 每个 var 只能声明一个变量。  
+[强制] [RULE072] 变量必须即用即声明，不得在函数或其它形式的代码块起始位置统一声明所有变量。
+</code></pre>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">// good</span><br><span class="line">function kv2List(source) &#123;</span><br><span class="line">    var list = [];</span><br><span class="line"></span><br><span class="line">    for (var key in source) &#123;</span><br><span class="line">        if (source.hasOwnProperty(key)) &#123;</span><br><span class="line">            var item = &#123;</span><br><span class="line">                k: key,</span><br><span class="line">                v: source[key]</span><br><span class="line">            &#125;;</span><br><span class="line">            list.push(item);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return list;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// bad</span><br><span class="line">function kv2List(source) &#123;</span><br><span class="line">    var list = [];</span><br><span class="line">    var key;</span><br><span class="line">    var item;</span><br><span class="line"></span><br><span class="line">    for (key in source) &#123;</span><br><span class="line">        if (source.hasOwnProperty(key)) &#123;</span><br><span class="line">            item = &#123;</span><br><span class="line">                k: key,</span><br><span class="line">                v: source[key]</span><br><span class="line">            &#125;;</span><br><span class="line">            list.push(item);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.2 函数声明</strong></p>
+<p>推荐总是先声明函数，再使用函数。Crockford规范还推荐在函数内部的函数应当紧跟着变量声明之后声明。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">function doSomeThing (item)&#123;</span><br><span class="line">    var i,</span><br><span class="line">        len,</span><br><span class="line">        value = 10,</span><br><span class="line">        result = value+10;</span><br><span class="line">    </span><br><span class="line">    function do(item)&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    for(i=10, len=item.length; i&lt;len; i++)&#123;</span><br><span class="line">        do(item[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>函数声明不应当出现在语句块之内，会有兼容方面的问题导致各个浏览器解析不一致。也是google规范中禁止的。</p>
+<p><strong>4.3 函数调用隔离</strong></p>
+<p>代码比较透气，增强可读性和读代码的舒适度</p>
+<p>百度代码规范 <a target="_blank" rel="noopener" href="http://styleguide.baidu.com/style/js/index.html#id6">空格</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">var a = !arr.length;</span><br><span class="line"></span><br><span class="line">if (condition) &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var obj = &#123;</span><br><span class="line">    a: 1,</span><br><span class="line">    b: 2,</span><br><span class="line">    c: 3</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">function funcName() &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var funcName = function funcName() &#123;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">funcName();</span><br><span class="line"></span><br><span class="line">callFunc(a, b);</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.4 立即调用的函数</strong></p>
+<p><strong>4.5 严格模式</strong><br>不推荐将严格模式使用在全局之中</p>
+<p><strong>4.6 相等</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">5 == &quot;5&quot; // true</span><br><span class="line">25 == &quot;0x19&quot; // true</span><br><span class="line">2 == true // false</span><br></pre></td></tr></table></figure>
+
+<p>对于对象，则会首先调用对象的 valueOf() 方法，得到原始类型值比较，如果没有定义则调用 toString()。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var object =&#123;</span><br><span class="line">    toString: function()&#123;</span><br><span class="line">        return &quot;0x19&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">object == 25; // true</span><br></pre></td></tr></table></figure>
+<p>由于强类型转换的情况，所以需要使用&#x3D;=&#x3D;和!=&#x3D;来处理比较的情况。而不推荐使用&#x3D;&#x3D;和!&#x3D; 。</p>
+<h2 id="编程实践"><a href="#编程实践" class="headerlink" title="编程实践"></a>编程实践</h2><blockquote>
+<p>构建软件设计的方法有两种：一种是把软件做的很简单以至于明显找不到缺陷，另一种是把它做的很复杂以至于找不到明显的缺陷。 - C.A.R.Hoare</p>
+</blockquote>
+<p><strong>5. 松耦合</strong></p>
+<p>很多的设计模式就是为了解决紧耦合的问题。如果2个组件耦合太紧密，就说明一个组件和另一个组件直接相关。</p>
+<p>比如有一个名为error的className，贯穿整个站点。有一天觉得他命名不合理需要更改的时候，有可能我们需要做更改上百个使用到它的组件，也有可能只需要更改一个组件。 </p>
+<p>你能做到只修改一个组件而不是说修改N个组件，那么就做到了松耦合。对于一些大型系统来说这是至关重要的。</p>
+<h2 id="避免使用全局变量"><a href="#避免使用全局变量" class="headerlink" title="避免使用全局变量"></a>避免使用全局变量</h2><p>JS执行环节相对于其他语言来说有很多独特之处，如全局变量和函数的使用。 </p>
+<p>JS本身的初始执行环境就定义了多种多样的全局变量，这些全局变量在环境创始之初就存在了。  </p>
+<p>全局对象是一个神秘的对象，表示脚本的最外层上下文。  </p>
+<p><strong>6.1 全局变量带来的问题</strong></p>
+<pre><code>命名冲突  
+代码的脆弱性  
+难以测试  
+</code></pre>
+<p><strong>6.2 意外的全局变量</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function doSomething()&#123;</span><br><span class="line">    var count = 10;</span><br><span class="line">        title = &quot;abcdefg&quot;;</span><br><span class="line"></span><br><span class="line">    var a = b = 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于意外的全局变量一些工具，比如JSLint和JSHint就可以起到作用,严格模式下也会报错。</p>
+<p><strong>6.3 单全局变量方式</strong></p>
+<p>YUI 引入 唯一 YUI全局变量。<br>jQuery 引入 $ 和 jQuery 全局变量。<br>Dojo 引入 dojo 全局变量。<br>Closure 引入 goog 全局变量。  </p>
+<pre><code>命名空间  
+模块
+</code></pre>
+<p><strong>6.4 零全局变量</strong></p>
+<h2 id="事件处理"><a href="#事件处理" class="headerlink" title="事件处理"></a>事件处理</h2><p>事件处理在JS中是至关重要的，影响着网站的各个方面。所有的JS代码均通过事件绑定到UI上，所以大多前端工程师需要花费很多的事件来编写和修改事件处理程序。  </p>
+<p>大多事件处理程序相关代码和事件环境紧紧偶合在一起，导致了可维护性很糟糕。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 不好的例子</span><br><span class="line">function handleClick( event )&#123;</span><br><span class="line">    var popup = document.getElementById( &quot;popup&quot; );</span><br><span class="line">    popup.style.left = event.clientX + &quot;px&quot;;</span><br><span class="line">    popup.style.top = event.clientY + &quot;px&quot;;</span><br><span class="line">    popup.className = &quot;reveal&quot;;</span><br><span class="line">&#125;</span><br><span class="line">addListener(element, &quot;click&quot;, handleClick);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><em>规则1：隔离应用逻辑</em><br>将应用逻辑从所有的事件处理程序中抽离出来是一种最佳实践。因为很有可能在之后的某段代码中我们会使用到同一段逻辑，抽离就降低了代码的耦合度，增强了可读性和维护成本。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">var MyApplication = &#123;</span><br><span class="line">    handleClick : function(event)&#123;</span><br><span class="line">        this.showPopup( event )；</span><br><span class="line">    &#125; ,</span><br><span class="line">    </span><br><span class="line">    showPopup : function(event)&#123;</span><br><span class="line">        var popup = document.getElementById( &quot;popup&quot; );</span><br><span class="line">        popup.style.left = event.clientX + &quot;px&quot;;</span><br><span class="line">        popup.style.top = event.clientY + &quot;px&quot;;</span><br><span class="line">        popup.className = &quot;reveal&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">addListener(element, &quot;click&quot;, function(event)&#123;</span><br><span class="line">    MyApplication.handleClick( event );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><em>规则二：不要分发事件对象</em></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">var MyApplication = &#123;</span><br><span class="line">    handleClick : function(event)&#123;</span><br><span class="line">        this.showPopup( event.clientX, event.clientY )；</span><br><span class="line">    &#125; ,</span><br><span class="line">    </span><br><span class="line">    showPopup : function(x, y)&#123;</span><br><span class="line">        var popup = document.getElementById( &quot;popup&quot; );</span><br><span class="line">        popup.style.left = x + &quot;px&quot;;</span><br><span class="line">        popup.style.top = y + &quot;px&quot;;</span><br><span class="line">        popup.className = &quot;reveal&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">addListener(element, &quot;click&quot;, function(event)&#123;</span><br><span class="line">    MyApplication.handleClick( event );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>清楚地展示了事件处理程序和应用逻辑之间的分工。应用逻辑也不需要对event产生任何依赖，进而很多地方都可以使用相同的应用逻辑。</p>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p><strong>8.1 检测原始值</strong></p>
+<p>5种原始类型 字符串、数字、布尔值、null和undefined。<br>typeof 可以检测各个原始值的类型，并且返回相应类型字符串。而 typeof null 会返回 “object”。</p>
+<p><strong>8.2 检测引用值</strong></p>
+<p>对于检测引用值，typeof会力不从心，基本都会返回”object”，那么对于引用值检测最好的方法是使用 instanceof。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">if( value instanceof Date )&#123;</span><br><span class="line">    // ... Code</span><br><span class="line">&#125;</span><br><span class="line">if( value instanceof RegExp )&#123;</span><br><span class="line">    // ... Code</span><br><span class="line">&#125;</span><br><span class="line">if( value instanceof Error )&#123;</span><br><span class="line">    // ... Code</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>8.3 检测属性</strong></p>
+<p>很多时候我们会使用与 null  undfined 对比来判断是否属性存在。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if( obj[prop] )&#123;  &#125;</span><br><span class="line">if( obj[prop] != null )&#123;  &#125;</span><br><span class="line">if( obj[prop] != undefined)&#123;  &#125;</span><br></pre></td></tr></table></figure>
+<p>这样会导致代码有漏洞，不能将所有的情况都覆盖到。</p>
+<h2 id="将配置数据从代码中分离"><a href="#将配置数据从代码中分离" class="headerlink" title="将配置数据从代码中分离"></a>将配置数据从代码中分离</h2><p>代码就是一些计算机运行的指令，当我们传递数据进入计算机的时候，指令对数据进行操作产生结果。  </p>
+<p>那么当我们在修改一些数据问题的时候就会带来一些源代码引入BUG的风险，所以对于应用来说，应当将一些关键数据从主要的源码中抽离出来，这样就可以是我们在修改数据或者源码的时候更放心。</p>
+<p><strong>9.1 什么是配置数据</strong></p>
+<p>配置数据就是我们在应用中写死（hardcoded）的值。<br>配置数据的例子：</p>
+<pre><code>1. URL
+2. 需要展示给用户看的字符串
+3. 重复的值
+4. 设置的值，一些配置选项
+5. 任何可能发生变化的值
+</code></pre>
+<p>配置数据随时都有可能做修改，我们不希望因为有人需要修改页面的提示信息而需要修改JS源码。</p>
+<p><strong>9.2 抽离配置数据</strong></p>
+<p>其实，抽离配置数据非常简单，只需要创建一个管理整体的配置数据的对象即可。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var config = &#123;</span><br><span class="line">    MSG_INVALID_VALUE : &quot;Invalid value&quot;,</span><br><span class="line">    URL_INVALID : &quot;/errors/invalid.html&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意统一在配置数据对象中的命名。<br>将配置数据提取出来之后任何人需要做修改都不会引起一些代码的逻辑错误问题，对于很大的系统，可以将配置数据专门使用其他单独文件，使其于代码隔离。</p>
+<p><strong>9.3 保存配置数据</strong></p>
+<p>配置数据最好放在单独的文件之中，以便清晰地分隔数据和应用逻辑。一种值得尝试的方法是将这些配置数据放于非JS的文件中。</p>
+<pre><code>1. 使用各种流行的属性文件来存放。（如 Java属性文件）
+2. JSONP，将JSON结构使用函数调用包装起来。
+3. 纯JS对象
+</code></pre>
+<h2 id="抛出自定义错误"><a href="#抛出自定义错误" class="headerlink" title="抛出自定义错误"></a>抛出自定义错误</h2><p>编程语言具有“创建”错误的能力，在JS中抛出错误是一门艺术。再合适的时间抛出错误可以大大减少我们调试的事件，对代码的满意度也将急剧提升。</p>
+<p><strong>10.1 错误的本质</strong></p>
+<p>当某些非期望的事情发生的时候，程序就会要发一个错误。这也许是传入了非法的值，或许是遇到无效的操作符等等。</p>
+<p>编程语言定义了一组基本的规则，当偏离了这些规则的时候将导致错误，只有当错误被抛出来时，我们才能有地方入手解决，如果错误无声无息，那么解决的代价可想而知。所以错误时开发者的朋友而非敌人。</p>
+<p><strong>10.2 在 JS 中抛出错误</strong></p>
+<p>毫无疑问，在 JS 中抛出错误比任何语言中做同样的事情更有价值，这要归结于Web端调试的复杂性。可以使用 throw 操作符，将提供一个对象作为错误抛出，Error对象时最常用的。</p>
+<p><strong>10.3 抛出错误的好处</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function getDivs( element )&#123;</span><br><span class="line">    return element.getElementByTagName(&quot;div&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function getDivs( element )&#123;</span><br><span class="line">    if( element &amp;&amp; element.getElementsByTagName )&#123;</span><br><span class="line">        return element.getElementByTagName(&quot;div&quot;);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        throw new Error(&quot;getDivs() : Argument must be a DOM element&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>10.4 何时抛出错误</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 不好的写法 检测太多</span><br><span class="line">function addClass(element, className)&#123;</span><br><span class="line">    if( !element || typeof element.className != &quot;string&quot; )&#123;</span><br><span class="line">        throw new Error(&quot;addClass() : First argument must be a DOM element&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    if( typeof element.className != &quot;string&quot; )&#123;</span><br><span class="line">        throw new Error(&quot;addClass() : First argument must be a DOM element&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    element.className +=&quot; &quot; + className;</span><br><span class="line">&#125;</span><br><span class="line">// 原本只是需要加一个class 但是加了那么多的抛出错误，就会适得其反。会引起过度杀伤。</span><br><span class="line">// 好的写法</span><br><span class="line">function addClass(element, className)&#123;</span><br><span class="line">    if( !element || typeof element.className != &quot;string&quot; )&#123;</span><br><span class="line">        throw new Error(&quot;addClass() : First argument must be a DOM element&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    element.className +=&quot; &quot; + className;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<pre><code>1. 当修复了一个难以调试的错误的时候，尝试增加一两个自定义错误，当再次发生错误的时候有助于解决问题。
+2. 如果正在编写代码，思考一下我希望哪些事情不会发生，如果发生将引发较大问题，在这个某些问题上抛出错误。
+3. 如果在编写别人的代码，思考下他们的使用方式在特定的情况下抛出错误。
+</code></pre>
+<p><strong>10.5 try-catch 语句</strong></p>
+<p>try-catch 可以在浏览器抛出错误之前解析，将可能引发错误的代码放在 try 块中，将处理错误的代码放在 catch 中。当然还可以加入 finally 块。</p>
+<p>在catch中不要为空，应该总要写点声明老处理错误，不然就会依旧不知道错误在哪里。</p>
+<p><strong>10.6 错误的类型</strong></p>
+<pre><code>Error ： 所有错误的基本类型，引擎不会抛出此类型。  
+EvalError ： 通过 eval() 函数执行的代码发生错误。  
+RangeError ： 一个数字超出边界时抛出，试图创建一个长度为-20的数组。 
+ReferenceError ： 期望对象不存在，例如试图在null上调用函数。  
+SyntaxError :  语法上的错误。  
+TypeError ： 变量不是期望类型的时候。  
+URIError ： 给一些内置函数传入非法URL时抛出的错误。
+</code></pre>
+<h2 id="不是你的对象不要动"><a href="#不是你的对象不要动" class="headerlink" title="不是你的对象不要动"></a>不是你的对象不要动</h2><p><strong>11.1 什么是你的</strong></p>
+<p>当你的代码创建了这些对象，那么你拥有这些对象。维护是你的责任。牢记，如果你的代码没有创建这些对象，那么不要修改它们。</p>
+<pre><code>1. 原生对象。
+2. DOM对象    
+3. 浏览器对象模式对象（BOM）。   
+4. 类库对象。
+</code></pre>
+<p><strong>11.2 原则</strong></p>
+<p>在JS中，我们将已经存在的对象视为一种背景，在此之上开发代码，应该将JS对象当做一个实用的工具函数来看待。</p>
+<p>不覆盖方法，神圣的 document.getElementById 都可以被轻易覆盖。<br>不增加方法，Prototype库就是一个不好的例子，很随意的修改了大量的原生对象和方法。导致在JS的历史上遇到很多问题。在小于1.6的版本中，Prototype定义了一个document.getElementsByClassName()方法<br>不删除方法。</p>
+<p><strong>11.3 更好的途径</strong></p>
+<p>修改非自己拥有的对象是解决某些问题的很好的方案。可能有一些方法，所谓的设计模式，不直接修改这些对象而是扩展这些对象。</p>
+<p>最受欢迎的对象扩充方式就是继承。一种类型的对象如果已经做到了你想要的大多数工作，那么继承，再加一些新的功能即可。JS中有两种基本形式：基于对象的继承和基于类型的继承。</p>
+<p><em>11.3.1 基于对象的继承</em></p>
+<p>基于对象的继承也就是原型继承，即ES5中的 Object.create() 方法。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var person = &#123;</span><br><span class="line">    name : &quot;Nicholas&quot;,</span><br><span class="line">    sayName : function()&#123;</span><br><span class="line">        alert( this.name );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">var ni = Object.create( person );</span><br><span class="line">// 当然可以扩展对象</span><br><span class="line">var ni = Object.create( person， &#123;</span><br><span class="line">    name : &#123;</span><br><span class="line">        value : &quot;Greg&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; );</span><br></pre></td></tr></table></figure>
+<p>一旦以这种方式创建了对象，那么你可以随意修改新对象，毕竟你是对象的拥有者。</p>
+<p><em>11.3.2 基于类型的继承</em></p>
+<p>基于类型的继承是通过构造函数而非对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function MyError( message )&#123;</span><br><span class="line">    this.message = message;</span><br><span class="line">&#125;</span><br><span class="line">MyError.prototype = new Error();</span><br></pre></td></tr></table></figure>
+
+<p><strong>11.3.3 门面模式</strong></p>
+<p>门面模式是一种流行的设计模式，他为一个已经存在的对象创建新的接口，门面模式是一个全新的对象，背后是一个已经存在的对象在工作。</p>
+<p>如果你的用例中无法使用继承满足需要，可以使用门面模式。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">funtion DOMWrapper( element )&#123;</span><br><span class="line">    this.element = element;</span><br><span class="line">&#125;</span><br><span class="line">DOMWrapper.prototype.addClass( className )&#123;</span><br><span class="line">    this.element.classmName += &quot; &quot; + className; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var wrapper = new DOMWrapper( document.getElementBuId(&quot;myDiv&quot;) );</span><br><span class="line">wrapper.addClass(&quot;selected&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>从JS的可维护性来说，门面模式是非常合适的方式，你可以完全控制这些接口。你可以允许访问任何底层对象的方法或者属性，反之也可以有效地过滤对象的访问。<br>门面实现一个特定的接口，让一个对象看上去像另一个对象就是适配器。两者的差别就是前者创建接口，后者实现已经存在的接口。</p>
+<p><strong>11.4 关于Polyfill的注解</strong></p>
+<p>随着ES5和H5的特性在各个浏览器中实现，JS polyfills（shims）开始就行起来，polyfill是指一种功能的模拟，这些功能在新版本的浏览器中已经实现，然后用自定义的方式使其在老版本中兼容实现。</p>
+<p><strong>11.5 阻止修改</strong></p>
+<p>在ES5中已经引入了几个方法来防止对对象的修改。<br>有三种级别： 防止扩展， 密封， 冻结。</p>
+<h2 id="浏览器嗅探"><a href="#浏览器嗅探" class="headerlink" title="浏览器嗅探"></a>浏览器嗅探</h2><p>浏览器嗅探始终是web领域的一个热门话题。</p>
+<p><strong>12.1 User-Agent 检测</strong></p>
+<p>用户代理检测是更具客户端浏览器的user-agent字符串进行检测，但是最大的问题就是解析user-agent并不是很容易，有些浏览器为了保证兼容性，会复制另一个浏览器的user-agent字符串，每当一个新的浏览器出来的时候我们都需要对user-agent检测的代码进行重新修正。意味着我们无法预期的出了问题，只能等待问题出现后再进行处理。</p>
+<p><strong>12.2 特性检测</strong></p>
+<p>特性检测的原理就是为特定浏览器的各个特性进行检测，并当特性存在时处理问题。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">function getById( id )&#123;</span><br><span class="line"></span><br><span class="line">    var element = null;</span><br><span class="line"></span><br><span class="line">    if( document.getElementById )&#123;</span><br><span class="line">        element = document.getElementById( id );</span><br><span class="line">    &#125;else if( document.all )&#123;</span><br><span class="line">        element = document.all[id];</span><br><span class="line">    &#125;else if( document.layers )&#123;</span><br><span class="line">        element = document.layers[id];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    return element;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>特性检测的重要组成部分</p>
+<pre><code>1. 探测标准方法
+2. 探测不同浏览器的特点方法
+3. 当被检测方法不存在的时候提供合乎逻辑的备用方案。
+</code></pre>
+<p><strong>12.3 避免特性推断</strong></p>
+<p>特性推断是更具一个特性的存在，推断另外一个特性是否存在。“如果他看起来像鸭子，就必定会像鸭子一样嘎嘎叫”</p>
+<p><strong>12.4 避免浏览器推断</strong></p>
+<p><strong>12.5 如何取舍</strong></p>
+<p>特性推断和浏览器推断是非常糟糕的做法，应当不惜一切代价避免他，纯粹的使用特性检测是一种很好的方式，几乎在任何情况下都是你想要的结果。</p>
+<p>对于 user-agent 检测，从来都不禁止他，因为总有非常适合的场景需要使用他。</p>
+<h1 id="React的一点学习"><a href="#React的一点学习" class="headerlink" title="React的一点学习"></a>React的一点学习</h1><h2 id="容器型组件-amp-展示型组件"><a href="#容器型组件-amp-展示型组件" class="headerlink" title="容器型组件&amp;展示型组件"></a>容器型组件&amp;展示型组件</h2><p>容器型组件：意味组件如何工作，具体数据如何更新，不包含任何Virtual DOM的修改与组合，不包含组件样式。<br>展示型组件：意味组件是如何渲染的，包含了Virtual DOM的修改与组合。不依赖store。</p>
+<p>这样区分能较好的使用相同的展示型组件来配合不同的数据最渲染，提高复用性。</p>
+<p>Layouts<br>页面布局结构，讲主框架与页面主体内容分离。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">const Layout = (&#123;children&#125;) =&gt; (</span><br><span class="line">    &lt;div className=&quot;container&quot;&gt;</span><br><span class="line">        &lt;Header /&gt;</span><br><span class="line">        &lt;div className=&quot;content&quot;&gt;</span><br><span class="line">            &#123;children&#125;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>Views<br>字路由的入口组件，包含此路由下的所有展示型组件。为保持子组件的纯净，在此层中定义数据以及action等，分发到子组件中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class HomeView extends Component &#123;</span><br><span class="line">    render() &#123;</span><br><span class="line">        const &#123; sth, changeType &#125; = this.props;</span><br><span class="line">        const cardProps = &#123; sth, changeType &#125;;</span><br><span class="line">        </span><br><span class="line">        return (</span><br><span class="line">            &lt;div className=&quot;page page-home&quot;&gt;</span><br><span class="line">                &lt;Card &#123;...cardProps&#125; /&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Components<br>渲染组件，包含相关组件的业务逻辑与交互，但所有数据与action均为Views下发，完全脱离数据层存在的展示型组件。项目中数量级别较大。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class Card extends Component &#123;</span><br><span class="line">    constructor(props) &#123;</span><br><span class="line">        super(props);</span><br><span class="line">        </span><br><span class="line">        this.handleChange = this.handleChange.bind(this);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    handleChange(opts) &#123;</span><br><span class="line">        const &#123; type &#125; = opts;</span><br><span class="line">        </span><br><span class="line">        this.props.changeType(type);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    render() &#123;</span><br><span class="line">        const &#123; sth &#125; = this.props;</span><br><span class="line">        </span><br><span class="line">        return (</span><br><span class="line">            &lt;div className=&quot;mod-card&quot;&gt;</span><br><span class="line">                &lt;Switch onChange=&#123;this.handleChange&#125;&gt;</span><br><span class="line">                    //...</span><br><span class="line">                &lt;/Switch&gt;  </span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="组件间抽象"><a href="#组件间抽象" class="headerlink" title="组件间抽象"></a>组件间抽象</h2><p>在React组件构建中，对于一类需要被不同需求同时使用的组件，就需要设计组件抽象的概念。主要为mixin与高阶组件。</p>
+<p>高阶函数：函数接受函数作为输入，或者输出一个函数。<br>高阶组件：接受React组件作为输入，输出一个新的React组件。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const MyContainer = (WrappedComponent) =&gt; </span><br><span class="line">    class extends Component &#123;</span><br><span class="line">        render() &#123;</span><br><span class="line">            return &lt;WrappedComponent &#123;...this.props&#125; /&gt;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>当React组件被包裹，高阶组件返回一个增强型的React组件，使得代码更具有复用性、逻辑性与抽象特性。</p>
+<p>抽象一个input组件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">const MyContainer = (WrappedComponent) =&gt; </span><br><span class="line">    class extends Component &#123;</span><br><span class="line">        consttructor(props) &#123;</span><br><span class="line">            super(props);</span><br><span class="line">            this.state = &#123;</span><br><span class="line">                name: &#x27;&#x27;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            this.onNameChange = this.onNameChange.bind(this);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        onNameChange(event) &#123;</span><br><span class="line">            this.setState(&#123;</span><br><span class="line">                name: event.target.value</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        render() &#123;</span><br><span class="line">            const newProps = &#123;</span><br><span class="line">                name: &#123;</span><br><span class="line">                    value: this.state.name,</span><br><span class="line">                    onChange: this.onNameChange</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            return &lt;WrappedComponent &#123;...this.props&#125; &#123;...newProps&#125;/&gt;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">@MyContainer</span><br><span class="line">class MyComponent extends Component &#123;</span><br><span class="line">    render() &#123;</span><br><span class="line">        return &lt;input name=&quot;name&quot; &#123;...this.props.name&#125; /&gt;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>简单的评论功能页，包含评论内容区域以及评论编辑区域</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">// 数据类型</span><br><span class="line">&#123;</span><br><span class="line">    commentList: [</span><br><span class="line">        &#123;name: &quot;cam&quot;, content: &quot;It&#x27;s good!&quot;, publishTime: &quot;2015-01-01&quot;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class  CommentList extends Component &#123;</span><br><span class="line">    constructor(props) &#123;</span><br><span class="line">        spuer(props);</span><br><span class="line">        </span><br><span class="line">        this.state = &#123;</span><br><span class="line">            loading: true,</span><br><span class="line">            error: null,</span><br><span class="line">            value: null</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    componentDidMount() &#123;</span><br><span class="line">        this.props.promise.then(respones =&gt; reponse.json())</span><br><span class="line">            .then(value =&gt; this.setState(&#123;loading: false, value&#125;))</span><br><span class="line">            .catch(error =&gt; this.setState(&#123;loading: false, error&#125;))</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    render() &#123;</span><br><span class="line">        if (this.state.loading) &#123;</span><br><span class="line">            return &lt;span&gt;loading...&lt;/span&gt;</span><br><span class="line">        &#125; else if (this.state.error !== null) &#123;</span><br><span class="line">            return &lt;span&gt;Error:&#123;this.state.error.message&#125;&lt;/span&gt;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            const list = this.state.value.commentList;</span><br><span class="line">            </span><br><span class="line">            return (</span><br><span class="line">                &lt;ul className=&quot;comment-box&quot;&gt;</span><br><span class="line">                    &#123;list.map((entry, i) =&gt; (</span><br><span class="line">                        &lt;li key=&#123;`response-$&#123;i&#125;`&#125; className=&quot;comment-item&quot;&gt;</span><br><span class="line">                            &lt;p className=&quot;comment-item-name&quot;&gt;&#123;entry.name&#125;&lt;/p&gt;</span><br><span class="line">                            &lt;p className=&quot;comment-item-content&quot;&gt;&#123;entry.content&#125;&lt;/p&gt;</span><br><span class="line">                        &lt;/li&gt;</span><br><span class="line">                    ))&#125;</span><br><span class="line">                &lt;/ul&gt;</span><br><span class="line">            );</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 使用</span><br><span class="line"></span><br><span class="line">&lt;CommentList promise=&#123;fetch(&#x27;/api/response.json&#x27;)&#125;&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>显然数据请求与业务逻辑混合在一起了，那么此时应该具体的确认区分容器型组件与展示型组件的界限。<br>并且对于公共逻辑的抽象。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">// 展示型组件</span><br><span class="line">class CommentList(&#123;commens&#125;) &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;ul className=&quot;comment-box&quot;&gt;</span><br><span class="line">            &#123;commens.map((entry, i) =&gt; (</span><br><span class="line">                &lt;li key=&#123;`response-$&#123;i&#125;`&#125; className=&quot;comment-item&quot;&gt;</span><br><span class="line">                    &lt;p className=&quot;comment-item-name&quot;&gt;&#123;entry.name&#125;&lt;/p&gt;</span><br><span class="line">                    &lt;p className=&quot;comment-item-content&quot;&gt;&#123;entry.content&#125;&lt;/p&gt;</span><br><span class="line">                &lt;/li&gt;</span><br><span class="line">            ))&#125;</span><br><span class="line">        &lt;/ul&gt;</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 高阶函数 抽象异步加载的模块的结构</span><br><span class="line">const  Promised = (promiseProp, Wrapped) =&gt;class extends Component &#123;</span><br><span class="line">    constructor(props) &#123;</span><br><span class="line">        spuer(props);</span><br><span class="line">        </span><br><span class="line">        this.state = &#123;</span><br><span class="line">            loading: true,</span><br><span class="line">            error: null,</span><br><span class="line">            value: null</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    componentDidMount() &#123;</span><br><span class="line">        this.props[promiseProp].then(respones =&gt; reponse.json())</span><br><span class="line">            .then(value =&gt; this.setState(&#123;loading: false, value&#125;))</span><br><span class="line">            .catch(error =&gt; this.setState(&#123;loading: false, error&#125;))</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    render() &#123;</span><br><span class="line">        if (this.state.loading) &#123;</span><br><span class="line">            return &lt;span&gt;loading...&lt;/span&gt;</span><br><span class="line">        &#125; else if (this.state.error !== null) &#123;</span><br><span class="line">            return &lt;span&gt;Error:&#123;this.state.error.message&#125;&lt;/span&gt;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            const list = this.state.value.commentList;</span><br><span class="line">            </span><br><span class="line">            return &lt;Wrapped &#123;...this.props&#125; &#123;...this.state.value&#125; /&gt;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class  CommentListContainer extends Component &#123;</span><br><span class="line">    render() &#123;</span><br><span class="line">        return &lt;CommentList comments=&#123;this.props.commentsList&#125; /&gt;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = Promised(&quot;comments&quot;, CommentListContainer);</span><br><span class="line"></span><br><span class="line">// 使用</span><br><span class="line">&lt;CommentListContainer comments=&#123;fetch(&#x27;/api/response.json&#x27;)&#125; /&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>CommentListContainer 与 CommentList 几乎等同，可以选择合并或者保留。取决于对于未来扩展的考量。</p>
+<p><img src="http://image.freefe.cc/Snipaste_2018-04-11_10-12-32.png" alt="image"></p>
+<h2 id="组件性能优化"><a href="#组件性能优化" class="headerlink" title="组件性能优化"></a>组件性能优化</h2><p>纯函数：<br>给定相同的输入，总返回相同的输出<br>过程没有副作用<br>没有额外的状态依赖</p>
+<p>完全独立于外部状态，避免因为共享的外部状态而导致BUG。并且有利于方法级别的测试与重构。</p>
+<p>PureRender：将props与state做浅比较（对象仅作引用比较），避免深比较的性能问题。</p>
+<p>Immutable：一旦创建，则无法更改的对象，每次操作会生成新的 ImmutableData。</p>
+<ol>
+<li>降低可变带来的复杂度</li>
+<li>节省内存（简化垃圾回收机制）</li>
+<li>撤销，复制，时间旅行等实现容易</li>
+<li>并发安全</li>
+<li>拥抱函数式编程</li>
+</ol>
+<p>key: 标识当前唯一项的props</p>
+<h2 id="无状态组件"><a href="#无状态组件" class="headerlink" title="无状态组件"></a>无状态组件</h2><p>类似纯函数形式，仅简单的接受props渲染生成DOM结构。纯粹未渲染而生的组件。简单便捷与高效。</p>
+<h1 id="ES6语法的优雅写法"><a href="#ES6语法的优雅写法" class="headerlink" title="ES6语法的优雅写法"></a>ES6语法的优雅写法</h1><h2 id="块级作用域"><a href="#块级作用域" class="headerlink" title="块级作用域"></a>块级作用域</h2><p>一直以来 var 声明让开发者在循环中创建函数以及一些循环事件绑定时，变成容易出错，陷入闭包的问题中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var funcs = [];</span><br><span class="line"></span><br><span class="line">for (var i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">    funcs.push(function()&#123;</span><br><span class="line">        console.log(i);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">funcs.forEach(function(func)&#123;</span><br><span class="line">    func();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>不得已，需要再创建一层作用域来解决此类问题，就显得不那么优雅</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var funcs = [];</span><br><span class="line"></span><br><span class="line">for (var i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">    funcs.push((function(value)&#123;</span><br><span class="line">        return function()&#123;</span><br><span class="line">            console.log(value);   </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)(i));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">funcs.forEach(function(func)&#123;</span><br><span class="line">    func();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>而块级作用域 let声明解决了该问题，每次迭代均会生成新变量。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">let funcs = [];</span><br><span class="line"></span><br><span class="line">for (let i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">    funcs.push(function()&#123;</span><br><span class="line">        console.log(i);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">funcs.forEach(function(func)&#123;</span><br><span class="line">    func();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>那么新的标准下，最佳实践为默认使用 const，在变量确实需要改变的时候使用 let。</p>
+<h2 id="模板字面量"><a href="#模板字面量" class="headerlink" title="模板字面量"></a>模板字面量</h2><p>提供了一套生成、查询、操作来自其他语言里内容的领域专用语言。避免注入攻击，如XSS、SQL注入等。</p>
+<p>占位符 ${} 内则为JS表达式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">let count = 10,</span><br><span class="line">    price = 0.25,</span><br><span class="line">    message = `$&#123;count&#125; items cost $$&#123;(count * price).toFixed(2)&#125;`;</span><br></pre></td></tr></table></figure>
+
+<h2 id="函数-amp-箭头函数"><a href="#函数-amp-箭头函数" class="headerlink" title="函数&amp;箭头函数"></a>函数&amp;箭头函数</h2><p>函数的默认参数值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function makeRequest(url, timeout = 2000, callback = function()&#123;&#125;)&#123;</span><br><span class="line">    // do something</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不定参数<br>可以指定对个各自独立的参数，通过整合后的数组进行访问</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function pick(object, ...keys) &#123;</span><br><span class="line">    // do something</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>展开运算符<br>类似于不定参数，指定一个数组，将其打散后作为各自独立的参数传入函数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let values = [12, 45, 43, 100];</span><br><span class="line">Math.max.apply(Math, values);</span><br><span class="line"></span><br><span class="line">Math.max(...values);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>块级函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&quot;use strict&quot;</span><br><span class="line"></span><br><span class="line">if (true) &#123;</span><br><span class="line"></span><br><span class="line">    // ES5中报错，ES6中不报错</span><br><span class="line">    function doSomeThing() &#123;</span><br><span class="line">        // ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>箭头函数</p>
+<ol>
+<li>没有this、super、arguments、和new.target 绑定，值由外围最近一层的非箭头函数决定。</li>
+<li>不能通过new关键词调用，无[[construct]]方法，不能被作为构造函数。</li>
+<li>没有原型。</li>
+<li>不能改变this的绑定。</li>
+<li>不支持arguments。</li>
+<li>不支持从夫命名参数</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">let reflect = (value) =&gt; value;</span><br><span class="line">let sum = (num1, num2) =&gt; num1 + num2;</span><br></pre></td></tr></table></figure>
+
+<p>业务中很多情况我们需要通过bind、闭包保存this等方法解决在处理回调函数时，考虑各种this的问题。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">let PageHamdler = &#123;</span><br><span class="line">    id: &#x27;123456&#x27;,</span><br><span class="line">    </span><br><span class="line">    init: function()&#123;</span><br><span class="line">        document.addEventListener(&#x27;click&#x27;, (function(event)&#123;</span><br><span class="line">            this.doSomething(event.type);</span><br><span class="line">        &#125;).bind(this), false)</span><br><span class="line">    &#125;,</span><br><span class="line">    </span><br><span class="line">    doSomething: function(type) &#123;</span><br><span class="line">        console.log(type + &#x27; for &#x27; + this.id);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 简洁形式</span><br><span class="line"></span><br><span class="line">init: function()&#123;</span><br><span class="line">    document.addEventListener(&#x27;click&#x27;,</span><br><span class="line">        event =&gt; this.doSomething(event.type), false)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>需要注意在VUE不应该使用箭头函数来定义 method 函数 箭头函数绑定了父级作用域的上下文，所以 this 将不会按照期望指向 Vue 实例。</p>
+</blockquote>
+<h2 id="解构"><a href="#解构" class="headerlink" title="解构"></a>解构</h2><p>打破数据结构，将其拆分为更小的部分的过程。</p>
+<p>在嵌套过深的一些数据结构中，我们会进行频繁的判定，提取公共对象，取值等一系列操作。<br>而很多情况，我们可以使用 解构+默认值 的方式解决。</p>
+<p>这是一坨动漫的业务老代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line">const convertBanner = (obj,fromSelf,moduleTitle) =&gt; &#123;</span><br><span class="line">    let result = &#123;&#125;;</span><br><span class="line">    if (obj[&#x27;page_id&#x27;] &amp;&amp; obj[&#x27;link_type&#x27;] == &#x27;1&#x27;) &#123;</span><br><span class="line">        result.id = obj[&#x27;page_id&#x27;];</span><br><span class="line">        result.dataType = &#x27;channel&#x27;;</span><br><span class="line">    &#125;</span><br><span class="line">    else if((obj[&#x27;book_id&#x27;] &amp;&amp; obj[&#x27;link_type&#x27;] == &#x27;0&#x27;) || !obj[&#x27;link_type&#x27;])&#123;</span><br><span class="line">        result.id = obj[&#x27;book_id&#x27;];</span><br><span class="line">        result.dataType = &#x27;detail&#x27;;</span><br><span class="line">    &#125;</span><br><span class="line">    else if(obj[&#x27;link_type&#x27;] == &#x27;2&#x27;)&#123;</span><br><span class="line">        result.url = obj[&#x27;url&#x27;];</span><br><span class="line">        result.dataType = &#x27;outerLink&#x27;;	</span><br><span class="line">    &#125;</span><br><span class="line">    result.title = obj[&#x27;record_title&#x27;];</span><br><span class="line">    result.pic = obj[&#x27;pic&#x27;];</span><br><span class="line">    result.cover = obj[&#x27;pic&#x27;];</span><br><span class="line">    result.dataFrom = fromSelf;</span><br><span class="line">    result.moduleTitle = moduleTitle;    </span><br><span class="line">    // todo server端的频道等其他参数。</span><br><span class="line">    return result;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 简单的优化（对于老代码的优化）</span><br><span class="line">const convertBanner = (obj, dataFrom, moduleTitle) =&gt; &#123;</span><br><span class="line"></span><br><span class="line">    // 相关数据的说明</span><br><span class="line">    let &#123;</span><br><span class="line">        url, link_type, pic, book_id</span><br><span class="line">        page_id: id,</span><br><span class="line">        record_title: title</span><br><span class="line">    &#125; = obj;</span><br><span class="line"></span><br><span class="line">    let result = &#123;</span><br><span class="line">        pic,</span><br><span class="line">        title,</span><br><span class="line">        cover: pic,</span><br><span class="line">        dataFrom,</span><br><span class="line">        moduleTitle,</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    // 相关逻辑的说明</span><br><span class="line">    if (link_type === &#x27;0&#x27; &amp;&amp; book_id || !link_type )&#123;</span><br><span class="line">        result.id = book_id;</span><br><span class="line">        result.dataType = &#x27;detail&#x27;;</span><br><span class="line">    &#125; else if (link_type === &#x27;1&#x27;) &#123;</span><br><span class="line">        result.id = page_id;</span><br><span class="line">        result.dataType = &#x27;channel&#x27;;</span><br><span class="line">    &#125; else if(link_type === &#x27;2&#x27;)&#123;</span><br><span class="line">        result.url = url;</span><br><span class="line">        result.dataType = &#x27;outerLink&#x27;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return result;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 如果是首次的编码</span><br><span class="line">const convertBanner = (obj, dataFrom, moduleTitle) =&gt; &#123;</span><br><span class="line"></span><br><span class="line">    // 相关数据的说明</span><br><span class="line">    let &#123;</span><br><span class="line">        url, link_type = &#x27;0&#x27;, pic, book_id</span><br><span class="line">        page_id: id,</span><br><span class="line">        record_title: title</span><br><span class="line">    &#125; = obj;</span><br><span class="line"></span><br><span class="line">    let result = &#123;</span><br><span class="line">        pic,</span><br><span class="line">        title,</span><br><span class="line">        cover: pic,</span><br><span class="line"></span><br><span class="line">        dataFrom,</span><br><span class="line">        moduleTitle,</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    // 相关逻辑的说明</span><br><span class="line">    switch (link_type)&#123;</span><br><span class="line">        case &#x27;0&#x27;:</span><br><span class="line">            result.id = book_id;</span><br><span class="line">            result.dataType = &#x27;detail&#x27;;</span><br><span class="line">            break;</span><br><span class="line"></span><br><span class="line">        case &#x27;1&#x27;:</span><br><span class="line">            result.id = page_id;</span><br><span class="line">            result.dataType = &#x27;channel&#x27;;</span><br><span class="line">            break;</span><br><span class="line"></span><br><span class="line">        case &#x27;2&#x27;:</span><br><span class="line">            result.url = url;</span><br><span class="line">            result.dataType = &#x27;outerLink&#x27;;</span><br><span class="line">            break;</span><br><span class="line"></span><br><span class="line">        default:</span><br><span class="line">            break;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return result;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2><h2 id="其他点"><a href="#其他点" class="headerlink" title="其他点"></a>其他点</h2><p>迭代器&amp;生成器</p>
+<p>Promise与异步编程</p>
+<p>对象，数组功能性的扩展</p>
+<p>模块封装</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7-%E9%AB%98%E8%B4%A8%E9%87%8F%E4%BB%A3%E7%A0%81/" rel="tag"># 可维护性,高质量代码</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/05/2017-summary/" rel="prev" title="2017年度总结">
+      <i class="fa fa-chevron-left"></i> 2017年度总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/14/communicate/" rel="next" title="《非暴力沟通》- 以同理心的姿态，和这个世界好好谈谈">
+      《非暴力沟通》- 以同理心的姿态，和这个世界好好谈谈 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E5%8F%AF%E7%BB%B4%E6%8A%A4%E7%9A%84-JavaScript-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">编写可维护的 JavaScript 读书笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8C%96"><span class="nav-number">1.1.</span> <span class="nav-text">基本的格式化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E9%87%8A"><span class="nav-number">1.2.</span> <span class="nav-text">注释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E5%8F%A5%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">1.3.</span> <span class="nav-text">语句和表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%EF%BC%8C%E5%87%BD%E6%95%B0%E5%92%8C%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="nav-number">1.4.</span> <span class="nav-text">变量，函数和运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5"><span class="nav-number">1.5.</span> <span class="nav-text">编程实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%BF%E5%85%8D%E4%BD%BF%E7%94%A8%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F"><span class="nav-number">1.6.</span> <span class="nav-text">避免使用全局变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86"><span class="nav-number">1.7.</span> <span class="nav-text">事件处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E8%BE%83"><span class="nav-number">1.8.</span> <span class="nav-text">比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E9%85%8D%E7%BD%AE%E6%95%B0%E6%8D%AE%E4%BB%8E%E4%BB%A3%E7%A0%81%E4%B8%AD%E5%88%86%E7%A6%BB"><span class="nav-number">1.9.</span> <span class="nav-text">将配置数据从代码中分离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%9B%E5%87%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E9%94%99%E8%AF%AF"><span class="nav-number">1.10.</span> <span class="nav-text">抛出自定义错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E6%98%AF%E4%BD%A0%E7%9A%84%E5%AF%B9%E8%B1%A1%E4%B8%8D%E8%A6%81%E5%8A%A8"><span class="nav-number">1.11.</span> <span class="nav-text">不是你的对象不要动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E5%97%85%E6%8E%A2"><span class="nav-number">1.12.</span> <span class="nav-text">浏览器嗅探</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#React%E7%9A%84%E4%B8%80%E7%82%B9%E5%AD%A6%E4%B9%A0"><span class="nav-number">2.</span> <span class="nav-text">React的一点学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E5%9E%8B%E7%BB%84%E4%BB%B6-amp-%E5%B1%95%E7%A4%BA%E5%9E%8B%E7%BB%84%E4%BB%B6"><span class="nav-number">2.1.</span> <span class="nav-text">容器型组件&amp;展示型组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E9%97%B4%E6%8A%BD%E8%B1%A1"><span class="nav-number">2.2.</span> <span class="nav-text">组件间抽象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="nav-number">2.3.</span> <span class="nav-text">组件性能优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E7%8A%B6%E6%80%81%E7%BB%84%E4%BB%B6"><span class="nav-number">2.4.</span> <span class="nav-text">无状态组件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ES6%E8%AF%AD%E6%B3%95%E7%9A%84%E4%BC%98%E9%9B%85%E5%86%99%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">ES6语法的优雅写法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9D%97%E7%BA%A7%E4%BD%9C%E7%94%A8%E5%9F%9F"><span class="nav-number">3.1.</span> <span class="nav-text">块级作用域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E5%AD%97%E9%9D%A2%E9%87%8F"><span class="nav-number">3.2.</span> <span class="nav-text">模板字面量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0-amp-%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0"><span class="nav-number">3.3.</span> <span class="nav-text">函数&amp;箭头函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%9E%84"><span class="nav-number">3.4.</span> <span class="nav-text">解构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB"><span class="nav-number">3.5.</span> <span class="nav-text">类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%82%B9"><span class="nav-number">3.6.</span> <span class="nav-text">其他点</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

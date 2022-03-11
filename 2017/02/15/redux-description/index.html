@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="最初知晓Redux这个概念就是在学习React的时候，简单的来说就是合理的来管理你react项目中的state变化操作。不过在开始时，一看其Action、Reducer、Store以及使用示例，表示真的会一脸懵逼。于是最近再比较详细的学习下Redux。 Redux 简介这里为最详细的官方文档 - Redux官方文档，这个文档介绍的非常非常详细，建议花大半天的时间与示例代码一起学习，基本就能完全理解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redux简单介绍">
+<meta property="og:url" content="http://freefe.cc/2017/02/15/redux-description/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="最初知晓Redux这个概念就是在学习React的时候，简单的来说就是合理的来管理你react项目中的state变化操作。不过在开始时，一看其Action、Reducer、Store以及使用示例，表示真的会一脸懵逼。于是最近再比较详细的学习下Redux。 Redux 简介这里为最详细的官方文档 - Redux官方文档，这个文档介绍的非常非常详细，建议花大半天的时间与示例代码一起学习，基本就能完全理解">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-02-15T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-11T14:46:23.624Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="React,Redux">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://freefe.cc/2017/02/15/redux-description/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Redux简单介绍 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2017/02/15/redux-description/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redux简单介绍
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-02-16 00:00:00" itemprop="dateCreated datePublished" datetime="2017-02-16T00:00:00+08:00">2017-02-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-11 22:46:23" itemprop="dateModified" datetime="2022-03-11T22:46:23+08:00">2022-03-11</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>最初知晓Redux这个概念就是在学习React的时候，简单的来说就是合理的来管理你react项目中的state变化操作。不过在开始时，一看其Action、Reducer、Store以及使用示例，表示真的会一脸懵逼。于是最近再比较详细的学习下Redux。</p>
+<h2 id="Redux-简介"><a href="#Redux-简介" class="headerlink" title="Redux 简介"></a>Redux 简介</h2><p>这里为最详细的官方文档 - <a target="_blank" rel="noopener" href="http://cn.redux.js.org//index.html">Redux官方文档</a>，这个文档介绍的非常非常详细，建议花大半天的时间与示例代码一起学习，基本就能完全理解Redux。</p>
+<p>首先要说的是虽然很多人知晓Redux是在React的相关内容中，不过需要清楚，Redux与React确实是没有半毛钱关系，完全无依赖，均是独立的类库而已。就像你隔壁家的大婶的侄女和你大伯邻居家的儿子的关系一样，然而人家可以一见钟情那就是另外一回事了。</p>
+<p>再说对于React来说其最大的优势就是严格控制了开发者对与DOM的直接操作，一直以来前端性能上很大的一个弊端就是开发者不合理以及频繁的去操作DOM，React以其高效的虚拟DOM对象、diff算法等，使得其以最优的方案来控制解决DOM的操作。</p>
+<p>另外一个层面就是React将整个框架以及内部的组件视为一个个状态机，通过state来进行对虚拟DOM的控制以至来触发真正的DOM操作，不过这就会使得在一些复杂应用中带来另外一些问题，对于state的控制方面，越来越多的state，将在项目开发、版本迭代变中产生强相关和越来越不可控。这就意味着人为的去操作一个个state，渐渐开始变得像先前开发人员独自操作DOM一样让人难以忍受，就好像React变成了曾经它最痛恨的那种形式。杂乱的state操作最后就导致具体某一个state在某个时刻或者某个地方别改变，变得非常难以去查询。</p>
+<p>相对于此问题的解决方案慢慢应运而生，Redux便是一种解决方案（但是相对来说Redux与React是没有关系的）。Redux强制在每一个应用中仅能使用整体单一的一个reducer生成唯一的一个store，来对state进行存储与操作，并且需要开发者独立定义各类形式的action，在触发某一action后通过所注册的reducer才能对某一状态进行操作。</p>
+<p>简单的说就是将state的操作进行封装，禁止开发者随意使用，必须通过触发某一action操作，来触发相对应注册的reducer来对store内部相应的state进行操作。项目初期它不能提高我们对于项目的开发效率，不过后期以及项目维护阶段，它能使我们的项目大大增强了可维护性和可扩展性，使其变成一个真正健硕的项目工程。</p>
+<h2 id="Redux-基础"><a href="#Redux-基础" class="headerlink" title="Redux 基础"></a>Redux 基础</h2><h3 id="Action"><a href="#Action" class="headerlink" title="Action"></a>Action</h3><p>action 意味着一个将数据中应用传递到store的操作定义，为一种对已发生事件的表达。纯粹的action仅仅只是一种定义，一般需要通过store.dispatch()实际出发才会生效。</p>
+<p>内部的<code>type</code>字段为默认的定义Action类型的字段</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  type: &#x27;ADD_ITEM&#x27;,</span><br><span class="line">  text: &#x27;add an item&#x27;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>亦或创建Action函数,以便于更好的移植和复用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function addItem(text)&#123;</span><br><span class="line">    return &#123;</span><br><span class="line">        type: &#x27;ADD_ITEM&#x27;,</span><br><span class="line">        text</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这便可以称为一个Action，当然任意Action，需要被dispatch之后才会生效。</p>
+<h3 id="Reducer"><a href="#Reducer" class="headerlink" title="Reducer"></a>Reducer</h3><p>Action 只是对一个已发生行为进行描述，而Reducer则是处理触发了某一个实例Action进行更新state的一个过程的定义。简单的说就是某一个Action被触发之后，Action内部的数据会被带入到注册的Reducer内执行，根据Action的type类型进行对应的store变更操作。</p>
+<p>首先，我们需要定义一个整体的state结构，这块内容需要在开发前进行思考组织。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  todos: [</span><br><span class="line">    &#123;</span><br><span class="line">      text: &#x27;item 1&#x27;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      text: &#x27;item 2&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>随即，编写纯函数Reducer，来接受旧state，action，返回新的state。</p>
+<p>纯函数意味着禁止在Reducer中做：</p>
+<ul>
+<li>修改传入的参数</li>
+<li>执行具有副作用的操作，如跳转，各类其他操作</li>
+<li>调用非纯函数，如事件函数，随即函数等</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">const initialState = &#123;</span><br><span class="line">    todos: []</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function todoAPP(state = initialState, action)&#123;</span><br><span class="line">    switch(action.type)&#123;</span><br><span class="line">        case &#x27;ADD_ITEM&#x27;:</span><br><span class="line">            return &#123;</span><br><span class="line">                todos:[</span><br><span class="line">                    ...state.todos,</span><br><span class="line">                    &#123;</span><br><span class="line">                        text: action.text</span><br><span class="line">                    &#125;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于实际应用中，对应的action数量会很多，在一个reducer中会使得switch结构维护性过差，所以都会使用到拆分reducer，最后使用combineReducers进行合并生成最终的reducer。</p>
+<h3 id="Store"><a href="#Store" class="headerlink" title="Store"></a>Store</h3><p>Redux应用只有唯一的store，通过应用唯一的最终Reducer生成而来。store是对state进行管理的中间件，当某一action被触发传入store的dispatch，触发注册的Reducer来改变store中对应的state。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">const store = createStore(todoAPP)</span><br></pre></td></tr></table></figure>
+
+<p>store职责为：</p>
+<ul>
+<li>维持应用的state</li>
+<li>提供getState方法来获取state</li>
+<li>提供dispatch方法来</li>
+<li>提供subscribe进行注册事件</li>
+<li>使用注册事件的返回值来注销事件</li>
+</ul>
+<p>发起action，触发改变state</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">store.dispatch(addItem(&#x27;item 3&#x27;))</span><br></pre></td></tr></table></figure>
+
+<p>整体来说，Redux的核心便是，控制开发者随意变更state，使用action来抽象具体的操作行为，由reducer生成的store进行对整体的state进行控制，在dispatch接受具体的action数据后来管理对于state的变更。</p>
+<h2 id="Redux-思想"><a href="#Redux-思想" class="headerlink" title="Redux 思想"></a>Redux 思想</h2><ul>
+<li>单一数据源，应用整体归结到一个state，存储应用在唯一的store中。state设计的扁平化，抽象化是确保其高效与可维护的的重要因素</li>
+<li>state为只读，触发action是唯一改变state的方式</li>
+<li>纯函数来编写reducers，改变state</li>
+</ul>
+<p>当然，还要包括异步的Action实现，Reducer的复用与性能，combineReducers高级用法等均可以在<a target="_blank" rel="noopener" href="http://cn.redux.js.org/index.html">中文文档</a>中获得答案，以及<a target="_blank" rel="noopener" href="https://github.com/reactjs/redux">GitHub</a>上有非常丰富的示例。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/React-Redux/" rel="tag"># React,Redux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/02/06/justify-align-height/" rel="prev" title="居中等高方案集锦">
+      <i class="fa fa-chevron-left"></i> 居中等高方案集锦
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/02/26/generator-function-yield/" rel="next" title="关于 Generator Function 简单介绍">
+      关于 Generator Function 简单介绍 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redux-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">Redux 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redux-%E5%9F%BA%E7%A1%80"><span class="nav-number">2.</span> <span class="nav-text">Redux 基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Action"><span class="nav-number">2.1.</span> <span class="nav-text">Action</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Reducer"><span class="nav-number">2.2.</span> <span class="nav-text">Reducer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Store"><span class="nav-number">2.3.</span> <span class="nav-text">Store</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redux-%E6%80%9D%E6%83%B3"><span class="nav-number">3.</span> <span class="nav-text">Redux 思想</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

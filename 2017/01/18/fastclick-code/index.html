@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="问题1: 大部分iOS浏览器中 click 时间有延迟感，没有及时触发绑定事件。 问题2：使用touchend，或者zepto的tap事件，出现一些奇观的穿透点击触发事件 主要原因：iOS历史上一直存在页面的默认事件-双击放大，导致对于浏览器判断此次是否为双击时间需要设置一定的等待时间，故而click点击事件相对于touchend时间会延迟300ms左右，以保证此次确定为单次的点击事件。 Fast">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FastClick源码分析">
+<meta property="og:url" content="http://freefe.cc/2017/01/18/fastclick-code/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="问题1: 大部分iOS浏览器中 click 时间有延迟感，没有及时触发绑定事件。 问题2：使用touchend，或者zepto的tap事件，出现一些奇观的穿透点击触发事件 主要原因：iOS历史上一直存在页面的默认事件-双击放大，导致对于浏览器判断此次是否为双击时间需要设置一定的等待时间，故而click点击事件相对于touchend时间会延迟300ms左右，以保证此次确定为单次的点击事件。 Fast">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-01-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-11T14:46:23.624Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="FastClick源码,FastClick">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://freefe.cc/2017/01/18/fastclick-code/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>FastClick源码分析 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2017/01/18/fastclick-code/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          FastClick源码分析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-01-19 00:00:00" itemprop="dateCreated datePublished" datetime="2017-01-19T00:00:00+08:00">2017-01-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-11 22:46:23" itemprop="dateModified" datetime="2022-03-11T22:46:23+08:00">2022-03-11</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>问题1:</strong> 大部分iOS浏览器中 click 时间有延迟感，没有及时触发绑定事件。</p>
+<p><strong>问题2：</strong>使用touchend，或者zepto的tap事件，出现一些奇观的穿透点击触发事件</p>
+<p><strong>主要原因：</strong>iOS历史上一直存在页面的默认事件-双击放大，导致对于浏览器判断此次是否为双击时间需要设置一定的等待时间，故而click点击事件相对于touchend时间会延迟300ms左右，以保证此次确定为单次的点击事件。</p>
+<p><strong>FastClick为用来解决消除移动浏览器上的点击事件与触摸事件之间的300ms。以下为其简单的代码逻辑。</strong></p>
+<p>1.首先，在初始化时 对touch click各类事件各绑定一个监听函数 保证触发时在同个事件中为最早触发的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line">function FastClick(layer, options) &#123;</span><br><span class="line">    var oldOnClick;</span><br><span class="line">    options = options || &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    this.trackingClick = false; // 当前的点击是否是被标记的</span><br><span class="line">    this.trackingClickStart = 0; // 点击被标记时的时间戳</span><br><span class="line">    this.targetElement = null; // 被标记点击的元素</span><br><span class="line">    </span><br><span class="line">    this.touchStartX = 0; // touch开始时的横坐标值</span><br><span class="line">    this.touchStartY = 0; //  touch开始时的纵坐标值</span><br><span class="line">    this.lastTouchIdentifier = 0; // 最后一次touch的id, 为Touch.identifier.</span><br><span class="line">    this.touchBoundary = options.touchBoundary || 10; // 标识 Touchmove 的分界线, 如超过后则取消触发点击.</span><br><span class="line"></span><br><span class="line">    this.layer = layer; // 绑定FastClick的layer.</span><br><span class="line">    this.tapDelay = options.tapDelay || 200; // 判断为 tap(touchstart 和 touchend) 事件之间最小时间间隔</span><br><span class="line">    this.tapTimeout = options.tapTimeout || 700; // 判断为 tap 的最大时间间隔</span><br><span class="line"></span><br><span class="line">    if (FastClick.notNeeded(layer)) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 部分老版本安卓没有 Function.prototype.bind</span><br><span class="line">    function bind(method, context) &#123;</span><br><span class="line">        return function() &#123; return method.apply(context, arguments); &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 添加实例的几个事件方法</span><br><span class="line">    var methods = [&#x27;onMouse&#x27;, &#x27;onClick&#x27;, &#x27;onTouchStart&#x27;, &#x27;onTouchMove&#x27;, &#x27;onTouchEnd&#x27;, &#x27;onTouchCancel&#x27;];</span><br><span class="line">    var context = this;</span><br><span class="line">    for (var i = 0, l = methods.length; i &lt; l; i++) &#123;</span><br><span class="line">        context[methods[i]] = bind(context[methods[i]], context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 更具需要来设置事件</span><br><span class="line">    if (deviceIsAndroid) &#123;</span><br><span class="line">        layer.addEventListener(&#x27;mouseover&#x27;, this.onMouse, true);</span><br><span class="line">        layer.addEventListener(&#x27;mousedown&#x27;, this.onMouse, true);</span><br><span class="line">        layer.addEventListener(&#x27;mouseup&#x27;, this.onMouse, true);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    layer.addEventListener(&#x27;click&#x27;, this.onClick, true);</span><br><span class="line">    layer.addEventListener(&#x27;touchstart&#x27;, this.onTouchStart, false);</span><br><span class="line">    layer.addEventListener(&#x27;touchmove&#x27;, this.onTouchMove, false);</span><br><span class="line">    layer.addEventListener(&#x27;touchend&#x27;, this.onTouchEnd, false);</span><br><span class="line">    layer.addEventListener(&#x27;touchcancel&#x27;, this.onTouchCancel, false);</span><br><span class="line"></span><br><span class="line">    // 对于浏览器不支持事件 stopImmediatePropagation的hack一下 (e.g. Android 2)</span><br><span class="line">    // 这是 FastClick 通常如何阻止的形式 点击事件在冒泡到 FastClick layer 注册的回调方法之前就被取消。</span><br><span class="line"></span><br><span class="line">    if (!Event.prototype.stopImmediatePropagation) &#123;</span><br><span class="line">        layer.removeEventListener = function(type, callback, capture) &#123;</span><br><span class="line">            var rmv = Node.prototype.removeEventListener;</span><br><span class="line">            if (type === &#x27;click&#x27;) &#123;</span><br><span class="line">                rmv.call(layer, type, callback.hijacked || callback, capture);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                rmv.call(layer, type, callback, capture);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        // 重写layer的绑定事件方法 单独处理click</span><br><span class="line">        layer.addEventListener = function(type, callback, capture) &#123;</span><br><span class="line">            var adv = Node.prototype.addEventListener;</span><br><span class="line">            if (type === &#x27;click&#x27;) &#123;</span><br><span class="line">                adv.call(layer, type, callback.hijacked || (callback.hijacked = function(event) &#123;</span><br><span class="line">                    if (!event.propagationStopped) &#123;</span><br><span class="line">                        callback(event);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;), capture);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                adv.call(layer, type, callback, capture);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 如果事件句柄已经被绑定在元素的 onclick 属性上, 会在 FastClick的onClick事件之前触发</span><br><span class="line">    // 通过创建用户定义事件句柄函数，将其添加到监听中来解决</span><br><span class="line">    if (typeof layer.onclick === &#x27;function&#x27;) &#123;</span><br><span class="line"></span><br><span class="line">        // 低于3.2的Android浏览器需要将 layer.onclick 指向新的引用</span><br><span class="line">        // 如果直接传递，会有有一定问题</span><br><span class="line">        oldOnClick = layer.onclick;</span><br><span class="line">        layer.addEventListener(&#x27;click&#x27;, function(event) &#123;</span><br><span class="line">            oldOnClick(event);</span><br><span class="line">        &#125;, false);</span><br><span class="line">        layer.onclick = null;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>2.在点击过程中，会在 touchstart 初始化记录一些数据，用于之后的逻辑判断处理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">FastClick.prototype.onTouchStart = function(event) &#123;</span><br><span class="line">    var targetElement, touch, selection;</span><br><span class="line"></span><br><span class="line">    // 忽略多点 touch, 否则 在FastClick元素上的双指触摸放大缩小会被阻止 (issue #111).</span><br><span class="line">    if (event.targetTouches.length &gt; 1) &#123;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    targetElement = this.getTargetElementFromEventTarget(event.target);</span><br><span class="line">    touch = event.targetTouches[0];</span><br><span class="line"></span><br><span class="line">    if (deviceIsIOS) &#123;</span><br><span class="line"></span><br><span class="line">        // 在iOS中 只有通过的事件才会触发文案的选择取消 (issue #49)</span><br><span class="line">        selection = window.getSelection();</span><br><span class="line">        if (selection.rangeCount &amp;&amp; !selection.isCollapsed) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (!deviceIsIOS4) &#123;</span><br><span class="line"></span><br><span class="line">            // iOS下奇怪的事件是当 alert 或者 confirm 对话框是被点击事件的回调方法打开的(issue #23):</span><br><span class="line">            if (touch.identifier &amp;&amp; touch.identifier === this.lastTouchIdentifier) &#123;</span><br><span class="line">                event.preventDefault();</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            this.lastTouchIdentifier = touch.identifier;</span><br><span class="line"></span><br><span class="line">            // 如果目标元素是一个滚动元素的子元素时 (使用了 -webkit-overflow-scrolling: touch) 并且:</span><br><span class="line">            // 1) 用户在滚动的layer上滚动</span><br><span class="line">            // 2) 用户使用tap来停止滚动</span><br><span class="line">            // 那么 event.target 的最后的 touchend 事件将是用户最后手指下面的元素的事件</span><br><span class="line">            // 当滚动开始时, 会触发 FastClick 将点击事件传递到那个layer - unless a check</span><br><span class="line">            // 除非在发送合成点击事件前检测其父级layer并非是滚动的 (issue #42).</span><br><span class="line">            this.updateScrollParent(targetElement);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 为重要标识 标识此次的触发行为为指定的fastclick</span><br><span class="line">    this.trackingClick = true;</span><br><span class="line">    this.trackingClickStart = event.timeStamp;</span><br><span class="line">    this.targetElement = targetElement;</span><br><span class="line"></span><br><span class="line">    this.touchStartX = touch.pageX;</span><br><span class="line">    this.touchStartY = touch.pageY;</span><br><span class="line"></span><br><span class="line">    // 防止双击触发fast click (issue #36)</span><br><span class="line">    if ((event.timeStamp - this.lastClickTime) &lt; this.tapDelay) &#123;</span><br><span class="line">        event.preventDefault();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return true;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>3.若有触发 touchmove 则使用自定义的函数进行判断，并且确认是否此次touch 不作为click 处理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">FastClick.prototype.onTouchMove = function(event) &#123;</span><br><span class="line">    if (!this.trackingClick) &#123;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 如果此次 touch 算作移动 , 取消该点击的跟踪</span><br><span class="line">    if (this.targetElement !== this.getTargetElementFromEventTarget(event.target) || this.touchHasMoved(event)) &#123;</span><br><span class="line">        this.trackingClick = false;</span><br><span class="line">        this.targetElement = null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return true;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>4.touchend 时，判断此次时间是否符合click条件 合成click事件来进行模拟触发保证绑定在该元素上的点击事件能在touchend时刻立即触发， 阻止事件冒泡以及去掉默认事件使得浏览器自身的延迟的点击事件不在触发。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line">FastClick.prototype.onTouchEnd = function(event) &#123;</span><br><span class="line">    var forElement, trackingClickStart, targetTagName, scrollParent, touch, targetElement = this.targetElement;</span><br><span class="line"></span><br><span class="line">    if (!this.trackingClick) &#123;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 阻止构造的快速双击 (issue #36)</span><br><span class="line">    if ((event.timeStamp - this.lastClickTime) &lt; this.tapDelay) &#123;</span><br><span class="line">        this.cancelNextClick = true;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if ((event.timeStamp - this.trackingClickStart) &gt; this.tapTimeout) &#123;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 重置错误的input上的点击取消 (issue #156).</span><br><span class="line">    this.cancelNextClick = false;</span><br><span class="line"></span><br><span class="line">    this.lastClickTime = event.timeStamp;</span><br><span class="line"></span><br><span class="line">    trackingClickStart = this.trackingClickStart;</span><br><span class="line">    this.trackingClick = false;</span><br><span class="line">    this.trackingClickStart = 0;</span><br><span class="line"></span><br><span class="line">    // 在一些iOS设备中, 如果目标元素的层正处于过渡变换或者滚动的时候，</span><br><span class="line">    // 其对于事件的支持是无效的除非再次手动检测. </span><br><span class="line">    // See issue #57; also filed as rdar://13048589 .</span><br><span class="line">    if (deviceIsIOSWithBadTarget) &#123;</span><br><span class="line">        touch = event.changedTouches[0];</span><br><span class="line"></span><br><span class="line">        // 在某些情况下 elementFromPoint 未负数, 所以阻止将目标元素设置为null</span><br><span class="line">        targetElement = document.elementFromPoint(touch.pageX - window.pageXOffset, touch.pageY - window.pageYOffset) || targetElement;</span><br><span class="line">        targetElement.fastClickScrollParent = this.targetElement.fastClickScrollParent;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 为label标签的时候 findControl 就近查找元素</span><br><span class="line">    targetTagName = targetElement.tagName.toLowerCase();</span><br><span class="line">    if (targetTagName === &#x27;label&#x27;) &#123;</span><br><span class="line">        forElement = this.findControl(targetElement);</span><br><span class="line">        if (forElement) &#123;</span><br><span class="line">            this.focus(targetElement);</span><br><span class="line">            if (deviceIsAndroid) &#123;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            targetElement = forElement;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; else if (this.needsFocus(targetElement)) &#123;</span><br><span class="line">        // 需要聚焦后模拟点击的</span><br><span class="line">        </span><br><span class="line">        // Case 1 快速双击情况: touch触发在一会会之前 (基于测试 100ms 左右 for issue #36) 出发聚焦.</span><br><span class="line">        // 尽早返回并且不设置target element的引用 以便后续的点击可被通过.</span><br><span class="line">        // Case 2: 当document处于一个iframe内部时，所有的输入元素都如此 (issue #37).</span><br><span class="line">        if ((event.timeStamp - trackingClickStart) &gt; 100 || (deviceIsIOS &amp;&amp; window.top !== window &amp;&amp; targetTagName === &#x27;input&#x27;)) &#123;</span><br><span class="line">            this.targetElement = null;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        this.focus(targetElement);</span><br><span class="line">        this.sendClick(targetElement, event);</span><br><span class="line"></span><br><span class="line">        // iOS 4 选择元素直接pass</span><br><span class="line">        if (!deviceIsIOS || targetTagName !== &#x27;select&#x27;) &#123;</span><br><span class="line">            this.targetElement = null;</span><br><span class="line">            event.preventDefault();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (deviceIsIOS &amp;&amp; !deviceIsIOS4) &#123;</span><br><span class="line"></span><br><span class="line">        // 父级为滚动layer的情况(usually initiated by a fling - issue #42).</span><br><span class="line">        scrollParent = targetElement.fastClickScrollParent;</span><br><span class="line">        if (scrollParent &amp;&amp; scrollParent.fastClickLastScrollTop !== scrollParent.scrollTop) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 阻止真实点击通过 - 除非是标记的元素</span><br><span class="line">    // real clicks or if it is in the whitelist in which case only non-programmatic clicks are permitted.</span><br><span class="line">    if (!this.needsClick(targetElement)) &#123;</span><br><span class="line">        event.preventDefault();</span><br><span class="line">        this.sendClick(targetElement, event);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return false;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">FastClick.prototype.sendClick = function(targetElement, event) &#123;</span><br><span class="line">    var clickEvent, touch;</span><br><span class="line"></span><br><span class="line">    // 在一些安卓设备下，需要先进行聚焦，否则无法调用合成的click事件 (#24)</span><br><span class="line">    if (document.activeElement &amp;&amp; document.activeElement !== targetElement) &#123;</span><br><span class="line">        document.activeElement.blur();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    touch = event.changedTouches[0];</span><br><span class="line"></span><br><span class="line">    // 合成一个点击事件, 添加一个额外属性以便于跟踪</span><br><span class="line">    // 合成事件 还真没见过</span><br><span class="line">    clickEvent = document.createEvent(&#x27;MouseEvents&#x27;);</span><br><span class="line">    clickEvent.initMouseEvent(this.determineEventType(targetElement), true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);</span><br><span class="line">    clickEvent.forwardedTouchEvent = true;</span><br><span class="line">    targetElement.dispatchEvent(clickEvent);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>总结：FastClick 经典之处在于，初始化时绑定第一时间触发的touch事件，在touchend时便判断此次行为是否可作为click，如果此次touch满足click事件，则在touchend事件中直接合成click并且进行触发，然后再touchend中阻止事件冒泡和默认事件等，来防止默认延迟的click事件延迟后又被触发。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/FastClick%E6%BA%90%E7%A0%81-FastClick/" rel="tag"># FastClick源码,FastClick</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/01/09/web-performce/" rel="prev" title="移动端通用性能点">
+      <i class="fa fa-chevron-left"></i> 移动端通用性能点
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/02/06/justify-align-height/" rel="next" title="居中等高方案集锦">
+      居中等高方案集锦 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

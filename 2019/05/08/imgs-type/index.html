@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="图片按照生成类型可分为点阵图与矢量图两种大体的模式，压缩方式按照质量损耗分有损与无损压缩。  WebP格式WebP是Google推出的相对较新的图片压缩技术，旨在加速网络传输图片的加载速度。支持无损和有损的压缩模式、Alpha透明以及动画等特性。该格式主要基于VP8的图片压缩技术，并且利用预测编码和轻量级的容器模式-仅需给图片增加20字节即可，压缩后大概仅有jpeg的三分之二，不过缺点为其编码占">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图片类型汇总介绍">
+<meta property="og:url" content="http://freefe.cc/2019/05/08/imgs-type/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="图片按照生成类型可分为点阵图与矢量图两种大体的模式，压缩方式按照质量损耗分有损与无损压缩。  WebP格式WebP是Google推出的相对较新的图片压缩技术，旨在加速网络传输图片的加载速度。支持无损和有损的压缩模式、Alpha透明以及动画等特性。该格式主要基于VP8的图片压缩技术，并且利用预测编码和轻量级的容器模式-仅需给图片增加20字节即可，压缩后大概仅有jpeg的三分之二，不过缺点为其编码占">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-05-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-11T14:46:23.624Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="gif,lottie,svg,webp,图片格式,渐进式jpeg">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://freefe.cc/2019/05/08/imgs-type/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>图片类型汇总介绍 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2019/05/08/imgs-type/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图片类型汇总介绍
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-09 00:00:00" itemprop="dateCreated datePublished" datetime="2019-05-09T00:00:00+08:00">2019-05-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-11 22:46:23" itemprop="dateModified" datetime="2022-03-11T22:46:23+08:00">2022-03-11</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>图片按照生成类型可分为点阵图与矢量图两种大体的模式，压缩方式按照质量损耗分有损与无损压缩。</p>
+</blockquote>
+<h2 id="WebP格式"><a href="#WebP格式" class="headerlink" title="WebP格式"></a>WebP格式</h2><p>WebP是Google推出的相对较新的图片压缩技术，旨在加速网络传输图片的加载速度。支持无损和有损的压缩模式、Alpha透明以及动画等特性。该格式主要基于VP8的图片压缩技术，并且利用预测编码和轻量级的容器模式-仅需给图片增加20字节即可，压缩后大概仅有jpeg的三分之二，不过缺点为其编码占用更多的计算资源，即存在编码时间较长问题。</p>
+<h2 id="BMP格式"><a href="#BMP格式" class="headerlink" title="BMP格式"></a>BMP格式</h2><p>即所说的位图，为一种与设备无关的图像格式，为windows操作系统中的标准图像文件格式。图像文件主要由三部分组成：位图头数据结构，包含类型、显示内容等各类信息信息；位图信息数据结构，包含图像的宽、高、压缩方法，以及位图的具体数据以及可选的调色板。由于为无损的数据格式，所以大小相对较大，不支持Alpha透明，网络中使用相对较少。</p>
+<h2 id="GIF格式"><a href="#GIF格式" class="headerlink" title="GIF格式"></a>GIF格式</h2><p>图形交换格式，为CompuServe公司在87年开发的图像文件格式。是一种基于LZW算法的连续色调的无损压缩格式。压缩率一般在50%左右，它不属于任何应用程序。LZW算法基本原理：提取原始文本文件数据中的不同字符，基于此创建编译表，然后使用编译表对应的索引来替换相对应对字符从而减少图片数据存储大小。</p>
+<p>其主要为无损压缩，并且支持透明度以及动画等优点。不过只支持8bit的索引色，就只支持256个色值。不过其相对解码较快，大致流程为：以隔行存储的方式分成四遍扫描。第一遍扫描显示图像的八分之一，第二遍的扫描后显示1&#x2F;4，基本显示出大致轮廓。为隔行存放的优点，但是GIF不支持Alpha透明通道。</p>
+<h2 id="JPEG格式"><a href="#JPEG格式" class="headerlink" title="JPEG格式"></a>JPEG格式</h2><p>JPEG也是最常用的图像文件格式之一，其压缩算法将图像中重复或不重要信息舍弃，为有损压缩。不过压缩技术十分先进，去除冗余的图像数据，在获得极高的压缩率的同时能展现十分丰富生动的图像，换句话说，就是可以用最少的磁盘空间得到较好的图像品质。其后缀名为 jpeg 或者 jpg。</p>
+<h3 id="渐进式jpeg"><a href="#渐进式jpeg" class="headerlink" title="渐进式jpeg"></a>渐进式jpeg</h3><p>标准模式的jpeg，图片数据从上到下逐行显示。而渐进式jpeg则优化了显示模式，打开文件过程中会从整体模糊轮廓开始到具体呈现细节。具体可见 <a target="_blank" rel="noopener" href="https://www.jianshu.com/p/e1b9d9aa9fc0">渐进式jpeg（Progressive JPEGs )解析</a>。</p>
+<h2 id="SVG格式"><a href="#SVG格式" class="headerlink" title="SVG格式"></a>SVG格式</h2><p>可缩放矢量图形（Scalable Vector Graphics）。它是基于XML（标准通用标记语言的子集），由万维网联盟进行开发的，当下极为火爆的图片格式。一种开放标准的矢量图形语言，可任意放大图形显示，边缘异常清晰，文字在SVG图像中保留可编辑和可搜寻的状态，没有字体的限制，生成的文件很小，下载很快，十分适合用于设计高分辨率的Web图形页面。其优点在于：</p>
+<ul>
+<li>可被各类的工具读取和修改</li>
+<li>相对 jpeg、png来说尺寸更小，可压缩性更强。</li>
+<li>是可伸缩的、任何尺寸下都能高质量呈现</li>
+<li>图像中的文本是可选的、可搜索的</li>
+<li>可与 JS 一起运行</li>
+<li>是开放的标准、文件是纯粹的 XML</li>
+</ul>
+<h2 id="PNG格式"><a href="#PNG格式" class="headerlink" title="PNG格式"></a>PNG格式</h2><p>便携式网络图形（外语简称PNG、外语全称：Portable Network Graphics），为较新的无损压缩图像文件格式。能够提供比GIF更小的无损压缩图像。提供 24位和48位真彩色图像。由于PNG相对较新，所以存在小部分兼容支持问题。支持 alpha 通道透明度但是不支持动画。</p>
+<p>优点在于：更优化的网络传输、支持透明效果、并且无锯齿问题、渐进的显示与流式的读写等。</p>
+<h2 id="APNG格式"><a href="#APNG格式" class="headerlink" title="APNG格式"></a>APNG格式</h2><p>APNG 是一个基于 PNG 格式的位图动画格式图片，因为对于一直以来的特点就是以动态显示为主的 GIF，为了更好地在网络上传播，它需要牺牲质量来降低体积，图像信息比较多的情况下，颗粒感很明显。APNG 是普通png的升级版，它的后缀依然是.png，包含动态的情况下体积会比普通静态 png 打出数倍，可以做到无损的情况展示动态。其诞生的目的是为了替代老旧的 GIF 格式，但它目前并没有获得 PNG 组织官方的认可。</p>
+<p>具体可参见 <a target="_blank" rel="noopener" href="https://aotu.io/notes/2016/11/07/apng/index.html">APNG 那些事</a></p>
+<h2 id="ICO格式"><a href="#ICO格式" class="headerlink" title="ICO格式"></a>ICO格式</h2><p>图标文件格式。它是Windows的图标文件格式的一种，可以存储单个图案、多尺寸、多色板的图标文件。图标是具有明确指代含义的计算机图形。其中桌面图标是软件标识，界面中的图标是功能标识。</p>
+<h2 id="其他相关"><a href="#其他相关" class="headerlink" title="其他相关"></a>其他相关</h2><h3 id="Lottie动画"><a href="#Lottie动画" class="headerlink" title="Lottie动画"></a>Lottie动画</h3><p>一套跨平台的动画解决方案，将设计好的动画导出为JSON格式，支持在iOS、Android、Web等统一使用。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/post/5b62e2bae51d4534c34a65e3">Lottie - 轻松实现复杂的动画效果</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/55315505">如何看待 Airbnb 新发布的 Lottie？</a></li>
+</ul>
+<h3 id="压缩工具"><a href="#压缩工具" class="headerlink" title="压缩工具"></a>压缩工具</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://tinypng.com/">熊猫TinyPNG</a></li>
+<li><a target="_blank" rel="noopener" href="http://zhitu.isux.us/">PNG&#x2F;JPEG 转 wepb</a></li>
+</ul>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%9B%BE%E5%BD%A2%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E6%AF%94%E8%BE%83">图形文件格式比较 - 维基百科</a></li>
+<li><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%9B%BE%E7%89%87%E6%A0%BC%E5%BC%8F">图片格式_百度百科</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/gif-lottie-svg-webp-%E5%9B%BE%E7%89%87%E6%A0%BC%E5%BC%8F-%E6%B8%90%E8%BF%9B%E5%BC%8Fjpeg/" rel="tag"># gif,lottie,svg,webp,图片格式,渐进式jpeg</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/26/justice/" rel="prev" title="《公正，该如何做是好》- 我们如何公正的看这个世界">
+      <i class="fa fa-chevron-left"></i> 《公正，该如何做是好》- 我们如何公正的看这个世界
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/06/07/coding/" rel="next" title="如何优雅的编程 - 来自《代码大全》">
+      如何优雅的编程 - 来自《代码大全》 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#WebP%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">WebP格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BMP%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">BMP格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GIF%E6%A0%BC%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">GIF格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JPEG%E6%A0%BC%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">JPEG格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%90%E8%BF%9B%E5%BC%8Fjpeg"><span class="nav-number">4.1.</span> <span class="nav-text">渐进式jpeg</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SVG%E6%A0%BC%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">SVG格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PNG%E6%A0%BC%E5%BC%8F"><span class="nav-number">6.</span> <span class="nav-text">PNG格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#APNG%E6%A0%BC%E5%BC%8F"><span class="nav-number">7.</span> <span class="nav-text">APNG格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ICO%E6%A0%BC%E5%BC%8F"><span class="nav-number">8.</span> <span class="nav-text">ICO格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%9B%B8%E5%85%B3"><span class="nav-number">9.</span> <span class="nav-text">其他相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Lottie%E5%8A%A8%E7%94%BB"><span class="nav-number">9.1.</span> <span class="nav-text">Lottie动画</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7"><span class="nav-number">9.2.</span> <span class="nav-text">压缩工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">9.3.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
