@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="之前一直针对于PC端开发，自适应方面接触甚少，一般来说用些的 css 方法就直接解决一些设计问题，直到目前现状开始转变为纯移动端开发，于是乎开始慢慢接触移动端的新特性的实战，今天主要做一下 flexbox 的笔记。 Flexbox 布局模块提供了我们一个在未知或者动态容器中自适应出我们所希望的布局形式。垂直居中，重新排序，布局动态的伸展以及收缩等。目前在移动端大体来说兼容性还不错 can I us">
+<meta property="og:type" content="article">
+<meta property="og:title" content="box-flex 弹性可伸缩盒模型">
+<meta property="og:url" content="http://freefe.cc/2015/08/27/box-flex/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="之前一直针对于PC端开发，自适应方面接触甚少，一般来说用些的 css 方法就直接解决一些设计问题，直到目前现状开始转变为纯移动端开发，于是乎开始慢慢接触移动端的新特性的实战，今天主要做一下 flexbox 的笔记。 Flexbox 布局模块提供了我们一个在未知或者动态容器中自适应出我们所希望的布局形式。垂直居中，重新排序，布局动态的伸展以及收缩等。目前在移动端大体来说兼容性还不错 can I us">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.freefe.cc/20170120105016.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105036.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105052.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105104.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105115.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105131.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105143.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105155.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105211.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105222.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105235.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105244.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105254.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105305.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105315.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105329.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105338.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105352.png">
+<meta property="og:image" content="http://image.freefe.cc/20170120105402.png">
+<meta property="article:published_time" content="2015-08-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.508Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="flex,垂直对齐,居中对齐">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.freefe.cc/20170120105016.png">
+
+<link rel="canonical" href="http://freefe.cc/2015/08/27/box-flex/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>box-flex 弹性可伸缩盒模型 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2015/08/27/box-flex/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          box-flex 弹性可伸缩盒模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2015-08-28 00:00:00" itemprop="dateCreated datePublished" datetime="2015-08-28T00:00:00+08:00">2015-08-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>之前一直针对于PC端开发，自适应方面接触甚少，一般来说用些的 css 方法就直接解决一些设计问题，直到目前现状开始转变为纯移动端开发，于是乎开始慢慢接触移动端的新特性的实战，今天主要做一下 flexbox 的笔记。 Flexbox 布局模块提供了我们一个在未知或者动态容器中自适应出我们所希望的布局形式。垂直居中，重新排序，布局动态的伸展以及收缩等。目前在移动端大体来说兼容性还不错 can I use(Flex)。 Flexbox 实质来说并不能仅仅作为一种属性，而是作为一类模块，包括作为父元素的伸缩容器以及子元素的伸缩元素。伸缩元素会依据伸缩容器具体变化，类似于在一些情况下我们盒大小使用百分比情况类似，不过使用百分比总会有那么一些时候需要我们使用不太规范的方式来处理某些特定的情况情况。 前提是容器的宽高已定： <img src="http://image.freefe.cc/20170120105016.png"> 对于上面很常见的布局逻辑，一般来说会简单的使用下面形式的 html ```</p>
+<p>``` 配合以下的 css ``` .container{ width: 300px; height: 100px; margin: 50px; } .item{ float: left; width: 33.33%; height: 100%; } .item:nth-child(1){ background-color: #333; } .item:nth-child(2){ background-color: #666; } .item:nth-child(3){ background-color: #999; } ``` 但是 我们更多的是会遇到这种形式 <img src="http://image.freefe.cc/20170120105036.png"> 那么 好吧 借助于一些通用的 css3 的伪类选择器 还是可以写的稍微好看一点，不过 html 也需要稍微恶心的包上一层，当然也有好多简单的 hack写法 ```</p>
+<p>``` css 如下 ``` .container1{ width: 300px; height: 100px; margin: 50px; border: 1px solid #000; } .item1{ float: left; width: 33.33%; height: 100%; } .innerItem1{ height: 90px; margin: 5px 5px 5px 0; background-color: #CCC; } .item1:nth-child(1) .innerItem1{ margin-left: 5px; } ``` 好的，flexbox 闪亮登场 如何使用例1中的 html 结构 优美的写出例2的布局呢？ ```</p>
+<p>``` 首先，对于 flexbox 我们需要创建一个 flex 容器，设置其 display 属性 ``` .container{ width: 300px; height: 100px; margin: 50px; border: 1px solid #000; display:-webkit-flex; display:-ms-flexbox; display:flex; } ``` 在对其子元素设置 flex： ``` .item{ flex:1; background-color: #999; margin: 5px 5px 5px 0; } .item:nth-child(1){ margin-left: 5px; } ``` 使得我们既不需要多放置一层div，也无需来处理写死内部伸缩元素的高度，最主要的却是内部元素的宽高已经完全依赖自适应于容器元素。将容器元素宽高随意配置均可使其子元素得到自适应（之前多嵌套一层的 高度上依旧不是很好处理）。 然后，处理高度的来了，先来个垂直居中吧。 <img src="http://image.freefe.cc/20170120105052.png"> 好吧，一般形式的已经不想写了，直接看下 flexbox 的形式 ``` &#x2F;&#x2F;html</p>
+<p>&#x2F;&#x2F; css .container-h{ height: 300px; width: 100px; margin: 50px; border: 1px solid #000; display:-webkit-flex; display:-ms-flexbox; display:flex; &#x2F;<em>垂直居中</em>&#x2F; -webkit-align-items: center; align-items: center; } .item-h{ flex:1; height:100px; background-color: #999; margin: 5px; } ``` 终于写个垂直居中，我可以不用量 line-height，不用设置margin，也不用去攀比各种css的奇思妙想了。突然感觉世界的起跑线都一样了。 <strong>好了，先来熟悉下了解 felxbox 之前的一些简单概念：</strong> * 伸缩容器：一个设置了 display 为 flex 或者 inline-flex 的外层元素 * 伸缩元素：在伸缩容器中的子元素 * 主轴：延伸缩容器配置伸缩元素的方向 * 侧轴：主轴的垂直线 #### 伸缩容器属性简单介绍： &gt; flex-direction : row | row-reverse | column | column-reverse; &gt; 在伸缩容器上定义用来定义主轴方向。 <strong>row</strong>：为默认方向，排版方向 <img src="http://image.freefe.cc/20170120105104.png"> <strong>row-reverse</strong>：与 row 反方向 <img src="http://image.freefe.cc/20170120105115.png"> <strong>column</strong>：从上到下排版 <img src="http://image.freefe.cc/20170120105131.png"> <strong>column-reverse</strong>：与 column 排版方向相反 <img src="http://image.freefe.cc/20170120105143.png"> &gt; flex-wrap : nowrap | wrap | wrap-reverse; &gt; 在伸缩容器上用来定义容器内伸缩元素是单行还是多行显示。（各个伸缩元素设置最小高宽，在每个元素最小宽度下伸缩容器无法一行内放置的时候所做的处理） <strong>nowrap</strong>：默认值，伸缩容器为单行显示，当容器太小时，内部元素会跑出 <img src="http://image.freefe.cc/20170120105155.png"> <strong>wrap</strong>：内部元素会多行显示，伸缩容器一行内放置不下的元素会被放置到下一行（与排版方向有关） <img src="http://image.freefe.cc/20170120105211.png"> <strong>wrap-reverse</strong>：内部元素会多行显示，伸缩容器一行内放置不下的元素会被往上位置放置 <img src="http://image.freefe.cc/20170120105222.png"> <strong>flex-flow</strong> : || 为上面两种属性的缩写版。 &gt; justify-content ： flex-start | flex-end | center | space-between | space-around; &gt; 为可伸缩模型的重头戏，也是真正优雅实现各种居中的css3属性。 <strong>flex-start</strong>：伸缩元素向起始位置靠齐 <img src="http://image.freefe.cc/20170120105235.png"> <strong>flex-end</strong>：伸缩元素向结束位置靠齐 <img src="http://image.freefe.cc/20170120105244.png"> <strong>center</strong>：伸缩元素居中 <img src="http://image.freefe.cc/20170120105254.png"> <strong>space-between</strong>：均匀分布，第一个向起始位置靠齐，最后一个向结束位置靠齐 <img src="http://image.freefe.cc/20170120105305.png"> <strong>space-around</strong>：伸缩元素平均分布在行里，首尾保留一半空间 <img src="http://image.freefe.cc/20170120105315.png"> &gt; align-items：flex-start | flex-end | center | baseline | stretch; &gt; 用来定义伸缩容器内部的伸缩项目在侧轴上的对齐方式 <strong>flex-start</strong>：伸缩元素向侧轴起始位子靠拢 <img src="http://image.freefe.cc/20170120105329.png"> <strong>flex-end</strong>：伸缩元素向侧轴结束位子靠拢 <img src="http://image.freefe.cc/20170120105338.png"> <strong>center</strong>: 伸缩元素居中对齐 <img src="http://image.freefe.cc/20170120105352.png"> <strong>baseline</strong>：侧轴方向根据基线对齐 <img src="http://image.freefe.cc/20170120105402.png"> <strong>stretch</strong>: 为默认值，会更具伸缩的状态尽可能填充伸缩容器。 #### 项目的属性： <strong>order：</strong> 标示伸缩项目在容器中的排序先后。 <strong>flex : none | [ ? || ]</strong> **flex-grow : ** 伸缩元素的无单位的伸缩比例 **flex-shrink : ** 根据弹性盒子元素所设置的收缩因子来作比例收缩空间。 **flex-basis : ** 根据弹性盒子元素所设置的收缩因子来作比例收缩剩余的空间。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/flex-%E5%9E%82%E7%9B%B4%E5%AF%B9%E9%BD%90-%E5%B1%85%E4%B8%AD%E5%AF%B9%E9%BD%90/" rel="tag"># flex,垂直对齐,居中对齐</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2015/04/13/ecmascript-6-promises-3/" rel="prev" title="ECMAScript 6 promises（下）：谈谈 API（二）">
+      <i class="fa fa-chevron-left"></i> ECMAScript 6 promises（下）：谈谈 API（二）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2015/09/29/animate-performance-optimization/" rel="next" title="关于动画到硬件加速的那点事儿">
+      关于动画到硬件加速的那点事儿 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

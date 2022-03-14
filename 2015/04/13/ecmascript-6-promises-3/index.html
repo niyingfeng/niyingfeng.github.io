@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="原文地址： http:&#x2F;&#x2F;www.2ality.com&#x2F;2014&#x2F;10&#x2F;es6-promises-api.html原文作者：Dr. Axel Rauschmayer 译者：倪颖峰 博文下半部分为纯干活内容，包括介绍的 ES6 中 Promise API，以及其简单的实现方式与思想，以及一些拓展内容。 9. 速查表：ES6的 promise API这边简单的给出一下 ES6 promise 的API">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ECMAScript 6 promises（下）：谈谈 API（二）">
+<meta property="og:url" content="http://freefe.cc/2015/04/13/ecmascript-6-promises-3/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="原文地址： http:&#x2F;&#x2F;www.2ality.com&#x2F;2014&#x2F;10&#x2F;es6-promises-api.html原文作者：Dr. Axel Rauschmayer 译者：倪颖峰 博文下半部分为纯干活内容，包括介绍的 ES6 中 Promise API，以及其简单的实现方式与思想，以及一些拓展内容。 9. 速查表：ES6的 promise API这边简单的给出一下 ES6 promise 的API">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.freefe.cc/20170125162922.png">
+<meta property="og:image" content="http://image.freefe.cc/20170125162939.png">
+<meta property="og:image" content="http://image.freefe.cc/20170125162959.png">
+<meta property="og:image" content="http://image.freefe.cc/20170125163015.png">
+<meta property="og:image" content="http://image.freefe.cc/20170125163029.png">
+<meta property="og:image" content="http://image.freefe.cc/20170125163044.png">
+<meta property="og:image" content="http://image.freefe.cc/20170125163059.png">
+<meta property="article:published_time" content="2015-04-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.512Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="promise">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.freefe.cc/20170125162922.png">
+
+<link rel="canonical" href="http://freefe.cc/2015/04/13/ecmascript-6-promises-3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>ECMAScript 6 promises（下）：谈谈 API（二） | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2015/04/13/ecmascript-6-promises-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ECMAScript 6 promises（下）：谈谈 API（二）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2015-04-14 00:00:00" itemprop="dateCreated datePublished" datetime="2015-04-14T00:00:00+08:00">2015-04-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>原文地址： <a target="_blank" rel="noopener" href="http://www.2ality.com/2014/10/es6-promises-api.html">http://www.2ality.com/2014/10/es6-promises-api.html</a><br>原文作者：Dr. Axel Rauschmayer</p>
+<p>译者：倪颖峰</p>
+<p>博文下半部分为纯干活内容，包括介绍的 ES6 中 Promise API，以及其简单的实现方式与思想，以及一些拓展内容。</p>
+<h2 id="9-速查表：ES6的-promise-API"><a href="#9-速查表：ES6的-promise-API" class="headerlink" title="9. 速查表：ES6的 promise API"></a>9. 速查表：ES6的 promise API</h2><p>这边简单的给出一下 ES6 promise 的API 简述，详细描述请看[<a target="_blank" rel="noopener" href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-promise-objects">文档]</a></p>
+<h3 id="9-1-术语"><a href="#9-1-术语" class="headerlink" title="9.1. 术语"></a>9.1. 术语</h3><p>promise 的 API 就是关于异步获取结果。一个 promise 对象是一个独立的对象，但会通过该对象传递结果。</p>
+<p><strong>状态：</strong></p>
+<ul>
+<li>一个promise 一般来说会处于以下三种互斥状态中的一种：<ul>
+<li>结果未完成时，promise 状态为 pending。</li>
+<li>结果通过时，promise 状态为 fulfilled。</li>
+<li>当错误发生时，promise 状态变为 rejected。</li>
+</ul>
+</li>
+<li>一个promise 一旦被设置则为“运行完成”（包括 fulfilled 或者 rejected）。</li>
+<li>一个peomise 一旦被设置之后便不能在改变。</li>
+</ul>
+<p><strong>状态变化反应：</strong></p>
+<p>Promise reastions 就是你是用 promise 方法 then 来注册的回调函数，用来监听状态 fulfillment 和 rejected。</p>
+<p>一个 then式即为一个含有 promise 风格方法 then 的对象。即使该方法仅仅只是监听状态的，依然为 then 式。</p>
+<p><strong>状态改变：</strong></p>
+<p>有两种改变 promise 状态的方式。一旦你调用了其中的一个，那么进一步调用将会无效。</p>
+<ul>
+<li>拒绝一个 promise 表示这个promise 被设为 rejected。</li>
+<li>通过一个 promise 有两种情况，取决于以什么值来解决的：<ul>
+<li>使用一个普通值（非 then式）来解决 promise。</li>
+<li>解决 promise P 以一个 then式的 T，意味着P 不再可以设置 resolved，而将会随着 T的状态走，即其 fulfillment 和 rejection 值。P 的回调会在T 被设置状态后合适的时候触发（或者如果T 已经被设置状态了，那么就会立即触发）。</li>
+</ul>
+</li>
+</ul>
+<h3 id="9-2-构造函数"><a href="#9-2-构造函数" class="headerlink" title="9.2. 构造函数"></a>9.2. 构造函数</h3><p>promise 的构造函数为以下形式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var p = new Promise(executor(resolve, reject));</span><br></pre></td></tr></table></figure>
+
+<p>上面创建了一个行为由回调函数 exector 决定的 promise。使用参数来处理解决或者拒绝 p：</p>
+<ul>
+<li>resolve(x)，以 x 来解决 p：<ul>
+<li>如果 x 是 then式的，那么它的结果会转到 p（包括通过 then() 注册的触发反馈）。</li>
+<li>否者，p 就以 x 处理 fulfilled 状态。</li>
+</ul>
+</li>
+<li>reject(x)，以 e 值来拒绝 p（通常为一个 Error 的子类）。</li>
+</ul>
+<h3 id="9-3-静态方法"><a href="#9-3-静态方法" class="headerlink" title="9.3. 静态方法"></a>9.3. 静态方法</h3><p>所有的 Promise 的静态方法都支持实例化：通过接收器来创建一个实例（像：new this），并且通过它来访问这些静态方法（this.resolve 与 Promise.resolve）。</p>
+<p><strong>创建 promises：</strong> 下面两种方式来创建接收器的实例。</p>
+<ul>
+<li>Promise.resolve(x):<ul>
+<li>如果 x 是 then式的，它将转化为一个 promise（接收器的实例）。</li>
+<li>如果 x 是一个 promise，返回将没有变化。</li>
+<li>否者将会返回一个接收器的实例并且以 x 来处理 fulfilled 状态。</li>
+</ul>
+</li>
+<li>Promise.reject(reason)：创建一个新的promise，并且以 reason 值来处理拒绝状态。</li>
+</ul>
+<p><strong>组合 promises：</strong> 直观来说，静态方法 Promise.all() 和 Promise.race() 组合迭代的 promises 变为一个单一的 promise。即：</p>
+<ul>
+<li>它们采用迭代。迭代的元素通过 this.resolve() 来转化为 promises。</li>
+<li>它们返回一个新的 promise。这个 promise 返回一个新的接收器的实例。</li>
+</ul>
+<p><strong>方式有：</strong></p>
+<ul>
+<li>Promise.all(iterable)：如此返回一个 promise<ul>
+<li>如果迭代的元素均为 fulfilled 那么将其设置为 fulfilled。成功值：各个成功值生成的数组。            </li>
+<li>当元素中有任何一个失败时便设置其为 rejected。拒绝值：第一个解决状态的值。</li>
+</ul>
+</li>
+<li>Promise.race(iterable)：迭代的第一个被设置完毕的元素被用来解决返回的 promise。</li>
+</ul>
+<h3 id="9-4-继承原型方法"><a href="#9-4-继承原型方法" class="headerlink" title="9.4. 继承原型方法"></a>9.4. 继承原型方法</h3><p>Promise.prototype.then(onFulfilled, onRejected);</p>
+<ul>
+<li>回调函数 onFulfilled 和 onRejected 被车称为 reactions。</li>
+<li>如果该 promise 已经被设为 fulfilled，或者一旦变成 fulfilled 状态，那么回调函数 onFulfilled 就会被立即执行。相同，被触发之后 onRejected 也一样。</li>
+<li>then() 返回一个新的 promise Q（通过接收器的构造函数创建）：<ul>
+<li>任意 reactions 返回一个结果，Q 便使用其来通过。</li>
+<li>任意 reactions 抛出一个错误，Q 便使用其来拒绝。</li>
+</ul>
+</li>
+<li>触发 reactions：<ul>
+<li>如果 onFulfilled 被触发了，那么一个通过状态的接收器就会被转发到 then() 的结果中。</li>
+<li>如果 onRejected 被触发了，那么一个拒绝状态的接收器就会被转发到 then() 的结果中。</li>
+</ul>
+</li>
+</ul>
+<p>触发 reactions 的默认值可以以以下方式执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function defaultOnFulfilled(x)&#123;</span><br><span class="line">	return x;</span><br><span class="line">&#125;</span><br><span class="line">function defaultOnRejected(e)&#123;</span><br><span class="line">	throw e;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Promise.prototype.catch(onRejected)：</strong> 与 then(null, onRejected) 一样。</p>
+<h2 id="10-promises-的优势与劣势"><a href="#10-promises-的优势与劣势" class="headerlink" title="10. promises 的优势与劣势"></a>10. promises 的优势与劣势</h2><h3 id="10-1-优势"><a href="#10-1-优势" class="headerlink" title="10.1. 优势"></a>10.1. 优势</h3><p><strong>统一的异步 APIs</strong><br>promises 的一个重要的优点就是被越来越多的浏览器的异步 API 使用，统一了当前多样化和不兼容的各种模式和约定。看一下即将出现的两种基于 promise 的API。</p>
+<p>基于 promise 的 ferch API 替代 XMLHttpRequest：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fetch(url)</span><br><span class="line">.then(request =&gt; request.text())</span><br><span class="line">.then(str =&gt; ...)</span><br></pre></td></tr></table></figure>
+
+<p>fetch() 会对实际的请求返回一个 promise，text() 会对内容作为字符串返回一个 promise。</p>
+<p>ECMAScript 6 API 编程式导入模块也是基于 promise：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">System.import(&#x27;some_modle.js&#x27;)</span><br><span class="line">.then(some_module =&gt; &#123;</span><br><span class="line">	...</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>promises VS events</strong></p>
+<p>对比 events，promises 更适合做一次性结果的监听。不管你是在得到结果之前或者之后注册都不会影响你监听到结果。这是 promises 更本上的优势。另一方面，你不能使用它来处理一些反复性的事件。链式是         promise 的另一个优势，但是每次只能添加一个。</p>
+<p><strong>promises VS callbacks</strong></p>
+<p>对比回调函数，promises 具有更简洁的函数（方法）参数。在 callbacks 中，参数包含输入输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fs.readFile(name, opts?, function(err, data))</span><br></pre></td></tr></table></figure>
+
+<p>而 promise 中，所有的参数均只是输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">readFilePromisified(name, opts?)</span><br><span class="line">.then(dataHandler, errorHandler)</span><br></pre></td></tr></table></figure>
+
+<p>此外，promises 的优势还包括更好的错误处理机制（异常的集成）和组合更任意更容易（因为你可以使用一些同步的工具，比如 Array.prototype.map()）。</p>
+<h3 id="10-2-劣势"><a href="#10-2-劣势" class="headerlink" title="10.2. 劣势"></a>10.2. 劣势</h3><p>Promises 对于单一的异步结果能处理的很好。但是它不擅长于：</p>
+<ul>
+<li>反复性事件：如果你对此感兴趣，可以看一下 reactive programming（<a target="_blank" rel="noopener" href="http://reactive-extensions.github.io/RxJS/%EF%BC%89%EF%BC%8C%E5%85%B3%E4%BA%8E%E9%93%BE%E5%BC%8F%E5%A4%84%E7%90%86%E6%99%AE%E9%80%9A%E7%9A%84%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E7%9A%84%E5%B7%A7%E5%A6%99%E6%96%B9%E5%BC%8F%E3%80%82">http://reactive-extensions.github.io/RxJS/），关于链式处理普通的事件监听的巧妙方式。</a></li>
+<li>数据流：支持的标准正在完善中。</li>
+</ul>
+<p>ECMAScript 6 的 promises 缺少一下的两个基本功能点：</p>
+<ul>
+<li>你无法取消。</li>
+<li>你无法确定他们要在多久之后发生（例如在客户端用户界面展现进度条）。</li>
+</ul>
+<p>Q promises 库支持后者，并且也将计划添加到 Promises&#x2F;A+。</p>
+<h2 id="11-promises-与-生成器"><a href="#11-promises-与-生成器" class="headerlink" title="11. promises 与 生成器"></a>11. promises 与 生成器</h2><p>由于一个实用功能 Q.spawn()，你可以通过生成器来实现在浅协程里使用基于 promises 的函数。这是一份重要的优点使得代码看起来类似于同步，并且可以使用一些同步机制，比如说 try-catch：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Q.spawn(function* () &#123;</span><br><span class="line">	try &#123;</span><br><span class="line">			let [foo, bar] = yield Promise.all([ // (A)</span><br><span class="line">					httpGet(&#x27;foo.json&#x27;),</span><br><span class="line">					httpGet(&#x27;bar.json&#x27;)</span><br><span class="line">			]);</span><br><span class="line">			render(foo);</span><br><span class="line">			render(bar);</span><br><span class="line">	&#125; catch (e)&#123;</span><br><span class="line">			console.log(&#x27;Read failed: &#x27;+ e );</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>Q.spawn() 的参数是生成器函数。如果 yield 标识符是有效的，那么将发生下面的事情：</p>
+<ul>
+<li>函数执行将被暂停。</li>
+<li>操作符 yield 被函数返回（返回，描述的不确切，暂时忽略）。</li>
+<li>随后函数会被恢复成一个值或者异常。前者情况继续执行之前暂停的那个点，yield 返回一个值。后者情况表达式被抛入函数中，类似 yield 操作符从内部被扔入。</li>
+</ul>
+<p>从而，很清楚的明白 Q.spawn() 所做的事情：当生成器函数产生一个 promise，spawn 便注册 reaction，等待处理。如果 promise 通过状态，生成器便会恢复一个结果。如果 promise 为拒绝，一个异常便会抛入注册器中。</p>
+<p>这是一个通过新的语法结构-异步函数。来添加支持 JS spawn 的提案（<a target="_blank" rel="noopener" href="https://github.com/lukehoban/ecmascript-asyncawait%EF%BC%89%E3%80%82%E4%B9%8B%E5%89%8D%E4%BE%8B%E5%AD%90%E4%BD%9C%E4%B8%BA%E5%BC%82%E6%AD%A5%E5%87%BD%E6%95%B0%E5%BA%94%E8%AF%A5%E5%A6%82%E4%B8%8B%E3%80%82%E5%BA%95%E5%B1%82%EF%BC%8C%E5%B9%B6%E6%B2%A1%E6%9C%89%E8%BE%83%E5%A4%9A%E4%B8%8D%E5%90%8C">https://github.com/lukehoban/ecmascript-asyncawait）。之前例子作为异步函数应该如下。底层，并没有较多不同</a> - 异步函数基于生成器。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">asyc function()&#123;</span><br><span class="line">	try &#123;</span><br><span class="line">			let [foo, bar] = await Promise.all([</span><br><span class="line">					httpGet(&#x27;foo.json&#x27;),</span><br><span class="line">					httpGet(&#x27;bar.json&#x27;)</span><br><span class="line">			]);</span><br><span class="line">			render(foo);</span><br><span class="line">			render(bar);</span><br><span class="line">	&#125; catch (e)&#123;</span><br><span class="line">			console.log(&#x27;Read failed: &#x27;+ e );</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="12-调试-promises"><a href="#12-调试-promises" class="headerlink" title="12. 调试 promises"></a>12. 调试 promises</h2><p>主要的挑战是调试异步代码中包含异步函数和方法的调用。异步调用源自于一个任务执行了一个新的任务。如果该新任务中有异常，堆栈跟踪只会覆盖该任务，不会包含之前任务的信息。所以在异步编程中你只能获得很少的调试信息。</p>
+<p>Google 的 chrome 最近开始可以调试异步代码。并不完全支持 promises，但是处理一般的异步编程做得非常不错。比如下面的实例，first 异步调用 返回调用 third 的 second。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function first()&#123;</span><br><span class="line">	setTimeout(function () &#123; second(&#x27;a&#x27;) &#125;, 0); //(A)</span><br><span class="line">&#125;</span><br><span class="line">function second()&#123;</span><br><span class="line">	setTimeout(function () &#123; third(&#x27;b&#x27;) &#125;, 0); //(B)</span><br><span class="line">&#125; </span><br><span class="line">function third()&#123;</span><br><span class="line">	debugger;</span><br><span class="line">&#125;</span><br><span class="line">first();</span><br></pre></td></tr></table></figure>
+
+<p>正如截图中所示，调试器展现一个包含三个函数的跟踪堆栈。它包含了 line A 和 line B 处的异步函数。</p>
+<p><img src="http://image.freefe.cc/20170125162922.png"></p>
+<h2 id="13-promises-内部窥秘"><a href="#13-promises-内部窥秘" class="headerlink" title="13. promises 内部窥秘"></a>13. promises 内部窥秘</h2><p>本段，我们将从不同的角度来看一下 promises：不再学习如何使用 promise API，我们将了解一下它的简单实现。这个视角将帮助我们实现一个 promises。</p>
+<p>promises 的实现被称为 DemoPromise 和 在 GitHub 上可用的实例（<a target="_blank" rel="noopener" href="https://github.com/rauschma/demo_promise%EF%BC%89%E3%80%82%E4%B8%BA%E4%BA%86%E6%9B%B4%E5%AE%B9%E6%98%93%E7%90%86%E8%A7%A3%EF%BC%8C%E5%B0%86%E4%B8%8D%E4%BC%9A%E5%AE%8C%E5%85%A8%E5%8C%B9%E9%85%8D">https://github.com/rauschma/demo_promise）。为了更容易理解，将不会完全匹配</a> API。但是它将足够使你了解在实现 promises 过程会中面对的各种难题。</p>
+<p>DemoPromises 是一个含有三个原型方法的构造函数：</p>
+<ul>
+<li>DemoPromises.prototype.resolve(value)</li>
+<li>DemoPromises.prototype.reject(reason)</li>
+<li>DemoPromises.prototype.then(onFulfilled, onRejected)</li>
+</ul>
+<p>在此，resolve 和 reject 为方法（而不是传递给传递给构造函数作为参数的回调函数）。</p>
+<h3 id="13-1-一个独立的-promise"><a href="#13-1-一个独立的-promise" class="headerlink" title="13.1 一个独立的 promise"></a>13.1 一个独立的 promise</h3><p>首先我们需要实现一个最少功能的独立的 promise ：</p>
+<ul>
+<li>你可以创建一个 promise。</li>
+<li>你可以通过或者拒绝一个 promise 并且只能处理它一次。</li>
+<li>你可以通过 then() 来注册 reactions（回调函数）。该方法不支持链式（该处应该是支持链式），就是说，其不返回任何东西。它需要被立即执行不管该 promise 是否已经被处理。</li>
+</ul>
+<p>以下是使用第一步所实现的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var dp = new DemoPromise();</span><br><span class="line">dp.resolve(&#x27;abc&#x27;);</span><br><span class="line">dp.then(function(value)&#123;</span><br><span class="line">	console.log(value); // abc</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>下面图标说明了我们第一个 DemoPromise 是如何实现的：</p>
+<p><img src="http://image.freefe.cc/20170125162939.png"></p>
+<p>让我们首先研究下 then()。它必须处理两个情况：</p>
+<ul>
+<li>如果 promise 还在执行中，那么将在 promise 被处理完毕之后调用 onFulfilled 或者 onRejected 的时候使用。</li>
+<li>如果 promise 已经被通过或者拒绝，onFulfilled 或者 onRejected 将被立即调用。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">DemoPromise.prototype.then = function (onFulfilled, onRejected) &#123;</span><br><span class="line">	var self = this;</span><br><span class="line">	var fulfilledTask = function () &#123;</span><br><span class="line">			onFulfilled(self.promiseResult);</span><br><span class="line">	&#125;;</span><br><span class="line">	var rejectedTask = function () &#123;</span><br><span class="line">			onRejected(self.promiseResult);</span><br><span class="line">	&#125;;</span><br><span class="line">	switch (this.promiseState) &#123;</span><br><span class="line">			case &#x27;pending&#x27;:</span><br><span class="line">					this.fulfillReactions.push(fulfilledTask);</span><br><span class="line">					this.rejectReactions.push(rejectedTask);</span><br><span class="line">					break;</span><br><span class="line">			case &#x27;fulfilled&#x27;:</span><br><span class="line">					addToTaskQueue(fulfilledTask);</span><br><span class="line">					break;</span><br><span class="line">			case &#x27;rejected&#x27;:</span><br><span class="line">					addToTaskQueue(rejectedTask);</span><br><span class="line">					break;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">function addToTaskQueue(task) &#123;</span><br><span class="line">	setTimeout(task, 0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>resolve() 工作原理如下：</strong>如果 promise 已经被处理完毕，将不做任何事情（确保一个 promise 只被处理一次）。否则，promise 的状态转变为 fulfilled 并且结果缓存到 this.promiseResult。所有入队到通过状态 reactions 的将被立即执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Promise.prototype.resolve = function (value) &#123;</span><br><span class="line">	// 为执行回调函数方法 如果不为状态 pending 为在 then 时刻已经处理执行过，立即跳出</span><br><span class="line">	if (this.promiseState !== &#x27;pending&#x27;) return;</span><br><span class="line">	this.promiseState = &#x27;fulfilled&#x27;;</span><br><span class="line">	this.promiseResult = value;</span><br><span class="line">	this._clearAndEnqueueReactions(this.fulfillReactions);</span><br><span class="line">	return this; // 链式</span><br><span class="line">&#125;;</span><br><span class="line">Promise.prototype._clearAndEnqueueReactions = function (reactions) &#123;</span><br><span class="line">	this.fulfillReactions = undefined;</span><br><span class="line">	this.rejectReactions = undefined;</span><br><span class="line">	reactions.map(addToTaskQueue);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>reject() 与 resolve() 类似。</p>
+<h3 id="13-2-链式（注意，这部分已经为下一步扁平化做好了基础）"><a href="#13-2-链式（注意，这部分已经为下一步扁平化做好了基础）" class="headerlink" title="13.2 链式（注意，这部分已经为下一步扁平化做好了基础）"></a>13.2 链式（注意，这部分已经为下一步扁平化做好了基础）</h3><p>接下来，我们将实现链式：</p>
+<ul>
+<li>then() 返回的 promise 实际上是 onFulfilled 或者 onRejected 被执行后所返回的。</li>
+<li>如果 onFulfilled 或者 onRejectecd 缺失，那么不管它们所传递的是什么， promise 通过 then() 返回出来。</li>
+</ul>
+<p><img src="http://image.freefe.cc/20170125162959.png"></p>
+<p>显然，只需要调整下 then()：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">DemoPromise.prototype.then = function (onFulfilled, onRejected) &#123;</span><br><span class="line">	var returnValue = new DemoPromise(); // (A)</span><br><span class="line">	var self = this;</span><br><span class="line"></span><br><span class="line">	var fulfilledTask;</span><br><span class="line">	if (typeof onFulfilled === &#x27;function&#x27;) &#123;</span><br><span class="line">			fulfilledTask = function () &#123;</span><br><span class="line">					var r = onFulfilled(self.promiseResult);</span><br><span class="line">					returnValue.resolve(r); // (B)</span><br><span class="line">			&#125;;</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">			fulfilledTask = function () &#123;</span><br><span class="line">					returnValue.resolve(self.promiseResult); // (C)</span><br><span class="line">			&#125;;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	var rejectedTask;</span><br><span class="line">	if (typeof onRejected === &#x27;function&#x27;) &#123;</span><br><span class="line">			rejectedTask = function () &#123;</span><br><span class="line">					var r = onRejected(self.promiseResult);</span><br><span class="line">					returnValue.resolve(r); // (D)</span><br><span class="line">			&#125;;</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">			rejectedTask = function () &#123;</span><br><span class="line">					// Important: we must reject here!</span><br><span class="line">					// Normally, result of `onRejected` is used to resolve</span><br><span class="line">					returnValue.reject(self.promiseResult); // (E)</span><br><span class="line">			&#125;;</span><br><span class="line">	&#125;</span><br><span class="line">	...</span><br><span class="line">	return returnValue; // (F)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>then() 创建并返回一个新的 promises（在 A 处和 F 处）。此外，fulfilledTask 和 rejectedTask 以不同方式设置：在处理结束时。</p>
+<ul>
+<li>onFulfilled 的结果被用在通过 returnValue（在 B 处）。如果 onFulfilled 为缺失的，我们使用通过的值来处理 returnValue（在 C 处）。</li>
+<li>onRejected 的结果被用于通过（并非拒绝） returnValue（在 D 处）。如果，onRejected 缺失，我们使用拒绝的值来拒绝 returnValue（在 E 处）。</li>
+</ul>
+<h3 id="13-3-扁平化"><a href="#13-3-扁平化" class="headerlink" title="13.3 扁平化"></a>13.3 扁平化</h3><p>扁平化思想主要是使链式方式更为便捷：一般，将一个 reaction 返回的值传递到下一个 then()。如果我们返回一个 promise，不包裹的形式是最好的，像下面的例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">asyncFunc1()</span><br><span class="line">.then(function (value1)&#123;</span><br><span class="line">	return asyncFunc2(); // A</span><br><span class="line">&#125;)</span><br><span class="line">.then(function (value2)&#123;</span><br><span class="line">	// value2 为 asyncFunc2() promise 的通过状态。</span><br><span class="line">	console.log(value2);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>我们在 A 处返回一个promise，就没有必要在当前方法中嵌套 then() 的调用，我们可以对方法的结果进行 then() 的调用。那么，不嵌套 then()，就保持扁平化。</p>
+<p>我们通过使 resolve() 方法扁平化来实现整体扁平化：</p>
+<ul>
+<li>以一个 promise Q 通过一个 promise P 意味着 Q 的处理结果要在 P 的 reactions 之前。</li>
+<li>在 Q 中，P 应该被锁定：它不能被通过（或者拒绝）。并且它的状态和结果和 Q 的保持同步。</li>
+</ul>
+<p>如果我们使用 then式 （而非一个 promise）能以更通用的形式实现扁平化。</p>
+<p><img src="http://image.freefe.cc/20170125163015.png"></p>
+<p>实现 锁住，我们需要使用一个布尔值标签 this.already 。一旦值为 true，this 将被锁住，不能在被通过，记录如果 this 仍在进行中，因为它的状态是和锁住的 promise 是一致的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DemoPromise.prototype.resolve = function (value) &#123;</span><br><span class="line">	if (this.alreadyResolved) return;</span><br><span class="line">	this.alreadyResolved = true;</span><br><span class="line">	this._doResolve(value);</span><br><span class="line">	return this; // enable chaining</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>真实的解决代码在私有方法 _doResolve() 中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">DemoPromise.prototype._doResolve = function (value) &#123;</span><br><span class="line">	var self = this;</span><br><span class="line">	// Is `value` a thenable?</span><br><span class="line">	if (value !== null &amp;&amp; typeof value === &#x27;object&#x27;</span><br><span class="line">			&amp;&amp; &#x27;then&#x27; in value) &#123;</span><br><span class="line">			addToTaskQueue(function () &#123; // (A)</span><br><span class="line">					value.then(</span><br><span class="line">							function onFulfilled(value) &#123;</span><br><span class="line">									self._doResolve(value);</span><br><span class="line">							&#125;,</span><br><span class="line">							function onRejected(reason) &#123;</span><br><span class="line">									self._doReject(reason);</span><br><span class="line">							&#125;);</span><br><span class="line">			&#125;);</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">			this.promiseState = &#x27;fulfilled&#x27;;</span><br><span class="line">			this.promiseResult = value;</span><br><span class="line">			this._clearAndEnqueueReactions(this.fulfillReactions);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>扁平化处理在 A 处进行：如果 value 为通过状态，那么当前 self 为通过状态，如果 value 为拒绝的，我们就希望 self 为拒绝状态。前面所述通过私有方法 _doResolve 和 _doReject 来实现，通过 alreadyResolved 来绕开阻挡。</p>
+<h3 id="13-4-更详细的-Promise-状态"><a href="#13-4-更详细的-Promise-状态" class="headerlink" title="13.4. 更详细的 Promise 状态"></a>13.4. 更详细的 Promise 状态</h3><p>由于链式形式，promises 的状态变得更为复杂。</p>
+<p><img src="http://image.freefe.cc/20170125163029.png"></p>
+<p>如果你只是使用 promises，你只需要以简单的视角来看待，忽略锁定就好。最主要的状态相关概念是“settledness”： 一个 promise 在被通过或者拒绝的时候被设置完毕。在一个 promise 被设置之后，将不再变化（状态为通过状态或者拒绝状态）。</p>
+<p>如果你希望先处理 promsie，然后再将其通过，这便会很难理解：</p>
+<ul>
+<li>直观的说，‘resolved’（已处理）意味着不能再次被（直接）的处理。一个 promise 在只在即未被设置过也不在锁定的状态下被解决。引用下规范：一个未被处理的 promise 一般处在 pending 状态。一个已经处理的 promise 可能为 等待，通过或者拒绝状态。</li>
+<li>处理中不一定会使其被设置：你可以通过一个 promise 以另一个状态为 pending的。</li>
+<li>处理中现在包含拒绝：你可以拒绝一个 promise 通过一个拒绝的 promise 处理。</li>
+</ul>
+<h3 id="13-5-异常"><a href="#13-5-异常" class="headerlink" title="13.5. 异常"></a>13.5. 异常</h3><p>在我们不久的将来，我们将会在 user code 中以 rejections 形式处理异常。目前来说，user code 只代表 then 中的两个回调函数参数。</p>
+<p><img src="http://image.freefe.cc/20170125163044.png"></p>
+<p>下面代码片段展现了我们在 onFulfilled 内部处理异常转到 拒绝状态 - 通过 A 处调用时的 try-catch 包裹。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var fulfilledTask;</span><br><span class="line">if (typeof onFulfilled === &#x27;function&#x27;) &#123;</span><br><span class="line">	fulfilledTask = function () &#123;</span><br><span class="line">			try &#123;</span><br><span class="line">					var r = onFulfilled(self.promiseResult); // (A)</span><br><span class="line">					returnValue.resolve(r);</span><br><span class="line">			&#125; catch (e) &#123;</span><br><span class="line">					returnValue.reject(e);</span><br><span class="line">			&#125;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125; else &#123;</span><br><span class="line">	fulfilledTask = function () &#123;</span><br><span class="line">			returnValue.resolve(self.promiseResult);</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="13-6-揭示构造函数模式"><a href="#13-6-揭示构造函数模式" class="headerlink" title="13.6. 揭示构造函数模式"></a>13.6. 揭示构造函数模式</h3><p>如果我们希望将 DemoPromise 转变为切实可用的 promise，我们还需要实现揭示构造函数模式：ES6 promises 不是通过方法来进行通过或者拒绝，而是通过监听在 executor 上的函数实现的，构造函数的参数。</p>
+<p><img src="http://image.freefe.cc/20170125163059.png"></p>
+<p>如果执行函数抛出一个异常，该 promise 一定被拒绝。</p>
+<h2 id="14-两个常用的-promise-附加方法"><a href="#14-两个常用的-promise-附加方法" class="headerlink" title="14. 两个常用的 promise 附加方法"></a>14. 两个常用的 promise 附加方法</h2><p>本段介绍一下两个在 ES6 中添加到 promsie 的方法。promise 库的大部分都支持他们。</p>
+<h3 id="14-1-done"><a href="#14-1-done" class="headerlink" title="14.1. done()"></a>14.1. done()</h3><p>当你将数个 promise 方法链式调用时，你可能会无心之中忽略错误。看实例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function doSomeThing()&#123;</span><br><span class="line">	asyncFunc()</span><br><span class="line">	.then(f1)</span><br><span class="line">	.catch(r1)</span><br><span class="line">	.then(f2); // A</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果在 A 处的 then() 生成拒绝状态，那么将不会被处理。 promise 库 Q 提供了一个方法 done()，放置在链式最后一个方法调用的后面。其或者替换最后一个 then()（也有一个到两个参数）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function doSomeThing()&#123;</span><br><span class="line">	asyncFunc()</span><br><span class="line">	.then(f1)</span><br><span class="line">	.catch(r1)</span><br><span class="line">	.done(f2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>又或者仅仅是插到最后一个 then() 之后（无参数）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">function doSomeThing()&#123;</span><br><span class="line">	asyncFunc()</span><br><span class="line">	.then(f1)</span><br><span class="line">	.catch(r1)</span><br><span class="line">	.then(f2)</span><br><span class="line">	.done();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>引用 Q 的文档：</p>
+<blockquote>
+<p>done 与 then 使用的黄金规则：既不返回任何一个 promise，或者结束链式调用，那么使用 done 来终止。使用 catch 来终止不是很好，因为 catch 的可能是其自己内部的错误。</p>
+</blockquote>
+<p>这也是在 ES6 中实现  done 的方式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Promise.prototype.done = function(onFulfilled, onRejected)&#123;</span><br><span class="line">	this.then(onFulfilled, onRejected)</span><br><span class="line">	.catch(function(reason)&#123;</span><br><span class="line">			setTimeout( ()=&gt;&#123; throw reason &#125;, 0 );</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>虽然 done 功能极为有用，但是没有添加到 ES6 中，因为在将来这种检测可以被调试器自动调起（一个 ES 讨论版本中）。</p>
+<h3 id="14-2-finally"><a href="#14-2-finally" class="headerlink" title="14.2. finally()"></a>14.2. finally()</h3><p>有时你希望某个行为不管有没有错误抛出都立即执行。例如在一系列行为后的处理。这便是 promise 方法 finally() 所做的，极为类似与错误处理机制中的 finally 。其回调方法不接受参数，但是会有 通过状态或者拒绝状态的通知。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">createPeaource(...)</span><br><span class="line">.then(function(value1)&#123; ... &#125;)</span><br><span class="line">.then(function(value2)&#123; ... &#125;)</span><br><span class="line">.finally(function()&#123; ... &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这是 Domenic Denicola 计划实现的 finally()：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Promise.prototype.finally = function (callback) &#123;</span><br><span class="line">	let p = this.constructor;</span><br><span class="line">	// 不在此调用回调函数,</span><br><span class="line">	// 希望使用 then 来处理</span><br><span class="line">	return this.then(</span><br><span class="line">			// Callback fulfills: 传递参数结果</span><br><span class="line">			// Callback rejects: 传递拒绝状态</span><br><span class="line">			value =&gt; p.resolve(callback()).then(() =&gt; value),</span><br><span class="line">			reason =&gt; p.resolve(callback()).then(() =&gt; &#123; throw reason &#125;)</span><br><span class="line">	);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>回调函数决定了 接收器（this）如何设置处理：</p>
+<ul>
+<li>如果回调函数抛出一个错误或者返回一个拒绝状态的 promise，那么变为 拒绝状态的值。</li>
+<li>否则，接收器的设置变为的 finally 返回的 promise 的设置。使用 finally() 的链式方法。</li>
+</ul>
+<p><strong>例一：使用 finally() 来隐藏 spinner：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">showSpinner();</span><br><span class="line">fetchGalleryData()</span><br><span class="line">.then(data =&gt; updateGallery(data) )</span><br><span class="line">.catch(showNoDataError)</span><br><span class="line">.finnally(hideSpinner);</span><br></pre></td></tr></table></figure>
+
+<p><strong>例二：使用 finally 来清除测试</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var HTTP = require(&#x27;q-io/http&#x27;);</span><br><span class="line">var server = HTTP.Server(app);</span><br><span class="line">return server.listen(0)</span><br><span class="line">.then(function()&#123; ... &#125;)</span><br><span class="line">finally(server.stop);</span><br></pre></td></tr></table></figure>
+
+<h2 id="15-ES6-兼容的-promise-库"><a href="#15-ES6-兼容的-promise-库" class="headerlink" title="15. ES6 兼容的 promise 库"></a>15. ES6 兼容的 promise 库</h2><p>下面有一些 promise 的库，有一些 ES6 的API，意味着你在将来也可以用原生 ES6 代码替换。</p>
+<ul>
+<li>RSVP.js 来自 Stefen Penner，为 ES6 promise API 的超集。</li>
+<li>Native Promise Only 来自 Kyle Simpson 是原生 ES6 promise 的 polyfill，以严格模式来定义，尽可能接近而不扩展。</li>
+<li>Lie 来自 Calvin Metcalf 小巧，完善的 promise 库，遵循 Promises&#x2F;A+ 规范。</li>
+<li>Q.promise 来自 Kowal 实现 ES6 API。</li>
+<li>最近的，来自 Paul Millr 包含 promise 的 ES6 Shim。</li>
+</ul>
+<h2 id="16-传统的异步代码的接口"><a href="#16-传统的异步代码的接口" class="headerlink" title="16. 传统的异步代码的接口"></a>16. 传统的异步代码的接口</h2><p>放你使用一个 promsie 库时，有时是基于不支持 promsie 的异步代码。这段讲述一下 Node.js 风格的异步函数与 jQuery deferreds。</p>
+<h3 id="16-1-Node-js-的接口"><a href="#16-1-Node-js-的接口" class="headerlink" title="16.1 Node.js 的接口"></a>16.1 Node.js 的接口</h3><p>promise 库 Q 有几个工具方法来转换函数使其使用 Node.js 风格(err, result)的回调函数然后返回一个promise（还有一些做一些相反的事情，转换基于 promise 的函数来为一些接受回调函数的函数）。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var readFile = Q.denideify( FS.readFile );</span><br><span class="line">readFile(&#x27;foo,txt&#x27;, &#x27;utf-8&#x27;)</span><br><span class="line">.then(function(text)&#123;</span><br><span class="line">	....</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>denodify 为一个符合 ES6 promise API ，提供 nodification 函数式化功能。</p>
+<h3 id="16-2-jQuery-的接口"><a href="#16-2-jQuery-的接口" class="headerlink" title="16.2. jQuery 的接口"></a>16.2. jQuery 的接口</h3><p>jQuery 的 deferred 类似于 promise，但是也有几个兼容性方面的不同。方法 then() 都类似与 ES6 promises（主要不同之处是：不会在 reactions 中监控错误抛出）。我们可以通过 Promise.resolve() 将 一个 jQuery deferred 为 ES6 的 promise：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Promise.resolve(</span><br><span class="line">	jQuery.ajax(&#123;...&#125;)</span><br><span class="line">).then(funciton(data)&#123;</span><br><span class="line">	console.log(data);</span><br><span class="line">&#125;).catch(function(reason)&#123;</span><br><span class="line">	console.error(reason)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="17-延伸阅读"><a href="#17-延伸阅读" class="headerlink" title="17. 延伸阅读"></a>17. 延伸阅读</h2><ol>
+<li>Promises&#x2F;A+（<a target="_blank" rel="noopener" href="http://promisesaplus.com/%EF%BC%89%EF%BC%9ABrian">http://promisesaplus.com/）：Brian</a> Cavalier 与 Domenic Denicola 编辑（JS promise 事实标准）</li>
+<li>Javascript Promises：再次强势归来（<a target="_blank" rel="noopener" href="http://www.html5rocks.com/en/tutorials/es6/promises/%EF%BC%89%EF%BC%9A%E6%9D%A5%E8%87%AA">http://www.html5rocks.com/en/tutorials/es6/promises/）：来自</a> Jake Archibad（挺不错的 promise 简要介绍）</li>
+<li>Promsie 反模式（<a target="_blank" rel="noopener" href="http://taoofcode.net/promise-anti-patterns/%EF%BC%89%EF%BC%9A%E6%9D%A5%E8%87%AA">http://taoofcode.net/promise-anti-patterns/）：来自</a> Tao（要点与技术）</li>
+<li>Promise 模式（<a target="_blank" rel="noopener" href="https://www.promisejs.org/patterns/%EF%BC%89%E6%9D%A5%E8%87%AA">https://www.promisejs.org/patterns/）来自</a> Forbes Lindeasy</li>
+<li>揭示构造函数模式（<a target="_blank" rel="noopener" href="http://domenic.me/2014/02/13/the-revealing-constructor-pattern/%EF%BC%89%EF%BC%9A%E6%9D%A5%E8%87%AA">http://domenic.me/2014/02/13/the-revealing-constructor-pattern/）：来自</a> Domenic Denicola（为 Promise 构造函数使用的模式）</li>
+<li>Chrome 开发者工具调试异步 JS 代码（<a target="_blank" rel="noopener" href="http://www.html5rocks.com/en/tutorials/developertools/async-call-stack/%EF%BC%89%EF%BC%9A%E6%9D%A5%E8%87%AA">http://www.html5rocks.com/en/tutorials/developertools/async-call-stack/）：来自</a> Pearl Chen</li>
+<li>ES6 中的迭代器和生成器（<a target="_blank" rel="noopener" href="http://www.2ality.com/2013/06/iterators-generators.html%EF%BC%89">http://www.2ality.com/2013/06/iterators-generators.html）</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/promise/" rel="tag"># promise</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2015/03/16/ecmascript-6-promises-2/" rel="prev" title="ECMAScript 6 promises（下）：谈谈 API（一）">
+      <i class="fa fa-chevron-left"></i> ECMAScript 6 promises（下）：谈谈 API（一）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2015/08/27/box-flex/" rel="next" title="box-flex 弹性可伸缩盒模型">
+      box-flex 弹性可伸缩盒模型 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E9%80%9F%E6%9F%A5%E8%A1%A8%EF%BC%9AES6%E7%9A%84-promise-API"><span class="nav-number">1.</span> <span class="nav-text">9. 速查表：ES6的 promise API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#9-1-%E6%9C%AF%E8%AF%AD"><span class="nav-number">1.1.</span> <span class="nav-text">9.1. 术语</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-2-%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">9.2. 构造函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-3-%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">9.3. 静态方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-4-%E7%BB%A7%E6%89%BF%E5%8E%9F%E5%9E%8B%E6%96%B9%E6%B3%95"><span class="nav-number">1.4.</span> <span class="nav-text">9.4. 继承原型方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-promises-%E7%9A%84%E4%BC%98%E5%8A%BF%E4%B8%8E%E5%8A%A3%E5%8A%BF"><span class="nav-number">2.</span> <span class="nav-text">10. promises 的优势与劣势</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#10-1-%E4%BC%98%E5%8A%BF"><span class="nav-number">2.1.</span> <span class="nav-text">10.1. 优势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-2-%E5%8A%A3%E5%8A%BF"><span class="nav-number">2.2.</span> <span class="nav-text">10.2. 劣势</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-promises-%E4%B8%8E-%E7%94%9F%E6%88%90%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">11. promises 与 生成器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-%E8%B0%83%E8%AF%95-promises"><span class="nav-number">4.</span> <span class="nav-text">12. 调试 promises</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13-promises-%E5%86%85%E9%83%A8%E7%AA%A5%E7%A7%98"><span class="nav-number">5.</span> <span class="nav-text">13. promises 内部窥秘</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#13-1-%E4%B8%80%E4%B8%AA%E7%8B%AC%E7%AB%8B%E7%9A%84-promise"><span class="nav-number">5.1.</span> <span class="nav-text">13.1 一个独立的 promise</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-2-%E9%93%BE%E5%BC%8F%EF%BC%88%E6%B3%A8%E6%84%8F%EF%BC%8C%E8%BF%99%E9%83%A8%E5%88%86%E5%B7%B2%E7%BB%8F%E4%B8%BA%E4%B8%8B%E4%B8%80%E6%AD%A5%E6%89%81%E5%B9%B3%E5%8C%96%E5%81%9A%E5%A5%BD%E4%BA%86%E5%9F%BA%E7%A1%80%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">13.2 链式（注意，这部分已经为下一步扁平化做好了基础）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-3-%E6%89%81%E5%B9%B3%E5%8C%96"><span class="nav-number">5.3.</span> <span class="nav-text">13.3 扁平化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-4-%E6%9B%B4%E8%AF%A6%E7%BB%86%E7%9A%84-Promise-%E7%8A%B6%E6%80%81"><span class="nav-number">5.4.</span> <span class="nav-text">13.4. 更详细的 Promise 状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-5-%E5%BC%82%E5%B8%B8"><span class="nav-number">5.5.</span> <span class="nav-text">13.5. 异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-6-%E6%8F%AD%E7%A4%BA%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E6%A8%A1%E5%BC%8F"><span class="nav-number">5.6.</span> <span class="nav-text">13.6. 揭示构造函数模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-%E4%B8%A4%E4%B8%AA%E5%B8%B8%E7%94%A8%E7%9A%84-promise-%E9%99%84%E5%8A%A0%E6%96%B9%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">14. 两个常用的 promise 附加方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#14-1-done"><span class="nav-number">6.1.</span> <span class="nav-text">14.1. done()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#14-2-finally"><span class="nav-number">6.2.</span> <span class="nav-text">14.2. finally()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#15-ES6-%E5%85%BC%E5%AE%B9%E7%9A%84-promise-%E5%BA%93"><span class="nav-number">7.</span> <span class="nav-text">15. ES6 兼容的 promise 库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#16-%E4%BC%A0%E7%BB%9F%E7%9A%84%E5%BC%82%E6%AD%A5%E4%BB%A3%E7%A0%81%E7%9A%84%E6%8E%A5%E5%8F%A3"><span class="nav-number">8.</span> <span class="nav-text">16. 传统的异步代码的接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#16-1-Node-js-%E7%9A%84%E6%8E%A5%E5%8F%A3"><span class="nav-number">8.1.</span> <span class="nav-text">16.1 Node.js 的接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#16-2-jQuery-%E7%9A%84%E6%8E%A5%E5%8F%A3"><span class="nav-number">8.2.</span> <span class="nav-text">16.2. jQuery 的接口</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17-%E5%BB%B6%E4%BC%B8%E9%98%85%E8%AF%BB"><span class="nav-number">9.</span> <span class="nav-text">17. 延伸阅读</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

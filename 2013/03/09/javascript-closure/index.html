@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="闭包的概念首先也来简单的说说，JS的闭包到底是什么？较为官方的解释为：  Closure : A “closure” is an expression (typically a function) that can have free variables together with an environment that binds those variables (that “closes” t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="详谈JS闭包~">
+<meta property="og:url" content="http://freefe.cc/2013/03/09/javascript-closure/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="闭包的概念首先也来简单的说说，JS的闭包到底是什么？较为官方的解释为：  Closure : A “closure” is an expression (typically a function) that can have free variables together with an environment that binds those variables (that “closes” t">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2013-03-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.512Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="closure,JS闭包">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://freefe.cc/2013/03/09/javascript-closure/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>详谈JS闭包~ | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2013/03/09/javascript-closure/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          详谈JS闭包~
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2013-03-10 00:00:00" itemprop="dateCreated datePublished" datetime="2013-03-10T00:00:00+08:00">2013-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="闭包的概念"><a href="#闭包的概念" class="headerlink" title="闭包的概念"></a>闭包的概念</h3><p>首先也来简单的说说，JS的闭包到底是什么？较为官方的解释为：</p>
+<blockquote>
+<p>Closure : A “closure” is an expression (typically a function) that can have free variables together with an environment that binds those variables (that “closes” the expression). 所谓“闭包”，指的是一个拥有多个自由变量和绑定了这些变量的环境的表达式（通常是一个函数），因而这些变量也是该表达式的一部分。</p>
+</blockquote>
+<p>还有一个对于闭包的描述我认为也挺不错的：</p>
+<blockquote>
+<p>A closure is a combination of a code block (in ECMAScript this is a function) and statically&#x2F;lexically saved all parent scopes.Thus, via these saved scopes a function may easily refer free variables. 闭包是一个组合的代码块（在ECMAScript中是函数），并且静态保存所有父级的作用域。通过这些保存的作用域来搜寻到函数中的自由变量。</p>
+</blockquote>
+<p>按照以上两条描述其实可以看出，闭包不是一个名词，而更偏向于一个形容词来形容一种结构，<code>闭包不仅仅是简单地是在外部函数返回一个内部函数那么简单，事实上从广义的理论上来讲ECMAScript中所有的函数均可以理解为闭包。</code>说了那么多模糊的，那么来具体理解下，到底，什么才是闭包。</p>
+<h3 id="讲在闭包前的知识"><a href="#讲在闭包前的知识" class="headerlink" title="讲在闭包前的知识"></a>讲在闭包前的知识</h3><p>首先要了解一些基本的与闭包有关的知识。(以下并不完全正确~) <code>执行上下文(execution context)：</code>执行上下文是ECMAScript中用来描述JS代码执行的一个抽象概念。所有的JS代码都是在某个执行上下文的环境中运行的。在当前执行上下文中调用另一个function的时候就会进入一个新的执行上下文环境，直到当前function执行完毕的时候就会离开此新的执行上下文环境，重新返回之前的执行上下文环境。来回的切换上下文执行环境也就构成了一个执行上下文堆栈。 <code>作用域链(scope chain)：</code>每一个执行上下文环境都会和一个作用域链相互关联。作用域链可在进入某一个执行上下文环境的时候来进行对标识符(identifier)求值。很多时候作用域链中不仅仅只有一个对象，可以想象作用域链也为一个堆栈，查找标识符会从链首开始，然后依次往后从对象中查找标识符，在对每个对象进行查找时也对其原型链进行查找。 当切换一个执行上下文环境的时候会进行以下的操作：</p>
+<ol>
+<li>当函数创建时(注意不是调用时)的时候已经静态的确定了[[scope]]属性(稍后会详细讲一下)。</li>
+<li>该处才是切换的时候进行的第一步操作，创建活动对象(activation object)，活动对象是在进入函数上下文时刻被创建的，它通过函数的arguments属性初始化，在函数执行上下文的时候变量对象(variable object)是无法直接访问的，所以由AO扮演VO角色，包括arguments属性等。</li>
+<li>创建作用域链，作用域链 &#x3D; 活动对象(AO) + [[scope]]，[[scope]]为function的一个内部属性，与function的创建方式与所在代码位置相关。</li>
+<li>变量的初始化。这个就简单的理解了，在函数运行时对一些变量进行赋值等一些操作。</li>
+</ol>
+<h3 id="我们所了解的闭包"><a href="#我们所了解的闭包" class="headerlink" title="我们所了解的闭包"></a>我们所了解的闭包</h3><p><code>E.g 1：</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function foo()&#123;</span><br><span class="line">    var x = 0;</span><br><span class="line">    return function()&#123;</span><br><span class="line">        alert(x++);</span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br><span class="line">var retFunc = foo();</span><br><span class="line">//foo内部返回一个function 可以随意访问foo的内部变量 x </span><br><span class="line">retFunc (); // 0</span><br><span class="line">retFunc (); // 1</span><br><span class="line">var x = 0;</span><br><span class="line">retFunc (); // 2</span><br></pre></td></tr></table></figure>
+
+<p>这是我们最常见的使用闭包特性来进行的处理。此处的 x 是从返回的内部函数的[[scope]]上搜索而来的，静态作用域。 再来一个例子可能可以更鲜明一点的理解静态的含义 <code>E.g 2：</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var x = 0;</span><br><span class="line">function foo()&#123;</span><br><span class="line">    alert(x);</span><br><span class="line">&#125;</span><br><span class="line">(function()&#123;</span><br><span class="line">    var x = 1;</span><br><span class="line">    foo();</span><br><span class="line">&#125;)();// 弹出 0</span><br></pre></td></tr></table></figure>
+
+<p>静态就是在此处并不弹出0的原因，因为每个函数的[[scope]]均是在函数定义的时候就已经确定，并且不再修改了的，知道与函数一起销毁。 foo在定义的时候[[scope]]中就为全局变量的 x ，而在哪里调用是不会再影响foo的[[scope]]的。 我们最常遇到的闭包带来的问题就是循环中的闭包影响(更多的时候是在操作DOM节点的时候的循环绑定事件，并且还是用的循环中的循环数值作为参数)： <code>E.g 3：</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var data =  [];</span><br><span class="line">    for(var i =0;i&lt;3;i++)&#123;</span><br><span class="line">        data[i] = function()&#123;</span><br><span class="line">        alert(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当我们在调用data<a href="">1</a>，data<a href="">2</a>，data<a href="">3</a>时均会返回 3。因为data数组中的每个函数的[[scope]]都存放着全局的 i，当在调用的时候 i 已经在循环中被赋值为3，故而不管调用哪一个方法，均会从该方法的[[scope]]中查找 i，便是目前的全局i，值为3。 解决办法便是在多制造出一层函数。(在[[scope]]中后进入的优先级更高，从栈首开始搜索。) <code>E.g 4：</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var data =  [];</span><br><span class="line">for(var i =0;i&lt;3;i++)&#123;</span><br><span class="line">    data[i] = (function(x)&#123;</span><br><span class="line">        return function()&#123;</span><br><span class="line">            alert(x);// 此处便有所不同</span><br><span class="line">            alert(i); // 此处仍是3</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使得每次alert的值并不是从[[scope]]中查询全局的i值。</p>
+<h3 id="闭包的原理"><a href="#闭包的原理" class="headerlink" title="闭包的原理"></a>闭包的原理</h3><p>闭包是代码块和创建该代码块的上下文中数据的结合。技术上来说创建函数的父级上下文中的数据是完全保持在该函数的内部属性[[scope]]中的，这也是的我们的内部函数能够访问外部函数的自由变量。所以理论上来说，所有函数都可以当做闭包。 闭包实质上是通过函数内部的[[scope]]属性来实现的。[[scope]]是所有父变量对象的层级链，处于当前函数上下文之上，在函数创建时存于其中。 [[scope]]在函数创建时被存储－－静态（不变的）直至函数销毁。即：函数可以永不调用，但[[scope]]属性已经写入，并存储在函数对象中。</p>
+<h3 id="我所认为的闭包"><a href="#我所认为的闭包" class="headerlink" title="我所认为的闭包"></a>我所认为的闭包</h3><p>闭包不简单，也不复杂。在JS中纯粹只是JS实现机制的一种产物，为我们所利用。理解作用域，作用域链，[[scope]]等JS知识，闭包自然而然的就会有了一定了解。本文如有错误，请各位矫正，谢谢~ 才疏学浅，无法将闭包讲的更深入，具体可以参考一下文章： <a target="_blank" rel="noopener" href="http://www.cn-cuckoo.com/2007/08/01/understand-javascript-closures-72.html">http://www.cn-cuckoo.com/2007/08/01/understand-javascript-closures-72.html</a> <a target="_blank" rel="noopener" href="http://www.cnblogs.com/TomXu/archive/2012/01/31/2330252.html">http://www.cnblogs.com/TomXu/archive/2012/01/31/2330252.html</a> <a target="_blank" rel="noopener" href="http://baike.baidu.com/view/648413.htm">http://baike.baidu.com/view/648413.htm</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/closure-JS%E9%97%AD%E5%8C%85/" rel="tag"># closure,JS闭包</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2013/01/29/lazyload-code/" rel="prev" title="JavaScript的LazyLoad源码分析">
+      <i class="fa fa-chevron-left"></i> JavaScript的LazyLoad源码分析
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2013/03/13/js-garbage-collecation/" rel="next" title="JS垃圾回收机制简介">
+      JS垃圾回收机制简介 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AD%E5%8C%85%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">闭包的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%B2%E5%9C%A8%E9%97%AD%E5%8C%85%E5%89%8D%E7%9A%84%E7%9F%A5%E8%AF%86"><span class="nav-number">2.</span> <span class="nav-text">讲在闭包前的知识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%91%E4%BB%AC%E6%89%80%E4%BA%86%E8%A7%A3%E7%9A%84%E9%97%AD%E5%8C%85"><span class="nav-number">3.</span> <span class="nav-text">我们所了解的闭包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AD%E5%8C%85%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">闭包的原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%91%E6%89%80%E8%AE%A4%E4%B8%BA%E7%9A%84%E9%97%AD%E5%8C%85"><span class="nav-number">5.</span> <span class="nav-text">我所认为的闭包</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

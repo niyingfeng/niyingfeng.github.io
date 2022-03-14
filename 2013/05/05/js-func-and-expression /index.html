@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="函数定义方式在javascript中，定义一个函数大体上有3种方式：  函数申明 函数表达式 通过 Function 函数构造函数定义。  一般来说 方法3 不太常出现，仅仅只会在一些JS类库中实现比如解析json，解析函数的字符串格式等作用。今天主要来讲解下我所理解的前2种方式 函数声明 和 函数表达式。 函数声明ECMA对于函数声明的定义为： 1function Identifier ( Fo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="javascript的函数声明与函数表达式">
+<meta property="og:url" content="http://freefe.cc/2013/05/05/js-func-and-expression%20/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="函数定义方式在javascript中，定义一个函数大体上有3种方式：  函数申明 函数表达式 通过 Function 函数构造函数定义。  一般来说 方法3 不太常出现，仅仅只会在一些JS类库中实现比如解析json，解析函数的字符串格式等作用。今天主要来讲解下我所理解的前2种方式 函数声明 和 函数表达式。 函数声明ECMA对于函数声明的定义为： 1function Identifier ( Fo">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.freefe.cc/26672038_1367503582f6uL.png">
+<meta property="og:image" content="http://image.freefe.cc/26672038_1367504437gxGP.png">
+<meta property="article:published_time" content="2013-05-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.512Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="JS函数声明,JS函数表达式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.freefe.cc/26672038_1367503582f6uL.png">
+
+<link rel="canonical" href="http://freefe.cc/2013/05/05/js-func-and-expression%20/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>javascript的函数声明与函数表达式 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2013/05/05/js-func-and-expression%20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          javascript的函数声明与函数表达式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2013-05-06 00:00:00" itemprop="dateCreated datePublished" datetime="2013-05-06T00:00:00+08:00">2013-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="函数定义方式"><a href="#函数定义方式" class="headerlink" title="函数定义方式"></a>函数定义方式</h3><p>在javascript中，定义一个函数大体上有3种方式：</p>
+<ul>
+<li>函数申明</li>
+<li>函数表达式</li>
+<li>通过 Function 函数构造函数定义。</li>
+</ul>
+<p>一般来说 方法3 不太常出现，仅仅只会在一些JS类库中实现比如解析json，解析函数的字符串格式等作用。今天主要来讲解下我所理解的前2种方式 <code>函数声明</code> 和 <code>函数表达式</code>。</p>
+<h3 id="函数声明"><a href="#函数声明" class="headerlink" title="函数声明"></a>函数声明</h3><p>ECMA对于函数声明的定义为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function Identifier ( FormalParameterListopt ) &#123; FunctionBody &#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用函数申明的函数其名称会被提升，严格意义上讲就是在进入上下文阶段便已经处在的该上下文中的变量对象中（VO），位于代码执行之前。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alert(func);</span><br><span class="line">function func()&#123;</span><br><span class="line">    return &quot;a function&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很显然，alert 为 func函数。 在line-1中便可以访问func，就是所谓的函数使用函数声明产生的函数提升。函数作为ECMAScript三种代码类型中的一种（还有global和eval），代码的执行都会依赖自身的一个上下文，执行上下文分为2个阶段 进入执行上下文 和 代码执行。 该处的函数声明名称被放入变量对象中，是在进入执行上下文阶段，是在代码执行阶段之前，所以可以在代码执行阶段被访问到，而无关于在代码中声明位子进行的函数声明。关于执行上下文可以参考TOM大叔的 javascript核心 和 执行上下文 ，讲的很有深度的。 对于函数声明也是有规范的：要么处于程序级别，要么处于其他函数中。除了这2处，其他位置都是违反规范的，也会导致一些浏览器的解析不正确。 比如</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function foo()&#123;</span><br><span class="line">    if(window===parent)&#123;</span><br><span class="line">        function bar()&#123;alert(1);&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    else&#123;</span><br><span class="line">        function bar()&#123;alert(2);&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    bar();</span><br><span class="line">&#125;</span><br><span class="line">foo();</span><br></pre></td></tr></table></figure>
+
+<p>显然讲函数声明置于if的块中是不符合ECMA规范的，一般浏览器会将 <img src="http://image.freefe.cc/26672038_1367503582f6uL.png"> ECMA中作用域只有函数级的作用域，而没有块级作用域，所以if的块级作用域是无效的。而在与火狐下 <img src="http://image.freefe.cc/26672038_1367504437gxGP.png"> 该问题就是由于火狐浏览器下对块内函数声明与一般的浏览器有差异导致的，所以需要注意对于一般函数声明需要有规范。</p>
+<h3 id="函数表达式"><a href="#函数表达式" class="headerlink" title="函数表达式"></a>函数表达式</h3><p>函数表达式的声明为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function Identifieropt ( FormalParameterListopt ) &#123; FunctionBody &#125;</span><br></pre></td></tr></table></figure>
+
+<p>与函数声明的区别在于，标示符名称可以省略，并且处于表达式中，为表达式的一部分。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var func1 = function f()&#123;&#125;;</span><br><span class="line">var func2 = function()&#123;&#125;;</span><br><span class="line">(function func3()&#123;&#125;);</span><br><span class="line">~function func4()&#123;&#125;;</span><br><span class="line">!function func5()&#123;&#125;;</span><br><span class="line">true,function func6()&#123;&#125;;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>以上等等，函数部分均为自身表达式的一部分，所以都为函数表达式。 函数表达式与函数声明的一个重要的区别在于，对于 var func1 &#x3D; function f(){}; 来说，规范定义其中的 f 标示符不会暴露出来，仅仅可以供 f 函数内部进行访问。 当然在此对于IE8-版本的浏览器来说又有一个重大的BUG。 对于表达式 var func1 &#x3D; function f(){}; 来说，其解析就会出现较为严重的错误，它会现将表达式中的函数部分单独提取出来先进行函数声明，在进行函数表达式解析。更为严重的是，其中的 func1 ！&#x3D; f，相当于独自创建了 函数f ，再对表达式中的函数在创建一份，并且将地址赋予 func1。解决的办法就是尽量避免IE的这些特性保证兼容所有浏览器。</p>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><h4 id="e-g-1"><a href="#e-g-1" class="headerlink" title="e.g.1"></a>e.g.1</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alert(a);</span><br><span class="line">var a = 2;</span><br><span class="line">function a()&#123;&#125;</span><br><span class="line">alert(a)</span><br></pre></td></tr></table></figure>
+
+<p>结果为 function a(){} 和 2。 首先在进入上下文阶段时 函数声明将变量声明覆盖掉（变量的赋值是处于代码执行阶段），所以第一个 alert 弹出的为函数，当代码执行过程中，a又被重新赋值为2，故第二个 alert 显示的为2。整个流程可以与 e.g.2 进行比较就不难理解了。</p>
+<h4 id="e-g-2"><a href="#e-g-2" class="headerlink" title="e.g.2"></a>e.g.2</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alert(a);</span><br><span class="line">var a;</span><br><span class="line">function a()&#123;&#125;</span><br><span class="line">alert(a)</span><br></pre></td></tr></table></figure>
+
+<p>其结果均为 function a(){}。 就可以看出，将a赋值为2，是在代码执行阶段进行的。那么对于</p>
+<h4 id="e-g-3"><a href="#e-g-3" class="headerlink" title="e.g.3"></a>e.g.3</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">alert(a);</span><br><span class="line">var a = 2;</span><br><span class="line">alert(a);</span><br></pre></td></tr></table></figure>
+
+<p>可以很清楚的知道 答案为 undefined 与 2 但是对于</p>
+<h4 id="e-g-4"><a href="#e-g-4" class="headerlink" title="e.g.4"></a>e.g.4</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alert(a);</span><br><span class="line">function a()&#123;&#125;</span><br><span class="line">var a = 2;</span><br><span class="line">alert(a)</span><br></pre></td></tr></table></figure>
+
+<p>为什么又是 function a(){} 和 2 为什么之后的变量声明中 a为undefined没有覆盖函数声明的a呢？ 一般的看法为权重说法，就是函数声明一个标示符之后，如果再对该标示符进行变量声明，那么该变量声明将视为无效。而另一种看法是对于函数声明其实其流程与变量声明是一直的，在进入上下文阶段 均赋值为undefined，但是函数声明将函数引用赋给标示符这一过程，是在代码执行之前触发那一刻。 就好第一个 alert 之前那一刻，a从undefined变为了function。个人偏向于后一种看法。当然如果要知道真正的流程那么还是需要去看 ECMA3或者ECMA5详细规范吧（<a target="_blank" rel="noopener" href="http://ecmascript.cn/">http://ecmascript.cn/</a> ）。 当然说到了函数，那么势必需要知道一下关于 this 的一些资料，可以参考下上篇文章 JS的this简单理解~ 文章下面有好几篇经典的 this 介绍。</p>
+<h4 id="e-g-5"><a href="#e-g-5" class="headerlink" title="e.g.5"></a>e.g.5</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var f = function()&#123; return true; &#125;;</span><br><span class="line">var g = function()&#123; return false; &#125;;</span><br><span class="line">(function()&#123;</span><br><span class="line">    alert(f());</span><br><span class="line">    if(g() &amp;&amp; [] !== [])&#123;</span><br><span class="line">        f = function f()&#123; return false; &#125;</span><br><span class="line">        function g()&#123; return true; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)();</span><br><span class="line">alert(f());</span><br></pre></td></tr></table></figure>
+
+<p>这是一个比较绕的题目，考察的就是上面说的2点。 先来看下答案 chrome opera IE9+等普通浏览器 会弹出 true false ，火狐这个文艺浏览器 会弹出 true true 而IE8-这2B浏览器就会弹出false true。 呵呵开玩笑。 首先说下普通浏览器 true false 吧，JS中只有函数作用域，而没有块级作用域，所以匿名自执行函数中判断的中的 g() 就为块中定义的函数g（所谓的函数提升），然后 f 被重新指向返回 false 的函数了。 所以结果为 true false。 那么第二种 true true的话，由于规范中的函数声明只可以在 程序级 或者 其它函数中，位于 if 块语句中显然会有悖于这个规范，而火狐是无法忍受该错误的，会将块中的函数声明作为 函数表达式的形式来处理。那么在 if 判断的时候就直接米有通过 那么就为 2个true了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var g = function()&#123; return false; &#125;;</span><br><span class="line">(function()&#123;</span><br><span class="line">    alert(g());</span><br><span class="line">    &#123;</span><br><span class="line">        function g()&#123; return true; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    alert(g());</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<p>从这段代码在火狐下执行可以看出来， false 和 true 相当于 火狐下，块中的函数声明被当做了函数表达式来处理（效果上可以这么说）。 最后对于IE8-下的浏览器来说对于有名称的函数表达式，该标示符会被暴露出来。确切的来讲 IE8-下 会将 f &#x3D; function f(){} 先进行函数声明一次，然后再进行一次函数声明，也导致了该处的 f 并不是会到全局变量下的 f ，而是因为已经在该函数作用域下有了f的函数声明，而覆盖该函数作用域下的 f。则有了 true false 的结果。 呵呵 能力有限，菜鸟观点，还有很多地方没有弄清楚，望大家多多指教。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JS%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E-JS%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag"># JS函数声明,JS函数表达式</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2013/03/13/js-garbage-collecation/" rel="prev" title="JS垃圾回收机制简介">
+      <i class="fa fa-chevron-left"></i> JS垃圾回收机制简介
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2013/05/08/jquery-mobile/" rel="next" title="jQuery Mobile介绍">
+      jQuery Mobile介绍 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">函数定义方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text">函数声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">函数表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B"><span class="nav-number">4.</span> <span class="nav-text">实例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#e-g-1"><span class="nav-number">4.1.</span> <span class="nav-text">e.g.1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#e-g-2"><span class="nav-number">4.2.</span> <span class="nav-text">e.g.2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#e-g-3"><span class="nav-number">4.3.</span> <span class="nav-text">e.g.3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#e-g-4"><span class="nav-number">4.4.</span> <span class="nav-text">e.g.4</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#e-g-5"><span class="nav-number">4.5.</span> <span class="nav-text">e.g.5</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

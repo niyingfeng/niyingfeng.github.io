@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Git 基础  Workspace：工作区 Index &#x2F; Stage：暂存区 Repository：仓库区（或本地仓库） Remote：远程仓库  Git 命令一、新建代码库12345$ git init ([project-name]) # 在当前目录新建一个Git代码库(新建一个目录，将其初始化为Git代码库) $ git clone [url]# 下载一个项目和它的整个代码历史">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 简单理解学习">
+<meta property="og:url" content="http://freefe.cc/2016/09/21/git-learn/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="Git 基础  Workspace：工作区 Index &#x2F; Stage：暂存区 Repository：仓库区（或本地仓库） Remote：远程仓库  Git 命令一、新建代码库12345$ git init ([project-name]) # 在当前目录新建一个Git代码库(新建一个目录，将其初始化为Git代码库) $ git clone [url]# 下载一个项目和它的整个代码历史">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.freefe.cc/20160922141.png">
+<meta property="og:image" content="http://image.freefe.cc/20160922142.png">
+<meta property="og:image" content="http://image.freefe.cc/20160922143.png">
+<meta property="og:image" content="http://image.freefe.cc/20160922144.png">
+<meta property="og:image" content="http://image.freefe.cc/20160922145.png">
+<meta property="og:image" content="http://image.freefe.cc/20160922146.png">
+<meta property="og:image" content="http://image.freefe.cc/20160922147.png">
+<meta property="og:image" content="http://image.freefe.cc/20160922148.png">
+<meta property="og:image" content="http://image.freefe.cc/20160922149.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214a.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214b.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214c.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214d.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214e.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214f.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214g.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214h.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214i.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214j.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214k.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214l.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214m.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214n.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214o.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214p.png">
+<meta property="og:image" content="http://image.freefe.cc/2016092214q.png">
+<meta property="article:published_time" content="2016-09-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.512Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="git,git 命令,git 基础,git 学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.freefe.cc/20160922141.png">
+
+<link rel="canonical" href="http://freefe.cc/2016/09/21/git-learn/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Git 简单理解学习 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2016/09/21/git-learn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Git 简单理解学习
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-09-22 00:00:00" itemprop="dateCreated datePublished" datetime="2016-09-22T00:00:00+08:00">2016-09-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Git-基础"><a href="#Git-基础" class="headerlink" title="Git 基础"></a>Git 基础</h3><p><img src="http://image.freefe.cc/20160922141.png"></p>
+<ul>
+<li>Workspace：工作区</li>
+<li>Index &#x2F; Stage：暂存区</li>
+<li>Repository：仓库区（或本地仓库）</li>
+<li>Remote：远程仓库</li>
+</ul>
+<h3 id="Git-命令"><a href="#Git-命令" class="headerlink" title="Git 命令"></a>Git 命令</h3><h3 id="一、新建代码库"><a href="#一、新建代码库" class="headerlink" title="一、新建代码库"></a>一、新建代码库</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git init ([project-name]) </span><br><span class="line"># 在当前目录新建一个Git代码库(新建一个目录，将其初始化为Git代码库) </span><br><span class="line"></span><br><span class="line">$ git clone [url]</span><br><span class="line"># 下载一个项目和它的整个代码历史</span><br></pre></td></tr></table></figure>
+
+<h3 id="二、配置"><a href="#二、配置" class="headerlink" title="二、配置"></a>二、配置</h3><p>Git的设置文件为.gitconfig，它可以在用户主目录下（全局配置），也可以在项目目录下（项目配置）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git config –list</span><br><span class="line"># 显示当前的Git配置 </span><br><span class="line"></span><br><span class="line">$ git config -e [--global]</span><br><span class="line"># 编辑Git配置文件</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、增加-x2F-删除文件"><a href="#三、增加-x2F-删除文件" class="headerlink" title="三、增加&#x2F;删除文件"></a>三、增加&#x2F;删除文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ git add ./[dir]/[file1] [file2] ...   </span><br><span class="line"># 添加所有文件/指定目录/指定文件到暂存区 </span><br><span class="line"></span><br><span class="line">$ git rm [file1] [file2] ...    </span><br><span class="line"># 删除工作区文件，并且将这次删除放入暂存区</span><br><span class="line"></span><br><span class="line">$ git mv [file-original] [file-renamed] </span><br><span class="line"># 改名文件，并且将这个改名放入暂存区</span><br></pre></td></tr></table></figure>
+
+<h3 id="四、代码提交"><a href="#四、代码提交" class="headerlink" title="四、代码提交"></a>四、代码提交</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ git commit -m [message]   # 提交暂存区到仓库区 </span><br><span class="line">$ git commit [file1] [file2] ... -m [message] # 提交暂存区的指定文件到仓库区 </span><br><span class="line"></span><br><span class="line">$ git commit -a     # 提交工作区自上次commit之后的变化，直接到仓库区 </span><br><span class="line">$ git commit -v     # 提交时显示所有diff信息 </span><br><span class="line"></span><br><span class="line">$ git commit --amend -m [message] </span><br><span class="line"># 使用一次新的commit，替代上一次提交，如果代码没有任何新变化，则用来改写上一次commit的提交信息 </span><br><span class="line">$ git commit --amend [file1] [file2] ...    </span><br><span class="line"># 重做上一次commit，并包括指定文件的新变化</span><br></pre></td></tr></table></figure>
+
+<h3 id="五、分支"><a href="#五、分支" class="headerlink" title="五、分支"></a>五、分支</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">$ git branch /-r/-a </span><br><span class="line"># 列出所有本地分支/所有远程分支/所有本地分支和远程分支</span><br><span class="line"></span><br><span class="line">$ git branch [branch-name]/[branch] [commit]</span><br><span class="line"># 新建一个分支/新建一个分支 指向指定commit，但依然停留在当前分支 </span><br><span class="line"></span><br><span class="line">$ git checkout -b [branch]  </span><br><span class="line"># 新建一个分支，并切换到该分支 </span><br><span class="line"></span><br><span class="line">$ git branch --track [branch] [remote-branch] </span><br><span class="line"># 新建一个分支，与指定的远程分支建立追踪关系 </span><br><span class="line"></span><br><span class="line">$ git checkout [branch-name]    </span><br><span class="line"># 切换到指定分支，并更新工作区 </span><br><span class="line"></span><br><span class="line">$ git branch --set-upstream [branch] [remote-branch] </span><br><span class="line"># 建立追踪关系，在现有分支与指定的远程分支之间 </span><br><span class="line"></span><br><span class="line">$ git merge [branch]    </span><br><span class="line"># 合并指定分支到当前分支 </span><br><span class="line"></span><br><span class="line">$ git branch -d [branch-name]   </span><br><span class="line"># 删除分支 </span><br><span class="line"></span><br><span class="line">$ git push origin --delete [branch-name]    </span><br><span class="line"># 删除远程分支</span><br></pre></td></tr></table></figure>
+
+<h3 id="六、标签"><a href="#六、标签" class="headerlink" title="六、标签"></a>六、标签</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ git tag       </span><br><span class="line"># 列出所有tag </span><br><span class="line">$ git tag [tag] ([commit])  </span><br><span class="line"># 新建一个tag在当前commit(在指定commit) </span><br><span class="line">$ git tag -d [tag]      </span><br><span class="line"># 删除本地tag </span><br><span class="line">$ git push origin :refs/tags/[tagName]   </span><br><span class="line"># 删除远程tag </span><br><span class="line">$ git show [tag]            </span><br><span class="line"># 查看tag信息 </span><br><span class="line">$ git push [remote] [tag]    </span><br><span class="line"># 提交指定tag </span><br><span class="line">$ git push [remote] --tags   </span><br><span class="line"># 提交所有tag </span><br><span class="line">$ git checkout -b [branch] [tag]     </span><br><span class="line"># 新建一个分支，指向某个tag</span><br></pre></td></tr></table></figure>
+
+<h3 id="七、查看信息"><a href="#七、查看信息" class="headerlink" title="七、查看信息"></a>七、查看信息</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ git status     </span><br><span class="line"># 显示有变更的文件 </span><br><span class="line">$ git log    </span><br><span class="line"># 显示当前分支的版本历史 </span><br><span class="line">$ git log --stat     </span><br><span class="line"># 显示commit历史，以及每次commit发生变更的文件 </span><br><span class="line">$ git log -S [keyword]   </span><br><span class="line"># 搜索提交历史，根据关键词 </span><br><span class="line">$ git log [tag] HEAD --pretty=format:%s </span><br><span class="line"># 显示某个commit之后的所有变动，每个commit占据一行 </span><br><span class="line">$ git log [tag] HEAD --grep feature </span><br><span class="line"># 显示某个commit之后的所有变动，其&quot;提交说明&quot;必须符合搜索条件</span><br></pre></td></tr></table></figure>
+
+<h3 id="八、远程同步"><a href="#八、远程同步" class="headerlink" title="八、远程同步"></a>八、远程同步</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ git fetch [remote]        </span><br><span class="line"># 下载远程仓库的所有变动 </span><br><span class="line">$ git remote -v             </span><br><span class="line"># 显示所有远程仓库 </span><br><span class="line">$ git remote show [remote]  </span><br><span class="line"># 显示某个远程仓库的信息 </span><br><span class="line">$ git remote add [shortname] [url]</span><br><span class="line"># 增加一个新的远程仓库，并命名 </span><br><span class="line"></span><br><span class="line">$ git pull [remote] [branch]    </span><br><span class="line"># 取回远程仓库的变化，并与本地分支合并 </span><br><span class="line">$ git push [remote] [branch]    </span><br><span class="line"># 上传本地指定分支到远程仓库 </span><br><span class="line"></span><br><span class="line">$ git rebase    </span><br><span class="line"># 从上游分支获取最新commit信息，并有机的将当前分支和上游分支进行合并</span><br></pre></td></tr></table></figure>
+
+<h3 id="九、撤销"><a href="#九、撤销" class="headerlink" title="九、撤销"></a>九、撤销</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout [file]    </span><br><span class="line"># 恢复暂存区的指定文件到工作区 </span><br><span class="line">$ git checkout [commit] [file] </span><br><span class="line"># 恢复某个commit的指定文件到暂存区和工作区</span><br><span class="line">$ git checkout .         </span><br><span class="line"># 恢复暂存区的所有文件到工作区 </span><br><span class="line"></span><br><span class="line">$ git reset [file]   </span><br><span class="line"># 重置暂存区的指定文件，与上一次commit保持一致，但工作区不变 </span><br><span class="line">$ git reset --hard   </span><br><span class="line"># 重置暂存区与工作区，与上一次commit保持一致 </span><br><span class="line">$ git reset [commit] </span><br><span class="line"></span><br><span class="line">$ git revert [commit]    </span><br><span class="line"># 后者的所有变化都将被前者抵消，并且应用到当前分支</span><br></pre></td></tr></table></figure>
+
+<h3 id="Git-命令图解"><a href="#Git-命令图解" class="headerlink" title="Git 命令图解"></a>Git 命令图解</h3><h3 id="git-reset"><a href="#git-reset" class="headerlink" title="git reset"></a>git reset</h3><p>reset将一个分支的末端指向另一个提交。这可以用来移除当前分支的一些提交。<code>git reset HEAD~2</code><img src="http://image.freefe.cc/20160922142.png"> <img src="http://image.freefe.cc/20160922143.png"></p>
+<h3 id="git-checkout"><a href="#git-checkout" class="headerlink" title="git checkout"></a>git checkout</h3><p>将HEAD移到一个新的分支</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">`git checkout Hotfix`</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.freefe.cc/20160922144.png"> <img src="http://image.freefe.cc/20160922145.png"></p>
+<h3 id="git-revert"><a href="#git-revert" class="headerlink" title="git revert"></a>git revert</h3><p>Revert撤销一个提交的同时会创建一个新的提交。这是一个安全的方法，因为它不会重写提交历史<code>git revert HEAD~2</code><img src="http://image.freefe.cc/20160922146.png"> <img src="http://image.freefe.cc/20160922147.png"></p>
+<h3 id="git-rebase"><a href="#git-rebase" class="headerlink" title="git rebase"></a>git rebase</h3><p>基于已有提交的远程分支”origin”，创建一个叫”mywork”的分支 再在这个分支做一些修改，然后生成两个提交(commit)，并且同时远程分支也有其他同学的提交，这时候 <img src="http://image.freefe.cc/20160922148.png"> <img src="http://image.freefe.cc/20160922149.png"> 在此，一般我们都会用”pull”命令把”origin”分支上的修改拉下来与当前的分钟修改合并，其结果看起来就像一个新的”合并的提交”(merge commit) <img src="http://image.freefe.cc/2016092214a.png"> 如果使用 git rebase，会把你的”mywork”分支里的每个提交(commit)取消掉，并且把它们临时 保存为补丁(patch)(这些补丁放到”.git&#x2F;rebase”目录中),然后把”mywork”分支更新 为最新的”origin”分支，最后把保存的这些补丁应用到”mywork”分支上 <img src="http://image.freefe.cc/2016092214b.png"></p>
+<h3 id="git-merge-–no-ff"><a href="#git-merge-–no-ff" class="headerlink" title="git merge –no-ff"></a>git merge –no-ff</h3><p>–no-ff 指的是强行关闭fast-forward方式 <img src="http://image.freefe.cc/2016092214c.png"></p>
+<h3 id="Git-分支"><a href="#Git-分支" class="headerlink" title="Git 分支"></a>Git 分支</h3><p>Git 保存的不是文件差异或者变化量，而只是一系列文件快照 Git 仓库中有五个对象：三个表示文件快照内容的 blob 对象；一个记录着目录树内容及其中各个文件对应 blob 对象索引的 tree 对象；以及一个包含指向 tree 对象（根目录）的索引和其他提交信息元数据的 commit 对象。 <img src="http://image.freefe.cc/2016092214d.png"> 作些修改后再次提交，那么这次的提交对象会包含一个指向上次提交对象的指针 <img src="http://image.freefe.cc/2016092214e.png"> Git 中的分支，其实本质上仅仅是个指向 commit 对象的可变指针。Git 会使用 master 作为分支的默认名字。在若干次提交后，你其实已经有了一个指向最后一次提交对象的 master 分支，它在每次提交的时候都会自动向前移动。 Git 是如何知道你当前在哪个分支上工作的呢？其实答案也很简单，它保存着一个名为 HEAD 的特别指针 <img src="http://image.freefe.cc/2016092214f.png"></p>
+<h3 id="Git-分支图解"><a href="#Git-分支图解" class="headerlink" title="Git 分支图解"></a>Git 分支图解</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout -b iss53</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.freefe.cc/2016092214g.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ vim a.js </span><br><span class="line">$ git commit -a -m &#x27;added a new footer [issue 53]&#x27;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.freefe.cc/2016092214h.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout master</span><br><span class="line">$ git checkout -b &#x27;hotfix&#x27;</span><br><span class="line">$ vim index.html </span><br><span class="line">$ git commit -a -m &#x27;fixed the broken email address&#x27;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.freefe.cc/2016092214i.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout master </span><br><span class="line">$ git merge hotfix</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.freefe.cc/2016092214j.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git branch -d hotfix</span><br><span class="line">$ git checkout iss53 </span><br><span class="line">$ vim index.html </span><br><span class="line">$ git commit -a -m &#x27;finished the new footer [issue 53]&#x27;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.freefe.cc/2016092214k.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout master </span><br><span class="line">$ git merge iss53</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.freefe.cc/2016092214l.png"></p>
+<h3 id="Git-分支的艺术"><a href="#Git-分支的艺术" class="headerlink" title="Git 分支的艺术"></a>Git 分支的艺术</h3><p><code>1、 GIT在技术层面上，是一个无中心的分布式版本控制系统，但在管理层面上，建议保持一个中心版本库。</code> <img src="http://image.freefe.cc/2016092214m.png"> <code>2、 建议一个中心版本库(origin)至少包括两个分支，即“主分支(master)”和“开发分支(develop)”</code> 要确保：团队成员从主分支(master)获得的都是处于可发布状态的代码，而从开发分支(develop)应该总能够获得最新开发进展的代码。 <img src="http://image.freefe.cc/2016092214n.png"></p>
+<blockquote>
+<p>3、在一个团队开发协作中，建议要有“辅助分支”的概念。 “辅助分支”，大体包括如下几类：“管理功能开发”的分支、“帮助构建可发布代码”的分支、“可以便捷的修复发布版本关键BUG”的分支。 “辅助分支”的最大特点就是“生命周期十分有限”，完成使命后即可被清除。</p>
+</blockquote>
+<p>建议至少还应设置三类“辅助分支”，我们称之为“Feature branches”，“Release branches”，“Hotfix branches”。 <img src="http://image.freefe.cc/2016092214o.png"> <code>4、 “Feature branches”，起源于develop分支，最终也会归于develop分支。</code></p>
+<blockquote>
+<p>“Feature branches”常用于开发一个独立的新功能，且其最终的结局必然只有两个，其一是合并入“develop”分支，其二是被抛弃。最典型的“Fearture branches”一定是存在于团队开发者那里，而不应该是“中心版本库”中。</p>
+</blockquote>
+<p>“Feature branches”起源于“develop”分支，实现方法是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b myfeature develop</span><br></pre></td></tr></table></figure>
+
+<p>“Feature branches”最终也归于“develop”分支，实现方式是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git checkout devleop</span><br><span class="line">git merge --no-ff myfeature（--no-ff，即not fast forward，其作用是：要求git merge即使在fast forward条件下也要产生一个新的merge commit）（采用--no-ff的方式进行分支合并，其目的在于，希望保持原有“Feature branches”整个提交链的完整性）</span><br><span class="line">git branch -d myfeature</span><br><span class="line">git push origin develop</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.freefe.cc/2016092214p.png"> <code>5、“Release branch”，起源于develop分支，最终归于“develop”或“master”分支。这类分支建议命名为“release-*”</code></p>
+<blockquote>
+<p>“Relase branch”通常负责“短期的发布前准备工作”、“小bug的修复工作”、“版本号等元信息的准备工作”。与此同时，“develop”分支又可以承接下一个新功能的开发工作了 “Release branch”产生新提交的最好时机是“develop”分支已经基本到达预期的状态，至少希望新功能已经完全从“Feature branches”合并到“develop”分支了</p>
+</blockquote>
+<p>创建“Release branches”，方法是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b release-2 develop./bump-version.sh 2 （这个脚本用于将代码所有涉及版本信息的地方都统一修改到2，另外，需要用户根据自己的项目去编写适合的bump-version.sh）</span><br><span class="line">git commit -a -m &quot;Bumped version number to 2&quot;</span><br></pre></td></tr></table></figure>
+
+<p>在一段短时间内，在“Release branches”上，我们可以继续修复bug。在此阶段，严禁新功能的并入，新功能应该是被合并到“develop”分支的。 经过若干bug修复后，“Release branches”上的代码已经达到可发布状态，此时，需要完成三个动作：</p>
+<ul>
+<li>第一是将“Release branches”合并到“master”分支</li>
+<li>第二是一定要为master上的这个新提交打TAG（记录里程碑）</li>
+<li>第三是要将“Release branches”合并回“develop”分支。 git checkout mastergit merge –no-ff release-1.2git tag -a 1.2（使用-u&#x2F;-s&#x2F;-a参数会创建tag对象，而非软tag） git checkout developgit merge –no-ff release-1.2git branch -d release-1.2</li>
+</ul>
+<p><code>6、“Hotfix branches”源于“master”，归于“develop”或“master”，通常命名为“hotfix-*”</code></p>
+<blockquote>
+<p>“Hotfix branches”类似于“Release branch”，但产生此分支总是非预期的关键BUG。</p>
+</blockquote>
+<p>建议设立“Hotfix branches”的原因是：希望避免“develop分支”新功能的开发必须为BUG修复让路的情况。 建立“Hotfix branches”，方法是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b hotfix-1 master./bump-version.sh 1</span><br><span class="line">git commit -a -m &quot;Bumpt version to 1&quot; （然后可以开始问题修复工作）</span><br><span class="line">git commit -m &quot;Fixed severe production problem&quot; （在问题修复后，进行第二次提交）</span><br></pre></td></tr></table></figure>
+
+<p>BUG修复后，需要将“Hotfix branches”合并回“master”分支，同时也需要合并回“develop”分支，方法是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git checkout mastergit merge --no-ff hotfix-1</span><br><span class="line">git tag -a 1</span><br><span class="line">git checkout developgit merge --no-ff hotfix-1</span><br><span class="line">git branch -d hotfix-1</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.freefe.cc/2016092214q.png"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/git-git-%E5%91%BD%E4%BB%A4-git-%E5%9F%BA%E7%A1%80-git-%E5%AD%A6%E4%B9%A0/" rel="tag"># git,git 命令,git 基础,git 学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/08/16/h5-mobile-cache-optimization/" rel="prev" title="【转载】H5 缓存机制浅析 – 移动端 Web 加载性能优化">
+      <i class="fa fa-chevron-left"></i> 【转载】H5 缓存机制浅析 – 移动端 Web 加载性能优化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/09/21/css-0-5px/" rel="next" title="关于0.5px的那点事儿">
+      关于0.5px的那点事儿 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-%E5%9F%BA%E7%A1%80"><span class="nav-number">1.</span> <span class="nav-text">Git 基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-%E5%91%BD%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">Git 命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%96%B0%E5%BB%BA%E4%BB%A3%E7%A0%81%E5%BA%93"><span class="nav-number">3.</span> <span class="nav-text">一、新建代码库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">二、配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%A2%9E%E5%8A%A0-x2F-%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6"><span class="nav-number">5.</span> <span class="nav-text">三、增加&#x2F;删除文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BB%A3%E7%A0%81%E6%8F%90%E4%BA%A4"><span class="nav-number">6.</span> <span class="nav-text">四、代码提交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%88%86%E6%94%AF"><span class="nav-number">7.</span> <span class="nav-text">五、分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E6%A0%87%E7%AD%BE"><span class="nav-number">8.</span> <span class="nav-text">六、标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%9F%A5%E7%9C%8B%E4%BF%A1%E6%81%AF"><span class="nav-number">9.</span> <span class="nav-text">七、查看信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E8%BF%9C%E7%A8%8B%E5%90%8C%E6%AD%A5"><span class="nav-number">10.</span> <span class="nav-text">八、远程同步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E6%92%A4%E9%94%80"><span class="nav-number">11.</span> <span class="nav-text">九、撤销</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-%E5%91%BD%E4%BB%A4%E5%9B%BE%E8%A7%A3"><span class="nav-number">12.</span> <span class="nav-text">Git 命令图解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git-reset"><span class="nav-number">13.</span> <span class="nav-text">git reset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git-checkout"><span class="nav-number">14.</span> <span class="nav-text">git checkout</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git-revert"><span class="nav-number">15.</span> <span class="nav-text">git revert</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git-rebase"><span class="nav-number">16.</span> <span class="nav-text">git rebase</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git-merge-%E2%80%93no-ff"><span class="nav-number">17.</span> <span class="nav-text">git merge –no-ff</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-%E5%88%86%E6%94%AF"><span class="nav-number">18.</span> <span class="nav-text">Git 分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-%E5%88%86%E6%94%AF%E5%9B%BE%E8%A7%A3"><span class="nav-number">19.</span> <span class="nav-text">Git 分支图解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-%E5%88%86%E6%94%AF%E7%9A%84%E8%89%BA%E6%9C%AF"><span class="nav-number">20.</span> <span class="nav-text">Git 分支的艺术</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

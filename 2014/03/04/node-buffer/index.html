@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="好吧，本以为node中的Buffer只是nodeJS中挺小的一块，仔细的翻阅了一些资料之后才发现，冰川总是将其巨大的屁股藏在海平面以下的，这次也是主要简单的讲一下关于Buffer比较浅的一些东西（针对Node初学者啦~） Buffer 是什么？对于JavaScript来说，对Unicode编码的数据很容易处理的，但是对于二进制数据就没什么处理方法了。 但是在一些TCP数据流或者在操作一些文件数据流">
+<meta property="og:type" content="article">
+<meta property="og:title" content="node之Buffer 介绍">
+<meta property="og:url" content="http://freefe.cc/2014/03/04/node-buffer/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="好吧，本以为node中的Buffer只是nodeJS中挺小的一块，仔细的翻阅了一些资料之后才发现，冰川总是将其巨大的屁股藏在海平面以下的，这次也是主要简单的讲一下关于Buffer比较浅的一些东西（针对Node初学者啦~） Buffer 是什么？对于JavaScript来说，对Unicode编码的数据很容易处理的，但是对于二进制数据就没什么处理方法了。 但是在一些TCP数据流或者在操作一些文件数据流">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_13957579146WFB.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758011Knm0.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_13957580902cvk.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758215FBRf.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_139575828735ZY.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758328p0MA.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758505cPtf.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758607bh1H.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_13957586459cC7.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758710m428.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_13957587702EjN.png">
+<meta property="article:published_time" content="2014-03-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.512Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="node,buffer">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.chinaunix.net/attachment/201403/25/26672038_13957579146WFB.png">
+
+<link rel="canonical" href="http://freefe.cc/2014/03/04/node-buffer/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>node之Buffer 介绍 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2014/03/04/node-buffer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          node之Buffer 介绍
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2014-03-05 00:00:00" itemprop="dateCreated datePublished" datetime="2014-03-05T00:00:00+08:00">2014-03-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>好吧，本以为node中的Buffer只是nodeJS中挺小的一块，仔细的翻阅了一些资料之后才发现，冰川总是将其巨大的屁股藏在海平面以下的，这次也是主要简单的讲一下关于Buffer比较浅的一些东西（针对Node初学者啦~）</p>
+<h2 id="Buffer-是什么？"><a href="#Buffer-是什么？" class="headerlink" title="Buffer 是什么？"></a>Buffer 是什么？</h2><p>对于JavaScript来说，对Unicode编码的数据很容易处理的，但是对于二进制数据就没什么处理方法了。</p>
+<p>但是在一些TCP数据流或者在操作一些文件数据流的时候，字节流的处理方法还是必须的。</p>
+<p>nodeJS中便出了处理的策略方法~提供了与String类似对等的全局构造函数Buffer（与其说与String对等，还不如说与Array类似但是有些不同方面还是需要注意），全局那么自然就不要每次的require了。</p>
+<blockquote>
+<p>Buffer则node中储存二进制数据的中介者。</p>
+</blockquote>
+<p><strong>创建Buffer实例的方式：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new Buffer( size );</span><br></pre></td></tr></table></figure>
+
+<p>和数组类似，给定所需要创建Buffer对象的大小。</p>
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_13957579146WFB.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new Buffer( array );</span><br></pre></td></tr></table></figure>
+
+<p>给定二进制数据的一个数组形式排列</p>
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758011Knm0.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new Buffer( str, [ encoding ] );</span><br></pre></td></tr></table></figure>
+
+<p>给与某一特定数据类型数据，以及其编码类型（默认均为utf8）</p>
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_13957580902cvk.png"></p>
+<p><strong>以及还有一些操作Buffer实例的方法：</strong></p>
+<p>一个Buffer的形式非常类似于一个整数数组，与字符串还是有一定的区别的。</p>
+<p>JS程序员都比较熟悉，对于字符串来说可以视为可读的，每次的修改，复制都会得到一个新的字符串，不会影响之前的字符串，就如有一个字符串a，将 var b &#x3D; a;  a 和 b 是各会拥有独立的一份字符串数据，相互独立，与对象类似于指针的形式不同（按值传递和按址传递）。</p>
+<p>不过对于字符串的兄弟Buffer来说，作为对象的Buffer含有的Array的血更多一点。</p>
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758215FBRf.png"></p>
+<p>但是对于Buffer的一些方法进行使用的时候，还是需要注意其和数组一些不一致的地方</p>
+<p> <img src="http://blog.chinaunix.net/attachment/201403/25/26672038_139575828735ZY.png"></p>
+<p>在将创建的Buffer截取一段之后，对返回的Buffer段进行修改，还是会影响原Buffer，两者仍是关联的。这类似于一个储存一个个对象的数组，Buffer这个类数组中每一个元素非原始值，而是引用值。</p>
+<p>对于希望复制一份独立的Buffer拷贝，Buffer提供了专门的方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Buffer.copy(targetBuffer, [targetStart], [sourceStart], [sourceEnd]);</span><br></pre></td></tr></table></figure>
+
+<p>相对来说并没有直接的直接拷贝副本的方法，只能新建一个长度相等的Buffer，然后在原Buffer上调用copy方法，参数中还可以设置copy的启事与结束位置等。</p>
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758328p0MA.png"></p>
+<p>对于更多的信息可以查看node的Buffer文档  <a target="_blank" rel="noopener" href="http://nodejs.org/api/buffer.html">http://nodejs.org/api/buffer.html</a></p>
+<h2 id="什么时候才需要使用Buffer"><a href="#什么时候才需要使用Buffer" class="headerlink" title="什么时候才需要使用Buffer"></a>什么时候才需要使用Buffer</h2><p>好了，以上就是对Buffer的简单介绍，其实那都是虚的，什么时候才需要使用Buffer呢？</p>
+<p>其实之前已经说过在Node中，许多地方的数据流均是使用的Buffer类型，以便于来处理一些二进制数据（比如读取文件数据，http请求中的post传递的数据等）。 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var fs = require(&#x27;fs&#x27;);</span><br><span class="line">var rs = fs.createReadStream(&#x27;chinese.md&#x27;);</span><br><span class="line">rs.on(&quot;data&quot;, function (chunk)&#123;</span><br><span class="line">    console.log( Buffer.isBuffer( chunk ) )</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758505cPtf.png"></p>
+<p>从上面可知其均为 Buffer 类型片段，那么在一些情况下也会使得我们遇到一些隐藏的问题：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var fs = require(&#x27;fs&#x27;);</span><br><span class="line">var rs = fs.createReadStream(&#x27;chinese.md&#x27; , &#123; highWaterMark: 5 &#125; );</span><br><span class="line">var data = &#x27;&#x27;;</span><br><span class="line">rs.on(&quot;data&quot;, function (chunk)&#123;</span><br><span class="line">    data += chunk;</span><br><span class="line">&#125;);</span><br><span class="line">rs.on(&quot;end&quot;, function () &#123;</span><br><span class="line">    console.log(data);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758607bh1H.png"></p>
+<p>会出现乱码现象，无法正常显示。</p>
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_13957586459cC7.png"></p>
+<p>一个中文字占了3个Buffer单位，但是在数据流分块的时候将一个中文的3个标识分开，再做 toString的时候救会发生出现这种乱码的情况。解决方式就是在拿到的分块数据千万不能直接进行类似toString式转义，将每段Buffer保存，最后合并成一个大的Buffer后在进行转义：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var fs = require(&#x27;fs&#x27;);</span><br><span class="line">var rs = fs.createReadStream(&#x27;chinese.md&#x27;, &#123; highWaterMark: 5 &#125; );</span><br><span class="line">var dataArr = [], len = 0, data;</span><br><span class="line">rs.on(&quot;data&quot;, function (chunk)&#123;</span><br><span class="line">    dataArr.push(chunk);</span><br><span class="line">    len += chunk.length;</span><br><span class="line">&#125;);</span><br><span class="line">rs.on(&quot;end&quot;, function () &#123;</span><br><span class="line">    data = Buffer.concat( dataArr, len ).toString();</span><br><span class="line">    console.log(data);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_1395758710m428.png"></p>
+<p>上述实例中我们可能还发现一个问题，将 { highWaterMark: 5 } 参数去掉后其实两个均没有问题，原因是因为默认的stream中切割data块单位是8K，所以可以在一个单位内容下这个小实例，所以没什么问题。一旦说数据很大，那么也会有相应的问题了。（之前一直拿txt测试了好久，发现怎么也不对，发现是编码方式问题）。</p>
+<p>顺便说一下在拼接性能方面，其实Buffer与String相比并不是很差：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">var buf = new Buffer(&#x27;this is text concat test&#x27;),</span><br><span class="line">	  str = &#x27;this is text concat test&#x27;;</span><br><span class="line">console.time(&#x27;buffer concat test&#x27;);</span><br><span class="line">var list = [];</span><br><span class="line">var len= 100000 * buf.length;</span><br><span class="line">for(var i=0;i&lt;100000;i++)&#123;</span><br><span class="line">    list.push(buf);</span><br><span class="line">    len += buf.length;</span><br><span class="line">&#125;</span><br><span class="line">var s1 = Buffer.concat(list, len).toString();</span><br><span class="line">console.timeEnd(&#x27;buffer concat test&#x27;);</span><br><span class="line">console.time(&#x27;string concat test&#x27;);</span><br><span class="line">var list = [];</span><br><span class="line">for (var i = 100000; i &gt;= 0; i--) &#123;</span><br><span class="line">    list.push(str);</span><br><span class="line">&#125;</span><br><span class="line">var s2 = list.join(&#x27;&#x27;);</span><br><span class="line">console.timeEnd(&#x27;string concat test&#x27;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://blog.chinaunix.net/attachment/201403/25/26672038_13957587702EjN.png"></p>
+<p>好吧，我承认写的有点不耐烦了，那么就这样吧，相当于简单的做个标签，有需要再查吧~ 哦吼吼~</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/node-buffer/" rel="tag"># node,buffer</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2013/06/25/javascript-note-1/" rel="prev" title="编写可维护的JavaScript笔记（1-3章）">
+      <i class="fa fa-chevron-left"></i> 编写可维护的JavaScript笔记（1-3章）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2014/04/08/facade-pattern/" rel="next" title="JS设计模式五：门面模式">
+      JS设计模式五：门面模式 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Buffer-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">Buffer 是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E6%89%8D%E9%9C%80%E8%A6%81%E4%BD%BF%E7%94%A8Buffer"><span class="nav-number">2.</span> <span class="nav-text">什么时候才需要使用Buffer</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

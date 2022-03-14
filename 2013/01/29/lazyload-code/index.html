@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="LazyloadLazyload 是通过延时加载JS和CSS文件来实现按需加载，以保证在页面刚刚开始呈现的时候提高速度，提高用户体验。 并且LazyLoad是非常小的，压缩完后（gzipped后只有 996 bite）,很容易实现装载外部JavaScript和CSS文件的需求。并且当你指定数组的 url 时,LazyLoad将自动加载资源,同时保证并行执行顺序加载。 其实现的对JS动态加载在不同浏">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript的LazyLoad源码分析">
+<meta property="og:url" content="http://freefe.cc/2013/01/29/lazyload-code/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="LazyloadLazyload 是通过延时加载JS和CSS文件来实现按需加载，以保证在页面刚刚开始呈现的时候提高速度，提高用户体验。 并且LazyLoad是非常小的，压缩完后（gzipped后只有 996 bite）,很容易实现装载外部JavaScript和CSS文件的需求。并且当你指定数组的 url 时,LazyLoad将自动加载资源,同时保证并行执行顺序加载。 其实现的对JS动态加载在不同浏">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2013-01-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.512Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="lazyload,lazyload源码">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://freefe.cc/2013/01/29/lazyload-code/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>JavaScript的LazyLoad源码分析 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2013/01/29/lazyload-code/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JavaScript的LazyLoad源码分析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2013-01-30 00:00:00" itemprop="dateCreated datePublished" datetime="2013-01-30T00:00:00+08:00">2013-01-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Lazyload"><a href="#Lazyload" class="headerlink" title="Lazyload"></a>Lazyload</h3><p>Lazyload 是通过延时加载JS和CSS文件来实现按需加载，以保证在页面刚刚开始呈现的时候提高速度，提高用户体验。 并且LazyLoad是非常小的，压缩完后（gzipped后只有 996 bite）,很容易实现装载外部JavaScript和CSS文件的需求。并且当你指定数组的 url 时,LazyLoad将自动加载资源,同时保证并行执行顺序加载。 其实现的对JS动态加载在不同浏览器的处理，以及CSS加载在不同浏览器的处理。实现了支持 Firefox 2+, IE6+, Safari 3+ (包括移动Safari), Google Chrome, and Opera 9+.</p>
+<h3 id="Lazyload-实例"><a href="#Lazyload-实例" class="headerlink" title="Lazyload 实例"></a>Lazyload 实例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// Load a single JavaScript file and execute a callback when it finishes.</span><br><span class="line">LazyLoad.js(&quot;http://example.com/foo.js&quot;, function () &#123;</span><br><span class="line">    alert(&quot;foo.js has been loaded&quot;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// Load multiple JS files and execute a callback when they&#x27;ve all finished.</span><br><span class="line">LazyLoad.js([&quot;foo.js&quot;, &quot;bar.js&quot;, &quot;baz.js&quot;], function () &#123;</span><br><span class="line">    alert(&quot;all files have been loaded&quot;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// Load a CSS file and pass an argument to the callback function.</span><br><span class="line">LazyLoad.css(&quot;foo.css&quot;, function (arg) &#123;</span><br><span class="line">    alert(arg);</span><br><span class="line">&#125;, &quot;foo.css has been loaded&quot;);</span><br><span class="line"></span><br><span class="line">// Load a CSS file and execute the callback in a different scope.</span><br><span class="line">LazyLoad.css(&quot;foo.css&quot;, function () &#123;</span><br><span class="line">    alert(this.foo); // displays &quot;bar&quot;</span><br><span class="line">&#125;, null, &#123;foo: &quot;bar&quot;&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Lazyload-源码分析"><a href="#Lazyload-源码分析" class="headerlink" title="Lazyload 源码分析"></a>Lazyload 源码分析</h3><p>LazyLoad 更容易的无阻塞延时加载一个或多个JavaScript 或 CSS 文件 在需求期间或之后呈现的web页面。 支撑 Firefox 2+, IE6+, Safari 3+ (包括移动Safari), Google Chrome, and Opera 9+. 其他浏览器为官方不标注支持。 关注 <a target="_blank" rel="noopener" href="https://github.com/rgrove/lazyload/">https://github.com/rgrove/lazyload/</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br></pre></td><td class="code"><pre><span class="line">Copyright (c) 2011 Ryan Grove &lt;ryan@wonko.com&gt;</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">LazyLoad = (function (doc) &#123;</span><br><span class="line">    // -- 私有变量 ------------------------------------------------------</span><br><span class="line">    // 用户代理和功能测试信息</span><br><span class="line">    var env,</span><br><span class="line">    // 指向元素 用来延迟填充.</span><br><span class="line">    head,</span><br><span class="line">    // 任何目前在进行的请求</span><br><span class="line">    pending = &#123;&#125;,</span><br><span class="line">    // 使用次数来判断样式表是否已经加载 数值太高可能停滞。</span><br><span class="line">    pollCount = 0,</span><br><span class="line">    // 请求队列</span><br><span class="line">    queue = &#123;css: [], js: []&#125;,</span><br><span class="line">    // 指向 文档的样式表列表</span><br><span class="line">    styleSheets = doc.styleSheets;</span><br><span class="line"></span><br><span class="line">    // -- 私有方法 --------------------------------------------------------</span><br><span class="line">    /**</span><br><span class="line">    创建并返回一个制定名和属性的 HTML 元素</span><br><span class="line">    @method createNode</span><br><span class="line">    @param &#123;String&#125; name element name</span><br><span class="line">    @param &#123;Object&#125; attrs name/value mapping of element attributes</span><br><span class="line">    @return &#123;HTMLElement&#125;</span><br><span class="line">    @private</span><br><span class="line">    */</span><br><span class="line">    function createNode(name, attrs) &#123;</span><br><span class="line">        var node = doc.createElement(name), attr;</span><br><span class="line">        for (attr in attrs) &#123;</span><br><span class="line">            if (attrs.hasOwnProperty(attr)) &#123;</span><br><span class="line">                node.setAttribute(attr, attrs[attr]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return node;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">    当当前指定类型的资源完成加载时调用。执行回调并加载下一个队列中的资源（如果有）</span><br><span class="line">    @method finish</span><br><span class="line">    @param &#123;String&#125; type resource type (&#x27;css&#x27; or &#x27;js&#x27;)</span><br><span class="line">    @private</span><br><span class="line">    */</span><br><span class="line">    function finish(type) &#123;</span><br><span class="line">        var p = pending[type],</span><br><span class="line">                callback,</span><br><span class="line">                urls;</span><br><span class="line">      // 判断是否有当前类型的资源加载</span><br><span class="line">        if (p) &#123;</span><br><span class="line">            callback = p.callback;</span><br><span class="line">            urls     = p.urls;</span><br><span class="line"></span><br><span class="line">            urls.shift();</span><br><span class="line">            pollCount = 0;</span><br><span class="line"></span><br><span class="line">          // 如果为最后一个待加载的URL 执行回调并且开始下一个队列中的请求（如果有）</span><br><span class="line">            if (!urls.length) &#123;</span><br><span class="line">                callback &amp;amp;&amp;amp; callback.call(p.context, p.obj);// 若有回调 以panding[type]中属性来执行</span><br><span class="line">                pending[type] = null;</span><br><span class="line">                queue[type].length &amp;amp;&amp;amp; load(type);// 队列中如还有当前类型的资源 加载该类型资源</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">    当前代码 the &lt;code&gt;env&lt;/code&gt; 环境变量和用户代理和功能测试信息。</span><br><span class="line">    @method getEnv</span><br><span class="line">    @private</span><br><span class="line">    */</span><br><span class="line">    function getEnv() &#123;</span><br><span class="line">        var ua = navigator.userAgent;</span><br><span class="line">        env = &#123;</span><br><span class="line">            // 如果这个浏览器支持禁用异步模式动态创建脚本节点</span><br><span class="line">            // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order</span><br><span class="line">            async: doc.createElement(&#x27;script&#x27;).async === true</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        (env.webkit = /AppleWebKit\//.test(ua))</span><br><span class="line">            || (env.ie = /MSIE/.test(ua))</span><br><span class="line">            || (env.opera = /Opera/.test(ua))</span><br><span class="line">            || (env.gecko = /Gecko\//.test(ua))</span><br><span class="line">            || (env.unknown = true);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">    加载指定的资源，或者在队列中如果没有指定的资源加载下一个指定类型资源。</span><br><span class="line">    如果一个指定类型资源已经被加载,新的请求将被排队,直到第一个请求完成。</span><br><span class="line">    当数组指定的资源urls,这些url将被载入并行如果它可行,同时保留执行顺序。所有</span><br><span class="line">    浏览器支持并行加载CSS,但只有Firefox和Opera支持并行加载的脚本。在其他浏览器,脚本将</span><br><span class="line">    排队并且在一个时间片段加载一次,以确保正确的执行顺序。</span><br><span class="line">    @method load</span><br><span class="line">    @param &#123;String&#125; type 资源类型 (&#x27;css&#x27; or &#x27;js&#x27;)</span><br><span class="line">    @param &#123;String|Array&#125; urls (可选) 需加载的URL或者URLs数组</span><br><span class="line">    @param &#123;Function&#125; callback (可选) 当资源加载完毕后</span><br><span class="line">    @param &#123;Object&#125; obj (可选) 传递给回调函数的对象参数</span><br><span class="line">    @param &#123;Object&#125; context (可选) 如果提供, 回调函数将被执行在这个对象的上下文参数中</span><br><span class="line">    @private</span><br><span class="line">    */</span><br><span class="line">    function load(type, urls, callback, obj, context) &#123;</span><br><span class="line">        var _finish = function () &#123; finish(type); &#125;,</span><br><span class="line">                isCSS   = type === &#x27;css&#x27;,</span><br><span class="line">                nodes   = [],</span><br><span class="line">                i, len, node, p, pendingUrls, url;</span><br><span class="line">        env || getEnv();</span><br><span class="line"></span><br><span class="line">        if (urls) &#123; // 有urls参数</span><br><span class="line">            // 当 urls 为 string 类型，处理为单元素数组  </span><br><span class="line">        // urls.concat()为复制数组（深度复制）使处理其不影响方法调用时的参数（对象在参数传递时是传址传递） </span><br><span class="line">            urls = typeof urls === &#x27;string&#x27; ? [urls] : urls.concat();</span><br><span class="line"></span><br><span class="line">        // 为每个URL创建一个请求对象，如果指定为多个url，则当所有url加载完毕后执行回调</span><br><span class="line">            //</span><br><span class="line">            // 可惜,Firefox和Opera浏览器是唯一能够并行加载并且同时保留执行顺序的浏览器。</span><br><span class="line">            // 在其他浏览器 脚本必须被逐一加载来保证顺序</span><br><span class="line">            //</span><br><span class="line">            // 所有浏览器对于 CSS 样式表的话 并行加载无先后顺序影响 都是简单的下载</span><br><span class="line">            if (isCSS || env.async || env.gecko || env.opera) &#123;</span><br><span class="line">                // 并行加载 当为CSS样式表 异步加载 Firefox和Opera 时 直接扔进队列中并行加载。</span><br><span class="line">                queue[type].push(&#123;</span><br><span class="line">                    urls    : urls,</span><br><span class="line">                    callback: callback,</span><br><span class="line">                    obj     : obj,</span><br><span class="line">                    context : context</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                // 否则 逐一加载保证顺序。</span><br><span class="line">                for (i = 0, len = urls.length; i &amp;lt; len; ++i) &#123;</span><br><span class="line">                    queue[type].push(&#123;</span><br><span class="line">                        urls    : [urls[i]],</span><br><span class="line">                        callback: i === len - 1 ? callback : null, // 只在最后一个时放入回调函数</span><br><span class="line">                        obj     : obj,</span><br><span class="line">                        context : context</span><br><span class="line">                    &#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    // 处理完urls参数进行队列处理</span><br><span class="line"></span><br><span class="line">    // 如果之前加载的要求这种类型目前还在进行中,将等待。否则,抓住队列中的下一项。</span><br><span class="line">        if (pending[type] || !(p = pending[type] = queue[type].shift())) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        head || (head = doc.head || doc.getElementsByTagName(&#x27;head&#x27;)[0]);</span><br><span class="line">        pendingUrls = p.urls;</span><br><span class="line"></span><br><span class="line">    //  循环建立请求</span><br><span class="line">        for (i = 0, len = pendingUrls.length; i &amp;lt; len; ++i) &#123;</span><br><span class="line">            url = pendingUrls[i];</span><br><span class="line"></span><br><span class="line">            // 火狐下不支持link节点的onload事件 以创建 style 标签 @import 引用来实现调用回调</span><br><span class="line">            if (isCSS) &#123;</span><br><span class="line">                    node = env.gecko ? createNode(&#x27;style&#x27;) : createNode(&#x27;link&#x27;, &#123;</span><br><span class="line">                        href: url,</span><br><span class="line">                        rel : &#x27;stylesheet&#x27;</span><br><span class="line">                    &#125;);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                node = createNode(&#x27;script&#x27;, &#123;src: url&#125;);</span><br><span class="line">                node.async = false;// 设为同步加载 保证顺序</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            node.className = &#x27;lazyload&#x27;;</span><br><span class="line">            node.setAttribute(&#x27;charset&#x27;, &#x27;utf-8&#x27;);</span><br><span class="line"></span><br><span class="line">            if (env.ie &amp;amp;&amp;amp; !isCSS) &#123;// IE的 script 加载完毕触发回调条件</span><br><span class="line">                node.onreadystatechange = function () &#123;</span><br><span class="line">                    if (/loaded|complete/.test(node.readyState)) &#123;</span><br><span class="line">                        node.onreadystatechange = null;</span><br><span class="line">                        _finish();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;;</span><br><span class="line">            &#125; else if (isCSS &amp;amp;&amp;amp; (env.gecko || env.webkit)) &#123;</span><br><span class="line">        // Gecko和WebKit不支持link节点的onload事件。</span><br><span class="line">                if (env.webkit) &#123;</span><br><span class="line">                    // 在WebKit,我们可以轮询修改文档。样式表找出当样式表已经加载。</span><br><span class="line">                    p.urls[i] = node.href; // 解决相对url(或轮询不会工作)</span><br><span class="line">                    pollWebKit();</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">            // 在Gecko,我们可以导入请求的URL到</span><br><span class="line">&lt;style&gt;节点和轮询node.sheet.cssRules的存在。</span><br><span class="line">                    node.innerHTML = &#x27;@import &quot;&#x27; + url + &#x27;&quot;;&#x27;;</span><br><span class="line">                    pollGecko(node);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                node.onload = node.onerror = _finish;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            nodes.push(node);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        for (i = 0, len = nodes.length; i &lt; len; ++i) &#123;</span><br><span class="line">            head.appendChild(nodes[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">    当样式表在Gecko中加载的时候 开始轮询来判断是否完成加载。在所有样式表完成加载 或者10S之后停止轮询防止无限循环</span><br><span class="line">    在此使用基于@import的跨域技术,和一个同域的实现 </span><br><span class="line">    http://www.zachleat.com/web/2010/07/29/load-css-dynamically/</span><br><span class="line">    @method pollGecko</span><br><span class="line">    @param &#123;HTMLElement&#125; node Style node to poll.</span><br><span class="line">    @private</span><br><span class="line">    */</span><br><span class="line">    function pollGecko(node) &#123;</span><br><span class="line">        var hasRules;</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            // 无需存储或者在此引用该值 但是如果不引用 编辑器就认为是无用的并且移除它。</span><br><span class="line">            hasRules = !!node.sheet.cssRules;</span><br><span class="line">        &#125; catch (ex) &#123;</span><br><span class="line">            // 一个例外意味着样式表仍然是在加载。</span><br><span class="line">            pollCount += 1;</span><br><span class="line"></span><br><span class="line">            if (pollCount &lt; 200) &#123; // 循环次数限制 共10s</span><br><span class="line">                setTimeout(function () &#123; pollGecko(node); &#125;, 50);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                // 轮询10秒后,还是没有结果发生。那么停止轮询和完成未决请求进一步判断 避免阻塞请求。</span><br><span class="line">                hasRules &amp;&amp; finish(&#x27;css&#x27;);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    // 如果执行到此,则样式表加载。</span><br><span class="line">        finish(&#x27;css&#x27;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">    在WebKit中 开始轮询来判断当等待样式表已经完成加载，在所有样式表完成加载 或者10S之后停止轮询防止无限循环</span><br><span class="line">    @method pollWebKit</span><br><span class="line">    @private</span><br><span class="line">    */</span><br><span class="line">    function pollWebKit() &#123;</span><br><span class="line">        var css = pending.css, i;</span><br><span class="line">        if (css) &#123;</span><br><span class="line">            i = styleSheets.length;</span><br><span class="line">          // 匹配styleSheet中的href 来判断是否加载完毕</span><br><span class="line">            while (--i &gt;= 0) &#123;</span><br><span class="line">                if (styleSheets[i].href === css.urls[0]) &#123;</span><br><span class="line">                    finish(&#x27;css&#x27;);</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            pollCount += 1;</span><br><span class="line"></span><br><span class="line">            if (css) &#123;</span><br><span class="line">                if (pollCount &lt; 200) &#123;</span><br><span class="line">                    setTimeout(pollWebKit, 50);</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    // 轮询10秒,但是什么也没有发生,这可能表明,样式表中已删除文件之前就有机会负载。停止轮询和完成等待请求以防止阻塞进一步的请求。</span><br><span class="line">                    finish(&#x27;css&#x27;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return &#123;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">    模块模式来暴露接口</span><br><span class="line"></span><br><span class="line">    请求指定CSS URL或URLs，当他们完成加载执行指定的回调函数(如果有的话)。</span><br><span class="line">    如果指定的是一个一个数组的urls,样式表将被并行加载在和所有的样式表加载完毕后执行回调。</span><br><span class="line"></span><br><span class="line">        @method css</span><br><span class="line">        @param &#123;String|Array&#125; urls 需要加载的单个或者数组形式的url</span><br><span class="line">        @param &#123;Function&#125; callback (可选)加载完毕所需要执行的回调函数</span><br><span class="line">        @param &#123;Object&#125; obj (可选) 回调函数需要传递的参数</span><br><span class="line">        @param &#123;Object&#125; context (可选) 提供回调函数的执行上下文</span><br><span class="line">        @static</span><br><span class="line">        */</span><br><span class="line">        css: function (urls, callback, obj, context) &#123;</span><br><span class="line">            load(&#x27;css&#x27;, urls, callback, obj, context);</span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">    请求指定的JavaScriptURL或URLs并当他们完成加载执行指定的回调函数(如果有的话)。</span><br><span class="line">    如果是指定一个url的数组和当浏览器支持,脚本将被并行载入，当完成所有的脚本加载后执行回调。</span><br><span class="line"></span><br><span class="line">    目前,只有Firefox和Opera支持并行加载脚本并且保存执行顺序。</span><br><span class="line">    在其他浏览器,脚本将排队和逐一加载一次,以确保正确的执行顺序。</span><br><span class="line"></span><br><span class="line">        @method js</span><br><span class="line">        @param &#123;String|Array&#125; urls 需要加载的单个或者数组形式的url</span><br><span class="line">        @param &#123;Function&#125; callback (可选) callback 加载完毕所需要执行的回调函数</span><br><span class="line">        @param &#123;Object&#125; obj (可选) 回调函数需要传递的参数</span><br><span class="line">        @param &#123;Object&#125; context (可选) 提供回调函数的执行上下文</span><br><span class="line">        @static</span><br><span class="line">        */</span><br><span class="line">        js: function (urls, callback, obj, context) &#123;</span><br><span class="line">            load(&#x27;js&#x27;, urls, callback, obj, context);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;)(this.document);</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/lazyload-lazyload%E6%BA%90%E7%A0%81/" rel="tag"># lazyload,lazyload源码</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2012/11/26/settimeout-and-setinterval/" rel="prev" title="setTimeout与setInterval">
+      <i class="fa fa-chevron-left"></i> setTimeout与setInterval
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2013/03/09/javascript-closure/" rel="next" title="详谈JS闭包~">
+      详谈JS闭包~ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Lazyload"><span class="nav-number">1.</span> <span class="nav-text">Lazyload</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lazyload-%E5%AE%9E%E4%BE%8B"><span class="nav-number">2.</span> <span class="nav-text">Lazyload 实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lazyload-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">Lazyload 源码分析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="backbone 简介当我们在开发大量 JavaScript 的 web 应用的时候，很大的工作就是处理 DOM 以及 DOM 中数据的问题。如果没有很好的组装架构，那么就会带来混乱的结构与越来越复杂和麻烦的问题。 backbone 是一个重量级的 JavaScript 应用框架。 为复杂的 JavaScript 应用程序提供了模型（models）、集合（collections）、视图（views">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BackBone事件源码">
+<meta property="og:url" content="http://freefe.cc/2013/05/30/backbone-event-code/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="backbone 简介当我们在开发大量 JavaScript 的 web 应用的时候，很大的工作就是处理 DOM 以及 DOM 中数据的问题。如果没有很好的组装架构，那么就会带来混乱的结构与越来越复杂和麻烦的问题。 backbone 是一个重量级的 JavaScript 应用框架。 为复杂的 JavaScript 应用程序提供了模型（models）、集合（collections）、视图（views">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2013-05-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.508Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="backbone,backbone事件源码,JS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://freefe.cc/2013/05/30/backbone-event-code/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>BackBone事件源码 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2013/05/30/backbone-event-code/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          BackBone事件源码
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2013-05-31 00:00:00" itemprop="dateCreated datePublished" datetime="2013-05-31T00:00:00+08:00">2013-05-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="backbone-简介"><a href="#backbone-简介" class="headerlink" title="backbone 简介"></a>backbone 简介</h3><p>当我们在开发大量 JavaScript 的 web 应用的时候，很大的工作就是处理 DOM 以及 DOM 中数据的问题。如果没有很好的组装架构，那么就会带来混乱的结构与越来越复杂和麻烦的问题。 backbone 是一个重量级的 JavaScript 应用框架。 为复杂的 JavaScript 应用程序提供了模型（models）、集合（collections）、视图（views）的结构。</p>
+<ul>
+<li>模型：用于绑定键值数据和自定义事件</li>
+<li>集合：附加有可枚举函数的丰富API</li>
+<li>视图：声明事件处理函数，通过RESRful JSON接口连接到应用程序。</li>
+</ul>
+<p>backbone.js 对于 Underscore.js 是重度依赖，对于RESTful，history则依赖与Backbone.Router，DOM处理依赖于 Backbone.View，json2.js，Jquery或者Zepto。 Backbone 将数据呈现为模型，可以创建模型、验证模型、销毁模型和保存模型至服务器。当 UI 的改变引起模型属性变化的时候就会触发 “change” 事件，所显示模型数据的 视图 会接受到更改通知，重新渲染。</p>
+<h3 id="backbone-使用"><a href="#backbone-使用" class="headerlink" title="backbone 使用"></a>backbone 使用</h3><p><code>backbone.Events</code> backbone 中的 event 模块可以被拓展到任意对象，使任何对象都可以使用自定义事件。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line">var Events = Backbone.Events = &#123;</span><br><span class="line">// 对一个事件绑定回调函数. 传递 &quot;all&quot; 则将绑定回调在所有事件触发时调用</span><br><span class="line">on: function(name, callback, context) &#123;</span><br><span class="line">  // API 检测 </span><br><span class="line">  if (!eventsApi(this, &#x27;on&#x27;, name, [callback, context]) || !callback) return this;</span><br><span class="line">  //相当于 this._events = this._events || &#123;&#125; 下面语法更容易用来赋值 如下下句</span><br><span class="line">  //在绑定时间的对象中 建立事件池 来进行事件管理</span><br><span class="line">  this._events || (this._events = &#123;&#125;); </span><br><span class="line">  // name 事件在事件池中的形式（数组形式） 存放当前对象绑定在name的所有事件</span><br><span class="line">  var events = this._events[name] || (this._events[name] = []);</span><br><span class="line">  // 将当前需要绑定的事件 push到事件池中的具体事件名称中</span><br><span class="line">  events.push(&#123;callback: callback, context: context, ctx: context || this&#125;);</span><br><span class="line">  return this;</span><br><span class="line">&#125;,</span><br><span class="line">off: function()&#123;&#125;,</span><br><span class="line">once: function()&#123;&#125;,</span><br><span class="line">trigger: function()&#123;&#125;,</span><br><span class="line">stopListening: function()&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">其实以上方法和 Jquery 的实现类似，只不过更为简单，Jquery 中还对当前需要绑定事件的对象如果为 DOM 元素的话需要进一步处理来保证 IE 中内存遇到的问题。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">// 解绑一个或者多个回调.</span><br><span class="line">// 如果 `context` 是 null, 移除所有有该函数的回调.</span><br><span class="line">// 如果 `callback` 是 null, 移除该事件下的所有回调. </span><br><span class="line">// 如果 `name` 是 null, 移除所有帮定的回调函数</span><br><span class="line">off: function(name, callback, context) &#123;</span><br><span class="line">    var retain, ev, events, names, i, l, j, k;</span><br><span class="line">    if (!this._events || !eventsApi(this, &#x27;off&#x27;, name, [callback, context])) return this;</span><br><span class="line"></span><br><span class="line">    // obj.off() 移除所有事件</span><br><span class="line">    if (!name &amp;&amp; !callback &amp;&amp; !context) &#123;</span><br><span class="line">        this._events = &#123;&#125;;</span><br><span class="line">        return this;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 使用 underscore 的 获取对象键值方法</span><br><span class="line">    names = name ? [name] : _.keys(this._events);</span><br><span class="line">    for (i = 0, l = names.length; i &lt; l; i++) &#123;</span><br><span class="line">        name = names[i];</span><br><span class="line">        // 移除某一事件下的回调</span><br><span class="line">        if (events = this._events[name]) &#123;</span><br><span class="line">            this._events[name] = retain = [];</span><br><span class="line">            if (callback || context) &#123;</span><br><span class="line">                for (j = 0, k = events.length; j &lt; k; j++) &#123;</span><br><span class="line">                    ev = events[j];</span><br><span class="line">                    if ((callback &amp;&amp; callback !== ev.callback &amp;&amp; callback !== ev.callback._callback) ||</span><br><span class="line">                            (context &amp;&amp; context !== ev.context)) &#123;</span><br><span class="line">                        // 不是所需要删除的事件 则重新扔回 事件池中的对应名称中</span><br><span class="line">                        retain.push(ev);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            //如果对应的名称中没有事件，那么删除事件池对象的该属性</span><br><span class="line">            if (!retain.length) delete this._events[name];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return this;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">事件移除，简单地说因为事件绑定是使用了 事件池 的方法处理，那么对于移除事件只需要在事件池中 delete 掉响应的事件即可，唯一需要做的是兼容参数个数不同情况下的移除事件情况。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">// 触发一个或多个事件, 触发所有绑定的回调.</span><br><span class="line">// 除了事件名称，回调函数会被传递&#x27;trigger&#x27;相同的参数。 </span><br><span class="line">// (如果你监听了 &#x27;all&#x27;, 会让你的回调函数将事件名称作为第一个参数).</span><br><span class="line">// obj.trigger(&quot;change&quot;,function()&#123;&#125;);</span><br><span class="line">// obj.trigger(&quot;all&quot;,function(eventName)&#123; alert(eventName) &#125;);</span><br><span class="line">trigger: function(name) &#123;</span><br><span class="line">    if (!this._events) return this;</span><br><span class="line">    var args = slice.call(arguments, 1);</span><br><span class="line">    if (!eventsApi(this, &#x27;trigger&#x27;, name, args)) return this;</span><br><span class="line">    var events = this._events[name];</span><br><span class="line">    //别忘了任何事件触发都要调用 all 中的事件</span><br><span class="line">    var allEvents = this._events.all;</span><br><span class="line">    if (events) triggerEvents(events, args);</span><br><span class="line">    if (allEvents) triggerEvents(allEvents, arguments);</span><br><span class="line">    return this;</span><br><span class="line">&#125;,</span><br><span class="line"></span><br><span class="line">// 使这个对象或者所有监听特定事件的对象停止监听该特定的事件</span><br><span class="line">stopListening: function(obj, name, callback) &#123;</span><br><span class="line">    var listeners = this._listeners;</span><br><span class="line">    if (!listeners) return this;</span><br><span class="line">    var deleteListener = !name &amp;&amp; !callback;</span><br><span class="line">    if (typeof name === &#x27;object&#x27;) callback = this;</span><br><span class="line">    if (obj) (listeners = &#123;&#125;)[obj._listenerId] = obj;</span><br><span class="line">    for (var id in listeners) &#123;</span><br><span class="line">        listeners[id].off(name, callback, this);</span><br><span class="line">        if (deleteListener) delete this._listeners[id];</span><br><span class="line">    &#125;</span><br><span class="line">    return this;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">触发与停止监听。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">// 分割事件字符串.</span><br><span class="line">var eventSplitter = /s+/;</span><br><span class="line">// 实现多样式化的事件功能的API </span><br><span class="line">//比如现有API中的多名称的change blur和jquery风格的事件映射 &#123;change: action&#125;</span><br><span class="line">var eventsApi = function(obj, action, name, rest) &#123;</span><br><span class="line">    if (!name) return true;</span><br><span class="line">    // 处理事件映射</span><br><span class="line">    if (typeof name === &#x27;object&#x27;) &#123;</span><br><span class="line">        for (var key in name) &#123;</span><br><span class="line">            obj[action].apply(obj, [key, name[key]].concat(rest));</span><br><span class="line">        &#125;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">    // 处理空间分割的事件名称.</span><br><span class="line">    if (eventSplitter.test(name)) &#123;</span><br><span class="line">        var names = name.split(eventSplitter);</span><br><span class="line">        for (var i = 0, l = names.length; i &lt; l; i++) &#123;</span><br><span class="line">            obj[action].apply(obj, [names[i]].concat(rest));</span><br><span class="line">        &#125;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">    return true;</span><br><span class="line">&#125;;</span><br><span class="line">// A difficult-to-believe, 在触发事件时优化内部调用. 尽可能快速到达最有可能的情况</span><br><span class="line">// (核心的3个 Backbone 事件参数).</span><br><span class="line">var triggerEvents = function(events, args) &#123;</span><br><span class="line">    var ev, i = -1, l = events.length, a1 = args[0], a2 = args[1], a3 = args[2];</span><br><span class="line">    switch (args.length) &#123;</span><br><span class="line">        case 0: while (++i &lt; l) (ev = events[i]).callback.call(ev.ctx); return;</span><br><span class="line">        case 1: while (++i &lt; l) (ev = events[i]).callback.call(ev.ctx, a1); return;</span><br><span class="line">        case 2: while (++i &lt; l) (ev = events[i]).callback.call(ev.ctx, a1, a2); return;</span><br><span class="line">        case 3: while (++i &lt; l) (ev = events[i]).callback.call(ev.ctx, a1, a2, a3); return;</span><br><span class="line">        default: while (++i &lt; l) (ev = events[i]).callback.apply(ev.ctx, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">var listenMethods = &#123;listenTo: &#x27;on&#x27;, listenToOnce: &#x27;once&#x27;&#125;;</span><br><span class="line">// 使用listenTo 和 listenToOnce反转 on and once 控制. 将 *this* 对象监听另外一个对象中的事件</span><br><span class="line">// 保持对监听的跟踪</span><br><span class="line">_.each(listenMethods, function(implementation, method) &#123;</span><br><span class="line">    Events[method] = function(obj, name, callback) &#123;</span><br><span class="line">        var listeners = this._listeners || (this._listeners = &#123;&#125;);</span><br><span class="line">        var id = obj._listenerId || (obj._listenerId = _.uniqueId(&#x27;l&#x27;));</span><br><span class="line">        listeners[id] = obj;</span><br><span class="line">        if (typeof name === &#x27;object&#x27;) callback = this;</span><br><span class="line">        obj[implementation](name, callback, this);</span><br><span class="line">        return this;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;);</span><br><span class="line">// 向后兼容的名称.</span><br><span class="line">Events.bind = Events.on;</span><br><span class="line">Events.unbind = Events.off;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">使用的实例为</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var object = &#123;&#125;;</span><br><span class="line">_.extend(object, Backbone.Events);</span><br><span class="line">object.bind(&quot;alert&quot;, function(msg) &#123;</span><br><span class="line">    alert(&quot;Triggered &quot; + msg);</span><br><span class="line">&#125;);</span><br><span class="line">object.trigger(&quot;alert&quot;, &quot;www.csser.com&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">object.unbind(&quot;change&quot;, onChange); // 只移除onChange回调函数</span><br><span class="line">object.unbind(&quot;change&quot;); // 移除所有 &quot;change&quot; 回调函数</span><br><span class="line">object.unbind();</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">`backbone.sync` _backbone.sync( method, model, [option] )_</span><br><span class="line"></span><br><span class="line">*   method - CRUD 方法 (&quot;create&quot;, &quot;read&quot;, &quot;update&quot;, 或 &quot;delete&quot;)</span><br><span class="line">*   model - 要被保存的模型（或要被读取的集合）</span><br><span class="line">*   options - 成功和失败的回调函数，以及所有 jQuery 请求支持的选项</span><br><span class="line"></span><br><span class="line">是对于模型在服务器中读取和保存的函数,都为 json 格式进行数据传输。默认情况下是依赖于 jQuery或者Zepto 的 Ajax 方法进行的发送 RESTful json 请求。（关于 REST Representational State Transfer 表现层状态转化 可见阮一峰老师的 理解RESTful架构）。额~反正本人不是很了解。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line">// Backbone.sync 同步</span><br><span class="line">// -------------</span><br><span class="line">// 重载这个方法来改变 Backbone 持久模型在服务器中的方式、</span><br><span class="line">// 通过请求类型和问题中的模型</span><br><span class="line">// 默认情况发送 RESTful Ajax 请求到模型中的`url()`.</span><br><span class="line">// 一些可行的自定义为:</span><br><span class="line">//</span><br><span class="line">// * 使用 `setTimeout` 在一个请求中批量的触发更新.</span><br><span class="line">// * 发送 XML 而不是 JSON.</span><br><span class="line">// * 坚持模型通过 WebSockets 而不是 Ajax.</span><br><span class="line">//</span><br><span class="line">// 开启 `Backbone.emulateHTTP` 为像 `POST` 一样发送 `PUT` 和 `DELETE` 请求</span><br><span class="line">// `_method` 参数中包含真正的 HTTP 方法,</span><br><span class="line">// 以及主体的所有请求 as `application/x-www-form-urlencoded`</span><br><span class="line">// 替换为 `application/json`参数名为 `model`的模块.</span><br><span class="line">// 当接口为服务器端语言，如**PHP**时很有用， 使得主体的&#x27;PUT&#x27;请求难以读取</span><br><span class="line">Backbone.sync = function(method, model, options) &#123;</span><br><span class="line">    var type = methodMap[method];</span><br><span class="line"></span><br><span class="line">    // 默认设置, 除非指定.</span><br><span class="line">    _.defaults(options || (options = &#123;&#125;), &#123;</span><br><span class="line">        emulateHTTP: Backbone.emulateHTTP,</span><br><span class="line">        emulateJSON: Backbone.emulateJSON</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    // 默认 JSON-request 设置.</span><br><span class="line">    var params = &#123;type: type, dataType: &#x27;json&#x27;&#125;;</span><br><span class="line"></span><br><span class="line">    // 确保有一个 URL.</span><br><span class="line">    if (!options.url) &#123;</span><br><span class="line">        params.url = _.result(model, &#x27;url&#x27;) || urlError();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 确保我们有正确的请求数据.</span><br><span class="line">    if (options.data == null &amp;&amp; model &amp;&amp; (method === &#x27;create&#x27; || method === &#x27;update&#x27; || method === &#x27;patch&#x27;)) &#123;</span><br><span class="line">        params.contentType = &#x27;application/json&#x27;;</span><br><span class="line">        params.data = JSON.stringify(options.attrs || model.toJSON(options));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 对于老的服务器, 模拟JSON以HTML形式的.</span><br><span class="line">    if (options.emulateJSON) &#123;</span><br><span class="line">        params.contentType = &#x27;application/x-www-form-urlencoded&#x27;;</span><br><span class="line">        params.data = params.data ? &#123;model: params.data&#125; : &#123;&#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 对于老的服务器, 模拟 HTTP 通过用 `_method` 方法仿造 HTTP </span><br><span class="line">    // 和一个 `X-HTTP-Method-Override` 头.</span><br><span class="line">    if (options.emulateHTTP &amp;&amp; (type === &#x27;PUT&#x27; || type === &#x27;DELETE&#x27; || type === &#x27;PATCH&#x27;)) &#123;</span><br><span class="line">        params.type = &#x27;POST&#x27;;</span><br><span class="line">        if (options.emulateJSON) params.data._method = type;</span><br><span class="line">        var beforeSend = options.beforeSend;</span><br><span class="line">        options.beforeSend = function(xhr) &#123;</span><br><span class="line">            xhr.setRequestHeader(&#x27;X-HTTP-Method-Override&#x27;, type);</span><br><span class="line">            if (beforeSend) return beforeSend.apply(this, arguments);</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 在 non-GET 请求中不传递数据.</span><br><span class="line">    if (params.type !== &#x27;GET&#x27; &amp;&amp; !options.emulateJSON) &#123;</span><br><span class="line">        params.processData = false;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 如果我们发送 `PATCH` 请求, </span><br><span class="line">    // 我们在一个老版本ActiveX默认启动的情况下，使用XHR来取代jQuery方法。</span><br><span class="line">    // 删除它当IE8支持 `PATCH` 的时候.</span><br><span class="line">    if (params.type === &#x27;PATCH&#x27; &amp;&amp; window.ActiveXObject &amp;&amp;</span><br><span class="line">                !(window.external &amp;&amp; window.external.msActiveXFilteringEnabled)) &#123;</span><br><span class="line">        params.xhr = function() &#123;</span><br><span class="line">            return new ActiveXObject(&quot;Microsoft.XMLHTTP&quot;);</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //提出请求, 允许用户自定义Ajax选项.</span><br><span class="line">    var xhr = options.xhr = Backbone.ajax(_.extend(params, options));</span><br><span class="line">    model.trigger(&#x27;request&#x27;, model, xhr, options);</span><br><span class="line">    return xhr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 映射 CRUD 到 HTTP 为了默认的 `Backbone.sync` 执行.</span><br><span class="line">var methodMap = &#123;</span><br><span class="line">    &#x27;create&#x27;: &#x27;POST&#x27;,</span><br><span class="line">    &#x27;update&#x27;: &#x27;PUT&#x27;,</span><br><span class="line">    &#x27;patch&#x27;: &#x27;PATCH&#x27;,</span><br><span class="line">    &#x27;delete&#x27;: &#x27;DELETE&#x27;,</span><br><span class="line">    &#x27;read&#x27;: &#x27;GET&#x27;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 通过 `$` 代理来设置 `Backbone.ajax` 的默认执行.</span><br><span class="line">// 如果想要使用另一个库那么重载它.</span><br><span class="line">Backbone.ajax = function() &#123;</span><br><span class="line">    return Backbone.$.ajax.apply(Backbone.$, arguments);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>&#96;&#96;&#96;</p>
+<h3 id="backbone-源码注释"><a href="#backbone-源码注释" class="headerlink" title="backbone 源码注释"></a>backbone 源码注释</h3><p>以上为 bockbone 的2个核心的模块，另外模块将在下两篇中简单介绍。 由于源码过长，请 查看 Github 猛击这里 。这里只为对 backbone 原文注释的简单翻译，具体还需要研究。 对于 backbone 的中文文档，请 点击这里 这是一个不错的中文文档，各个接口均有详细说明。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/backbone-backbone%E4%BA%8B%E4%BB%B6%E6%BA%90%E7%A0%81-JS/" rel="tag"># backbone,backbone事件源码,JS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2013/05/14/the-running-execution-context/" rel="prev" title="关于JavaScript的执行上下文">
+      <i class="fa fa-chevron-left"></i> 关于JavaScript的执行上下文
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2013/06/04/html5-canvas-api/" rel="next" title="HTML5 Canvas API简介">
+      HTML5 Canvas API简介 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#backbone-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">backbone 简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#backbone-%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">backbone 使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#backbone-%E6%BA%90%E7%A0%81%E6%B3%A8%E9%87%8A"><span class="nav-number">3.</span> <span class="nav-text">backbone 源码注释</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

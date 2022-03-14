@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="目前我们关于实现动画的方式，无非就是类似 jQuery的动画， CSS 的 animation，transition，tranform 或者 requestAnimationFrame 以及触及GPU的硬件加速动画。 jQuery的动画不用说，就普通的 CSS 动画而言使用浏览器自身的渲染引擎来处理动画的渲染，而触发 CSS 硬件加速则是通过 GPU 来提升 CSS 动画的性能，将有关于动画的运算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于动画到硬件加速的那点事儿">
+<meta property="og:url" content="http://freefe.cc/2015/09/29/animate-performance-optimization/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="目前我们关于实现动画的方式，无非就是类似 jQuery的动画， CSS 的 animation，transition，tranform 或者 requestAnimationFrame 以及触及GPU的硬件加速动画。 jQuery的动画不用说，就普通的 CSS 动画而言使用浏览器自身的渲染引擎来处理动画的渲染，而触发 CSS 硬件加速则是通过 GPU 来提升 CSS 动画的性能，将有关于动画的运算">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201509/30/26672038_14435988628aR6.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201509/30/26672038_14435978423d0d.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201509/30/26672038_1443597942uS7O.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201509/30/26672038_1443598040RPIT.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201509/30/26672038_1443598115lJHb.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201509/30/26672038_1443598224ob6h.png">
+<meta property="og:image" content="http://blog.chinaunix.net/attachment/201509/30/26672038_1443598249rf4X.png">
+<meta property="article:published_time" content="2015-09-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.508Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="CSS,动画性能">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.chinaunix.net/attachment/201509/30/26672038_14435988628aR6.png">
+
+<link rel="canonical" href="http://freefe.cc/2015/09/29/animate-performance-optimization/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>关于动画到硬件加速的那点事儿 | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2015/09/29/animate-performance-optimization/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          关于动画到硬件加速的那点事儿
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2015-09-30 00:00:00" itemprop="dateCreated datePublished" datetime="2015-09-30T00:00:00+08:00">2015-09-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>目前我们关于实现动画的方式，无非就是类似 jQuery的动画， CSS 的 animation，transition，tranform 或者 requestAnimationFrame 以及触及GPU的硬件加速动画。 jQuery的动画不用说，就普通的 CSS 动画而言使用浏览器自身的渲染引擎来处理动画的渲染，而触发 CSS 硬件加速则是通过 GPU 来提升 CSS 动画的性能，将有关于动画的运算从 CPU 移植到 GPU 上，大大提高渲染动画的效率。GPU 在对于渲染图形方便的优势，所以能在渲染动画上更容易达到每秒60帧的顺滑效果，使得视觉上顺畅无比。 简单来讲，当一个页面初次加载完毕的时候，浏览器的渲染引擎便开始了它的工作：</p>
+<ul>
+<li>浏览器解析HTML， 构建一棵 DOM 树，其每个节点对应页面的每个元素。</li>
+<li>渲染引擎对 DOM树，以浏览器解析后的 CSS ，会对应构建出一棵 Render 树，其每个节点 RenderObject包含了所对应 DOM 的最终样式信息。</li>
+<li>基于 Render 树，渲染引擎会将其中的某些特定节点同时创建新的 RenderLayer，从而还会生成一棵 RenderLayer 树。</li>
+<li>当 Render 树和 RenderLayer 树构建完毕之后，便依据两者，遍历各个节点开始渲染绘制出页面。</li>
+</ul>
+<p><img src="http://blog.chinaunix.net/attachment/201509/30/26672038_14435988628aR6.png"> 再简单介绍下 chrome 的 timeline 的几个名词：</p>
+<ul>
+<li>Timer Fire： 定时器触发，很简单，比如 jquery 的动画均是通过 setTimeout 来处理生产动画效果（一般性的动画），所以每次展现完毕后都会触发下一个定时器事件 JS 的过程。</li>
+<li>Recalculate Style：将 CSS 构建与 DOM 对应的的树，一般称之为 Render 树的过程。</li>
+<li>Layout：依据 Render 树，以及 RenderLayer 树进行页面布局的过程。</li>
+<li>Print：更具布局，绘制出页面的过程</li>
+<li>Composite Layers：渲染展现到屏幕的过程</li>
+</ul>
+<p>最古老的动画形式： HTML：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;square&quot;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+
+<p>CSS：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.square&#123;</span><br><span class="line">        position:relative;</span><br><span class="line">        top:50px;</span><br><span class="line">        left: 50px;</span><br><span class="line">        margin-bottom: 10px; </span><br><span class="line">        height:80px;</span><br><span class="line">        width:80px;</span><br><span class="line">        background-color:#999;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JS：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$(&#x27;.jquery&#x27;).click(function()&#123;</span><br><span class="line">        $(&#x27;.square&#x27;).animate(&#123;</span><br><span class="line">                height: 300,</span><br><span class="line">                width: 300,</span><br><span class="line">                left:200,</span><br><span class="line">                top:200,</span><br><span class="line">                opacity: 5&#125;,</span><br><span class="line">                3000, &#x27;linear&#x27;, function() &#123;</span><br><span class="line">        &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>以上是一个很简单 jq 动画效果，3秒钟从原有图形样式转变到指定的图形样式，但是，浏览器所处理的却是一段 jq 分割的复杂的过程， <img src="http://blog.chinaunix.net/attachment/201509/30/26672038_14435978423d0d.png"> 每一次浏览器都要处理包括 Timer Fire，Recalculate Style，Layout，Paint，Composite Layers，一次又一次的不断重复又循环，内存占用率也是随之增大。 <img src="http://blog.chinaunix.net/attachment/201509/30/26672038_1443597942uS7O.png"> 如今的时代，css的动画帮我们解决了很多难题， 普通的2D CSS动画： CSS：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.css2d&#123;</span><br><span class="line">        width:300px;</span><br><span class="line">        height:300px;</span><br><span class="line">        left:200px;</span><br><span class="line">        top:200px;</span><br><span class="line">        transition: width 3s linear, height 3s linear,top 3s linear,left 3s linear;</span><br><span class="line">        -webkit-transition: width 3s linear, height 3s linear,top 3s linear,left 3s linear,;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JS：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$(&#x27;.css-2d&#x27;).click(function()&#123;</span><br><span class="line">        $(&#x27;.square&#x27;).addClass(&#x27;css2d&#x27;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>直接上图，计算样式以及重新布局均有浏览器自身完成，并且少了定时器触发事件这一块，使得动画运行方式更为自然， <img src="http://blog.chinaunix.net/attachment/201509/30/26672038_1443598040RPIT.png"> 还有内存图： <img src="http://blog.chinaunix.net/attachment/201509/30/26672038_1443598115lJHb.png"> 或许感觉还不错了，但是由于涉及到了一些或导致重排的属性，使得动画的时候一直重排重绘，那么来看看硬件加速的样式动画吧， 吊炸天的硬件加速CSS动画： CSS：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">.hardware&#123;</span><br><span class="line">        -webkit-animation: hardware 2s infinite linear;</span><br><span class="line">        animation: hardware 2s infinite linear;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@-webkit-keyframes hardware &#123;</span><br><span class="line">        0% &#123;</span><br><span class="line">                transform: translate3d(0,0,0) scale3d(1,1,1);</span><br><span class="line">                -webkit-transform: translate3d(0,0,0) scale3d(1,1,1);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        50% &#123;</span><br><span class="line">                transform: translate3d(150px,150px,0) scale3d(3,3,1);</span><br><span class="line">                -webkit-transform: translate3d(150px,150px,0) scale3d(3,3,1);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@keyframes hardware &#123;</span><br><span class="line">        0% &#123;</span><br><span class="line">                transform: translate3d(0,0,0) scale3d(1,1,1);</span><br><span class="line">                -webkit-transform: translate3d(0,0,0) scale3d(1,1,1);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        50% &#123;</span><br><span class="line">                transform: translate3d(150px,150px,0) scale3d(3,3,1);</span><br><span class="line">                -webkit-transform: translate3d(150px,150px,0) scale3d(3,3,1);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JS：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$(&#x27;.css-hardware&#x27;).click(function()&#123;</span><br><span class="line">        $(&#x27;.square&#x27;).addClass(&#x27;hardware&#x27;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>对于硬件加速的动画，浏览器渲染的过程： <img src="http://blog.chinaunix.net/attachment/201509/30/26672038_1443598224ob6h.png"> 屌不屌其实都一样啦，只不过没有使用处理元素的一些，如height， width，left，top 等元素值的动画，而使用了一些3D CSS属性达到了我们所需的动画效果，但是浏览器处理动画却已经完全不一样。动画过程优化到了仅剩Recalculate Style，Composite Layers 两个过程。 <img src="http://blog.chinaunix.net/attachment/201509/30/26672038_1443598249rf4X.png"> 这边为什么会这么吊呢，这就全依仗与 对应所生成的第三种树 RenderLayer 树，该元素节点被渲染引擎根据 CSS 创建了对应的 RenderLayer 树节点，并将其绑定到 GPU，当该 RenderLayer 的 transform 等变化时候，跳过浏览器的 Layout，以及 Print，直接有 GPU 对其做变换。这个也是直接提升动画性能，内存突然降低（计算被移植到了GPU）的原因。 那么如何来处理 CSS，将我们所需要进行动画的元素构建时拥有新建的 RenderLayer 节点呢？ 目前查询到的资料来看，chrome 以下：</p>
+<ul>
+<li>3D或透视变换（perspective transform）CSS属性</li>
+<li>使用加速视频解码的\<video>节点</li>
+<li>拥有3D（WebGL）上下文或加速的2D上下文的\<canvas>节点</li>
+<li>混合插件（如Flash）</li>
+<li>对自己的opacity做CSS动画或使用一个动画webkit变换的元素</li>
+<li>拥有加速CSS过滤器的元素</li>
+<li>元素有一个包含复合层的后代节点（一个元素拥有一个子元素，该子元素在自己的层里）</li>
+<li>元素有一个z-index较低且包含一个复合层的兄弟元素（换句话说就是该元素在复合层上面渲染）</li>
+</ul>
+<p>一般我们都会尝试对需要进行动画的元素添加一个 3D 的属性从而来触发其硬件加速的动画效果，现在又有一个专门用作触发生成新 RenderLayer 的属性值 will-change。 当然以上动画最优情况只正对于部分 GPU 加速处理的 CSS 属性，对于涉及到重排 relayout 和 重绘 repaint 的属性我们可能需要慎重考虑以及优化了。 <code>重排：</code>重排是页面结构调整，获取或者设置元素某些属性值时，触发了浏览器 Layout 过程重新定义的情况，比如调整元素的几何大小，位置，获取宽高等。重排必然导致重绘，浏览器渲染总会依照 Layout，Paint，Composite Layers 的流程来处理。下面是触发重排的一些主要情况：</p>
+<ul>
+<li>脚本操作DOM，增加删除可视的DOM节点</li>
+<li>操作 class 属性，或者设置 style 属性</li>
+<li>计算获取当前 offsetTop&#x2F;Left&#x2F;Width&#x2F;Height, scrollTop&#x2F;Left&#x2F;Width&#x2F;Height, clientTop&#x2F;Left&#x2F;Width&#x2F;Height, width, height 等属性值</li>
+<li>内容变化， 窗口调整等</li>
+</ul>
+<p><code>触发重排的属性：</code> <code>盒子模型的相关属性：</code>width, height, padding, margin, display, border <code>定位特性的相关属性：</code>top, bottom, left, right, position, float, clear <code>内容的相关属性：</code>text-align, overflow, font-family, line-height,font-size <code>重绘：</code>重排必然导致重绘，并且对于仅调整各类属性色值等时，浏览器重新绘制输出到浏览器的情况。 触发重排的属性：color, border-style, visibility, background, outline, box-shadow 等 一些动画的重排重绘我们不可避免，我们要做的并不是禁止它，存在即合理，事实只有我们滥用。以下是一些简单的优化重排，重绘的方法：</p>
+<ul>
+<li>将多次需要频繁改变的样式一次性完成，不要频繁的获取计算样式。</li>
+<li>将大量的操作 DOM 操作放置到页面之外进行。</li>
+<li>尽可能在最末端需要调整的 DOM 上改变 class，减小对其它 DOM 的影响。</li>
+<li>动画尽量应用到 position 为 absolute 或者 fixed 的元素上，以便当前元素的动画造成大规模的重排。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSS-%E5%8A%A8%E7%94%BB%E6%80%A7%E8%83%BD/" rel="tag"># CSS,动画性能</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2015/08/27/box-flex/" rel="prev" title="box-flex 弹性可伸缩盒模型">
+      <i class="fa fa-chevron-left"></i> box-flex 弹性可伸缩盒模型
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/02/28/jquery-deferred/" rel="next" title="jQuery 实现异步队列模块 Deferred">
+      jQuery 实现异步队列模块 Deferred <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

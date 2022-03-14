@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"freefe.cc","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="原文地址：http:&#x2F;&#x2F;www.2ality.com&#x2F;2014&#x2F;09&#x2F;es6-modules-final.html原文作者：Dr. Axel Rauschmayer 译者：倪颖峰地址：freefe.cc 在2014年7月底，TC39的另外一个会议，敲定了关于 ECMAScript 6 模块化语法的最后一些细节。本文完整的概述了关于 ES6 模块系统。 1. 当前 JavaScript 的模块系统。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】 ECMAScript 6 模块化：最后的战役（上）">
+<meta property="og:url" content="http://freefe.cc/2014/10/08/es6-module/index.html">
+<meta property="og:site_name" content="NiYingfeng 的博客">
+<meta property="og:description" content="原文地址：http:&#x2F;&#x2F;www.2ality.com&#x2F;2014&#x2F;09&#x2F;es6-modules-final.html原文作者：Dr. Axel Rauschmayer 译者：倪颖峰地址：freefe.cc 在2014年7月底，TC39的另外一个会议，敲定了关于 ECMAScript 6 模块化语法的最后一些细节。本文完整的概述了关于 ES6 模块系统。 1. 当前 JavaScript 的模块系统。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2014-10-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-14T14:59:59.512Z">
+<meta property="article:author" content="倪颖峰">
+<meta property="article:tag" content="前端开发,学习与方案">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://freefe.cc/2014/10/08/es6-module/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【译】 ECMAScript 6 模块化：最后的战役（上） | NiYingfeng 的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">NiYingfeng 的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录技术、生活与思考</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2014/10/08/es6-module/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【译】 ECMAScript 6 模块化：最后的战役（上）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2014-10-09 00:00:00" itemprop="dateCreated datePublished" datetime="2014-10-09T00:00:00+08:00">2014-10-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 22:59:59" itemprop="dateModified" datetime="2022-03-14T22:59:59+08:00">2022-03-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>原文地址：<a target="_blank" rel="noopener" href="http://www.2ality.com/2014/09/es6-modules-final.html">http://www.2ality.com/2014/09/es6-modules-final.html</a><br>原文作者：Dr. Axel Rauschmayer</p>
+<p>译者：倪颖峰<br>地址：<a href="http://freefe.cc/">freefe.cc</a></p>
+<p>在2014年7月底，TC39的另外一个会议，敲定了关于 ECMAScript 6 模块化语法的最后一些细节。本文完整的概述了关于 ES6 模块系统。</p>
+<h2 id="1-当前-JavaScript-的模块系统。"><a href="#1-当前-JavaScript-的模块系统。" class="headerlink" title="1. 当前 JavaScript 的模块系统。"></a>1. 当前 JavaScript 的模块系统。</h2><p>JavaScript 目前没有内置方法来支持模块化，不过社区创造了非常不错的变通方案。两个重要的（可惜相互不兼容）标准是：</p>
+<ol>
+<li>CommonJS 模块化：该标准主要被使用在 Node.js 中（Node.js 模块化中有一些超出 CommonJS 的语法的特性）。特点：语法简洁，为同步加载设计，主要使用在服务器端。</li>
+<li>异步模块定义（AMD）：该标准最流行的应用就是 RequireJS。    特点：略微复杂的语法使得 AMD 可以不使用 eval() 实现（或者说编译过程），为异步加载设计，主要在浏览器端使用。</li>
+</ol>
+<p>以上只是对目前的状况简单粗暴的解释了一下，如果你想更深入的了解一下可以读一下 Addy Osmani 的“使用AMD，CommonJS 和 ES Harmony 写模块化JavaScript”。</p>
+<h2 id="2-ECMAScript-6-模块化"><a href="#2-ECMAScript-6-模块化" class="headerlink" title="2. ECMAScript 6 模块化"></a>2. ECMAScript 6 模块化</h2><p>ECMAScript 6 模块化的目标是创建一种 CommonJS 和 AMD 使用者都乐意接受的方式：</p>
+<ol>
+<li>类似 CommonJS，拥有简洁的语法，倾向于单一的接口并且支持循环依赖。</li>
+<li>类似 AMD，直接支持异步加载和配置模块加载。</li>
+</ol>
+<p>内置语言允许 ES6 模块化超出 CommonJS 和 AMD 规范（之后会详细介绍）：</p>
+<ol>
+<li>语法将比 CommonJS 的更简洁。</li>
+<li>结构可以做静态分析（静态检测，优化等）。</li>
+<li>比 CommonJS 做的更好的循环依赖。</li>
+</ol>
+<p>ES6 模块化标准包括两部分：</p>
+<ol>
+<li>声明语法（引入与导出）。</li>
+<li>编程式加载接口：用来配置如何加载模块和按条件加载模块。</li>
+</ol>
+<h2 id="3-ES6-模块语法概述"><a href="#3-ES6-模块语法概述" class="headerlink" title="3. ES6 模块语法概述"></a>3. ES6 模块语法概述</h2><p>有两种导出方式：命名式导出（每个模块可以多个）和定义式导出（每个模块仅一个）。</p>
+<p>3.1. 命名式导出（每个模块可以多个）</p>
+<p>一个模块可以通过前缀关键词 export 声明来导出多个。</p>
+<p>这些导出以名字进行区分，称之为命名式导出。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// ----- lib.js ------</span><br><span class="line">export const sqrt = Math.sqrt;</span><br><span class="line">export function square( x )&#123;</span><br><span class="line">    return x*x;</span><br><span class="line">&#125;</span><br><span class="line">export function diag( x, y )&#123;</span><br><span class="line">    return sqrt( square( x ) + square( y ) );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// -------- main.js -------</span><br><span class="line">import&#123; square, diag &#125; from &#x27;lib&#x27;;</span><br><span class="line">console.log( square(11) ); // 121</span><br><span class="line">console.log( diag( 4, 3 ) ); // 5</span><br></pre></td></tr></table></figure>
+
+<p>也有其他方式带定义命名式导出（稍后介绍），但是我发现此方式是最方便的：如果没有外层环境，你可以很简单的书写代码，然后以你想要的关键词来标识所有的东西。</p>
+<p>如果需要，你也可以导入整一个模块，通过属性命名来指向命名式的导出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import * as lib grom &#x27;lib&#x27;;</span><br><span class="line">console.log( lib.square( 11 ) ); // 121</span><br><span class="line">console.log( lib.diag( 4, 3 ) ); // 5</span><br></pre></td></tr></table></figure>
+
+<p>在 CommonJS 语法下的相同代码：有段时间我在 Node.js 下尝试了几种不错的策略来减少我的模块导出时代码冗余。现在我比较喜欢下面这种简单但是略微冗长的风格，有点类似于模块模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">// ---- lib.js -----</span><br><span class="line">var sqrt = Math.sqrt;</span><br><span class="line">function square( x )&#123;</span><br><span class="line">    return x*x;</span><br><span class="line">&#125;</span><br><span class="line">function diag( x, y )&#123;</span><br><span class="line">    return sqrt( square( x ) + square( y ) );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = &#123;</span><br><span class="line">    sqrt : sqrt,</span><br><span class="line">    sqare : sqare,</span><br><span class="line">    diag : diag</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// ------ main.js ------</span><br><span class="line">var square = require( &#x27;lib&#x27; ).square;</span><br><span class="line">var diag = require( &#x27;lib&#x27; ).diag;</span><br><span class="line">console.log( square( 11 ) ); // 121</span><br><span class="line">console.log( diag( 4, 3 ) ); // 5</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-定义式导出（每个模块仅一个）"><a href="#3-2-定义式导出（每个模块仅一个）" class="headerlink" title="3.2. 定义式导出（每个模块仅一个）"></a>3.2. 定义式导出（每个模块仅一个）</h3><p>在 Node.js 社区很受欢迎的模块导出单一值。当然在需要经常有构造函数和类来创建模型的前端开发中也类一样，一模块一模型。一个 ECMAScript 6 模块可以采用定义式导出，导出最主要的值。定义式导出容易引用。</p>
+<p>以下为单函数的 ECMAScript 6 模块：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// ----- myFunc.js -------</span><br><span class="line">export default function()&#123; &#125;;</span><br><span class="line"></span><br><span class="line">// ------ main.js --------</span><br><span class="line">import myFunc from &#x27;myFunc&#x27;;</span><br><span class="line">myFunc();</span><br></pre></td></tr></table></figure>
+
+<p>定义式导出一个类的 ECMAScript 6 模块如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// ----- MyClass.js -------</span><br><span class="line">export default class()&#123; &#125;;</span><br><span class="line"></span><br><span class="line">// ------ main.js --------</span><br><span class="line">import MyClass from &#x27;MyClass&#x27;;</span><br><span class="line">let inst = new MyClass();</span><br></pre></td></tr></table></figure>
+
+<p>注：定义式导出声明的操作数是一个表达式，往往不需要名字。代替之的是通过模块的名称来确认。</p>
+<h3 id="3-3-同一模块中使用命名式导出和定义式导出"><a href="#3-3-同一模块中使用命名式导出和定义式导出" class="headerlink" title="3.3. 同一模块中使用命名式导出和定义式导出"></a>3.3. 同一模块中使用命名式导出和定义式导出</h3><p>一下模式在 JavaScript 中非常常见：一个库仅仅是单一的函数，不过通过该函数的属性来提供其他的支持。包括 jQuery 和Underscore.js。下面是简单的 Underscore 作为 CommonJS 模块的写法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// ----------underscore.js ----------</span><br><span class="line">var _ = function( obj )&#123;&#125;;</span><br><span class="line">var each = _.each = _forEach = function( obj, iterator, context )&#123;&#125;</span><br><span class="line"></span><br><span class="line">module.esports = _;</span><br><span class="line"></span><br><span class="line">// ---------- main.js ---------</span><br><span class="line">var _ = require(&#x27;underscore&#x27;);</span><br><span class="line">var each = _.each;</span><br></pre></td></tr></table></figure>
+
+<p>在ES6下，函数 _ 是定义式导出而 each 和 forEach 是命名式导出。 这证明事实上是可以同时进行命名式导出和定义式导出的。例如之前的 CommonJS 模块，以 ES6 来重写模块，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// --------underscore.js--------------</span><br><span class="line">export default function( obj )&#123; &#125;</span><br><span class="line">export function each( obj, itertor, context )&#123; &#125;</span><br><span class="line">export &#123; each as forEach &#125;</span><br><span class="line"></span><br><span class="line">// --------main.js ------------</span><br><span class="line">import _, &#123; each &#125; from &#x27;underscore&#x27;;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是 CommonJS 版本和 ECMAScript 6 版本仅仅是大致相同。后者为扁平式结构，而前者为嵌套式结构。喜欢哪一种风格有自己决定，不过扁平式结构具有做静态分析的优势（下面会提到优点）。CommonJS 风格看起来为了满足对象的需要部分被作为命名空间，可以通过 ES6 模块来实现这种需求并且导出实现。</p>
+<p>定义式导出仅仅是另一种形式的命名式导出。</p>
+<p>定义式导出事实上是命名式导出使用了特殊名称 default 。即，下面两个是等价的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import &#123; default as foo &#125; from &#x27;lib&#x27;;</span><br><span class="line">import foo from &#x27;lib&#x27;;</span><br></pre></td></tr></table></figure>
+
+<p>类似的，下面两者也是等价的定义式导出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// --------module1.js-----------</span><br><span class="line">export default 123;</span><br><span class="line">// --------module2.js-----------</span><br><span class="line">const D = 123;</span><br><span class="line">export &#123; D as default &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>那为何我们还需要命名式到导出呢？</p>
+<p>你可能会疑虑，为何我们还需要命名式导出，而不是类似于 CommonJS 形式的单一定义式导出对象？答案就是，你不能通过对象来强制执行一个静态结构并且会丢失相关的优势（下一节描述）。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%89%8D%E7%AB%AF%E5%BC%80%E5%8F%91-%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%96%B9%E6%A1%88/" rel="tag"># 前端开发,学习与方案</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2014/09/14/js-calculation-most-letter/" rel="prev" title="JS 统计一个字符串中出现次数最多字母">
+      <i class="fa fa-chevron-left"></i> JS 统计一个字符串中出现次数最多字母
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2014/10/13/es6-module-2/" rel="next" title="【译】 ECMAScript 6 模块化：最后的战役（下）">
+      【译】 ECMAScript 6 模块化：最后的战役（下） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%BD%93%E5%89%8D-JavaScript-%E7%9A%84%E6%A8%A1%E5%9D%97%E7%B3%BB%E7%BB%9F%E3%80%82"><span class="nav-number">1.</span> <span class="nav-text">1. 当前 JavaScript 的模块系统。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-ECMAScript-6-%E6%A8%A1%E5%9D%97%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">2. ECMAScript 6 模块化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-ES6-%E6%A8%A1%E5%9D%97%E8%AF%AD%E6%B3%95%E6%A6%82%E8%BF%B0"><span class="nav-number">3.</span> <span class="nav-text">3. ES6 模块语法概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%AE%9A%E4%B9%89%E5%BC%8F%E5%AF%BC%E5%87%BA%EF%BC%88%E6%AF%8F%E4%B8%AA%E6%A8%A1%E5%9D%97%E4%BB%85%E4%B8%80%E4%B8%AA%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">3.2. 定义式导出（每个模块仅一个）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E5%90%8C%E4%B8%80%E6%A8%A1%E5%9D%97%E4%B8%AD%E4%BD%BF%E7%94%A8%E5%91%BD%E5%90%8D%E5%BC%8F%E5%AF%BC%E5%87%BA%E5%92%8C%E5%AE%9A%E4%B9%89%E5%BC%8F%E5%AF%BC%E5%87%BA"><span class="nav-number">3.2.</span> <span class="nav-text">3.3. 同一模块中使用命名式导出和定义式导出</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">倪颖峰</p>
+  <div class="site-description" itemprop="description">曾在果壳、百度蹦哒，目前在B站活跃</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">倪颖峰</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
