@@ -102,4 +102,13 @@ theme: next
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  - type: leancloud_counter_security_sync
+
+
+leancloud_counter_security:
+  enable_sync: true
+  app_id: z3J5VC7OBuKe3Bs1ApRTYaT8-gzGzoHsz
+  app_key: jijPF2bP4TXvA3lY4rddhVVF
+  server_url: https://z3j5vc7o.lc-cn-n1-shared.com
+  username: niyingfeng
+  password: 2056869
