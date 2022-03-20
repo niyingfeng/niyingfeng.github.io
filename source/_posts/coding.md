@@ -13,6 +13,7 @@ tags:
 > Write Programs for People Frist, Computers Second.
 > 首先为人写程序，其次才是机器。
 
+<!-- more -->
 ## 软件构建的世界 
 
 ### 什么是软件构建
