@@ -28,7 +28,7 @@
 <meta property="og:description" content="观察者模式对于前端开发来说也是一种接触较为频繁的软件设计模式，如果没注意过，那说明你还要好好学习啦。 观察者模式又称做发布订阅模式，基本定义为一对多或者多对多的依赖关系，由一个或者多个观察者对象来对一个或者多个发布者进行监听，由发布者的行为来触发各个观察者的行为。 观察者模式使的可以支持简单的广播通信，自动通知所有订阅过的对象，从而使得目标对象和各个观察者可以各自独立，减弱耦合度，使两者更容易扩展">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2015-02-08T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-03-20T07:54:16.944Z">
+<meta property="article:modified_time" content="2022-03-20T09:39:22.280Z">
 <meta property="article:author" content="倪颖峰">
 <meta property="article:tag" content="JS设计模式">
 <meta property="article:tag" content="设计模式">
@@ -188,7 +188,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -417,14 +417,9 @@
                 console.error('Failed to save visitor count', error);
               });
           } else {
-              Counter('post', '/classes/Counter', { title, url, time: 1 })
-                .then(response => response.json())
-                .then(() => {
-                  leancloudSelector(url).innerText = 1;
-                })
-                .catch(error => {
-                  console.error('Failed to create', error);
-                });
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
           }
         })
         .catch(error => {
@@ -451,7 +446,7 @@
         });
     }
 
-    let { app_id, app_key, server_url } = {"enable":true,"app_id":"z3J5VC7OBuKe3Bs1ApRTYaT8-gzGzoHsz","app_key":"jijPF2bP4TXvA3lY4rddhVVF","server_url":null,"Dependencies":"https://github.com/theme-next/hexo-leancloud-counter-security","security":false};
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"z3J5VC7OBuKe3Bs1ApRTYaT8-gzGzoHsz","app_key":"jijPF2bP4TXvA3lY4rddhVVF","server_url":null,"security":true};
     function fetchData(api_server) {
       var Counter = (method, url, data) => {
         return fetch(`${api_server}/1.1${url}`, {

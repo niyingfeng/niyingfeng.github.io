@@ -185,7 +185,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -268,7 +268,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -349,7 +349,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -429,7 +429,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -511,7 +511,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -592,7 +592,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -676,7 +676,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -759,7 +759,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -842,7 +842,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -922,7 +922,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 15:54:16" itemprop="dateModified" datetime="2022-03-20T15:54:16+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
               </span>
 
           
@@ -1122,14 +1122,9 @@
                 console.error('Failed to save visitor count', error);
               });
           } else {
-              Counter('post', '/classes/Counter', { title, url, time: 1 })
-                .then(response => response.json())
-                .then(() => {
-                  leancloudSelector(url).innerText = 1;
-                })
-                .catch(error => {
-                  console.error('Failed to create', error);
-                });
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
           }
         })
         .catch(error => {
@@ -1156,7 +1151,7 @@
         });
     }
 
-    let { app_id, app_key, server_url } = {"enable":true,"app_id":"z3J5VC7OBuKe3Bs1ApRTYaT8-gzGzoHsz","app_key":"jijPF2bP4TXvA3lY4rddhVVF","server_url":null,"Dependencies":"https://github.com/theme-next/hexo-leancloud-counter-security","security":false};
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"z3J5VC7OBuKe3Bs1ApRTYaT8-gzGzoHsz","app_key":"jijPF2bP4TXvA3lY4rddhVVF","server_url":null,"security":true};
     function fetchData(api_server) {
       var Counter = (method, url, data) => {
         return fetch(`${api_server}/1.1${url}`, {
