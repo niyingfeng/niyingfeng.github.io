@@ -1,7 +1,9 @@
 ---
 title: 详谈JS闭包~
 date: 2013-03-10
-tags: closure,JS闭包
+tags: 
+- closure
+- JS闭包
 ---
 
 ### 闭包的概念

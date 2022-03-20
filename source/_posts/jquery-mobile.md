@@ -1,7 +1,8 @@
 ---
 title: jQuery Mobile介绍
 date: 2013-05-09
-tags: jQuery Mobile
+tags: 
+- jQuery Mobile
 ---
 
 ### 什么是jQuery Mobile？

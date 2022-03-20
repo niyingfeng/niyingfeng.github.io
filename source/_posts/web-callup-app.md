@@ -1,7 +1,10 @@
 ---
 title: 关于第三方Web调起本地APP方案
 date: 2017-03-09
-tags: callup,Scheme,Universal Links
+tags: 
+- callup
+- Scheme
+- Universal Links
 ---
 ## 安卓
 

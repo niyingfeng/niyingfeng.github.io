@@ -1,7 +1,8 @@
 ---
 title: ECMAScript 6 promises（下）：谈谈 API（一）
 date: 2015-03-17
-tags: promise
+tags: 
+- promise
 ---
 原文地址： [http://www.2ality.com/2014/10/es6-promises-api.html](http://www.2ality.com/2014/10/es6-promises-api.html)
 原文作者：Dr. Axel Rauschmayer

@@ -1,7 +1,8 @@
 ---
 title: 关于JavaScript的执行上下文
 date: 2013-05-15
-tags: JS执行上下文
+tags: 
+- JS执行上下文
 ---
 
 ### 什么是执行上下文

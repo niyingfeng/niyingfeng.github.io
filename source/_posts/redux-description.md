@@ -1,7 +1,9 @@
 ---
 title: Redux简单介绍
 date: 2017-02-16
-tags: React,Redux
+tags: 
+- React
+- Redux
 ---
 最初知晓Redux这个概念就是在学习React的时候，简单的来说就是合理的来管理你react项目中的state变化操作。不过在开始时，一看其Action、Reducer、Store以及使用示例，表示真的会一脸懵逼。于是最近再比较详细的学习下Redux。
 

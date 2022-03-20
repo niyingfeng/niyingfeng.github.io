@@ -1,7 +1,9 @@
 ---
 title: JavaScript的LazyLoad源码分析
 date: 2013-01-30
-tags: lazyload,lazyload源码
+tags: 
+- lazyload
+- lazyload源码
 ---
 
 ### Lazyload

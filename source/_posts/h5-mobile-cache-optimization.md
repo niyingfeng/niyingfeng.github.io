@@ -1,7 +1,12 @@
 ---
 title: 【转载】H5 缓存机制浅析 – 移动端 Web 加载性能优化
 date: 2016-08-17
-tags: AppCache,cache,IndexedDB,storage,缓存
+tags: 
+- AppCache
+- cache
+- IndexedDB
+- storage
+- 缓存
 ---
 
 作者：腾讯Bugly 原文地址：原文地址

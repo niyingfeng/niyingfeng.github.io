@@ -1,7 +1,9 @@
 ---
 title: 【译】 ECMAScript 6 模块化：最后的战役（上）
 date: 2014-10-09
-tags: 前端开发,学习与方案
+tags: 
+- 前端开发
+- 学习与方案
 ---
 
 原文地址：[http://www.2ality.com/2014/09/es6-modules-final.html](http://www.2ality.com/2014/09/es6-modules-final.html)

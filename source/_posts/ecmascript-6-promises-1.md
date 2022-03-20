@@ -1,7 +1,8 @@
 ---
 title: ECMAScript 6 promises（上）：基本概念
 date: 2015-02-11
-tags: promises
+tags: 
+- promises
 ---
 
 原文地址： [http://www.2ality.com/2014/09/es6-promises-foundations.html](http://www.2ality.com/2014/09/es6-promises-foundations.html)

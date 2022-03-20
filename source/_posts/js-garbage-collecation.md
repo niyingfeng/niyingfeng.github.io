@@ -1,7 +1,9 @@
 ---
 title: JS垃圾回收机制简介
 date: 2013-03-14
-tags: 垃圾回收机制,引用计数
+tags: 
+- 垃圾回收机制
+- 引用计数
 ---
 
 ### 什么是JS的垃圾回收机制（Garbage Collecation）

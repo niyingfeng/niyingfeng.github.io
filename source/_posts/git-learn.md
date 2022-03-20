@@ -1,7 +1,11 @@
 ---
 title: Git 简单理解学习
 date: 2016-09-22
-tags: git,git 命令,git 基础,git 学习
+tags: 
+- git
+- git 命令
+- git 基础
+- git 学习
 ---
 
 ### Git 基础

@@ -1,7 +1,12 @@
 ---
 title: 关于第三方应用中调起己方APP的Web实现方式
 date: 2016-10-08
-tags: Intent,JS,Scheme,Universal Links,移动端开发
+tags: 
+- Intent
+- JS
+- Scheme
+- Universal Links
+- 移动端开发
 ---
 
 

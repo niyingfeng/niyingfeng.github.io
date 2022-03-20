@@ -1,7 +1,9 @@
 ---
 title: 浅谈 CSS hack
 date: 2012-03-03
-tags: CSS,css hack
+tags: 
+- CSS
+- css hack
 ---
 
 CSS hack是基于浏览器的不同，如IE，FF等，各个浏览器对于CSS的解析不同，就会导致页面产生一些差异，是我们的设计在不同浏览器上得到不同的效果。 这个时候我们就需要针对不同的浏览器去写不同的CSS，让它能够同时兼容不同的浏览器，能在不同的浏览器中也能得到我们想要的页面效果。 CSS hack大致有3种表现形式。CSS内部样式hack，选择器hack以及HTML头部引用（if IE）hack。 先来看看简单的CSS内部样式hack使用表：（括号中的 S 代表标准模式 Q 代表混杂模式） ![](http://freefe.cc/blog/wp-content/uploads/2016/06/csshack.png) 上面列表中很清楚的标出了各个hack对于版本的适用性，hack通常的用法就是以 适用性少的来覆盖适用性多的。（IE6 对于 !important 可以查看一些资料，并不是所说的那么简单） 如：（均以标准模式进行说明）

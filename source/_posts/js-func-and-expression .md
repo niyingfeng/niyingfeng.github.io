@@ -1,7 +1,9 @@
 ---
 title: javascript的函数声明与函数表达式
 date: 2013-05-06
-tags: JS函数声明,JS函数表达式
+tags: 
+- JS函数声明
+- JS函数表达式
 ---
 
 ### 函数定义方式

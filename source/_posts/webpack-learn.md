@@ -1,7 +1,10 @@
 ---
 title: webpack 初步学习
 date: 2017-06-23
-tags: webpack,webpack学习,webpack文档
+tags: 
+- webpack
+- webpack学习
+- webpack文档
 ---
 ## 什么是webpack
 

@@ -1,7 +1,8 @@
 ---
 title: image标签底部留白问题原理以及解决方案
 date: 2016-07-12
-tags: image底部留白
+tags: 
+- image底部留白
 ---
 
 ### 那一缕白是什么情况

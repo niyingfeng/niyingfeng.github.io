@@ -1,7 +1,9 @@
 ---
 title: FastClick源码分析
 date: 2017-01-19
-tags: FastClick源码,FastClick
+tags: 
+- FastClick源码
+- FastClick
 ---
 **问题1:** 大部分iOS浏览器中 click 时间有延迟感，没有及时触发绑定事件。
 

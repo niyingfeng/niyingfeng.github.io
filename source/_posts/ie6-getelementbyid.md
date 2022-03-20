@@ -1,7 +1,9 @@
 ---
 title: IE6关于getElementById的BUG
 date: 2012-08-02
-tags: IE bug,IE6
+tags: 
+- IE bug
+- IE6
 ---
 
 最近遇到一个很常见的JS在IE下的兼容性问题，其实也很简单，主要由于IE6下调试工具较少不好发现导致花费了挺多的时间。 首先说一下我遇见的关于getElementById的小小兼容性问题吧，都知道 document.getElementById 是获取DOM节点中指定id的节点，但是在IE6下，会把某些标签中（并不是所有标签）的name也当做 getElementById 可获取的元素，有时真会发生影响不到的坑。 我是在获取相应id节点后再插入一个div，没想到在head的标签内竟然将其name属性设置了可这个ID一样的名字。真是妹的我去了！！！IE6中只是看到该div不显示，真不容易发现其错误。关键是标签内无内容，弹出其innerHTML还未空。呵呵~ 下面是一些有意思的代码： 下面代码在IE6下会获取正常的DOM节点：

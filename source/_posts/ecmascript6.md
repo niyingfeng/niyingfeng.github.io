@@ -1,7 +1,9 @@
 ---
 title: 【译】来试试 ECMAScript 6
 date: 2014-08-11
-tags: ES,ES6
+tags: 
+- ES
+- ES6
 ---
 
 原文地址：http://www.2ality.com/2014/08/es6-today.html 原文作者：Dr. Axel Rauschmayer （ 译者： 可以在此处了解 ES5.1 的情况 ） ECMAScript 6 （ES6）听起来依旧感觉离我们很远。毕竟，它要到2015年中旬才能成为标准。但是，它的一些特性逐渐出现在一些浏览器中，有其内置的编译器将 ES6编码 转化为 ES5编码。由于 ES6 的特性集为冻结状态，所以通过后者实现是一个不错的解决方案。 本文简述一下 ECMAScript 6 的特性以及介绍一下现在来使用它们的一些工具。

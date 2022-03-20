@@ -1,7 +1,9 @@
 ---
 title: 【译】ECMAScript 5 与 6 中方法的调度调用和和直接调用
 date: 2014-07-29
-tags: apply,call
+tags: 
+- apply
+- call
 ---
 
 原文地址：[http://www.2ality.com/2014/07/method-calls.html](http://www.2ality.com/2014/07/method-calls.html)

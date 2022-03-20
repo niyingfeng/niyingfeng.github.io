@@ -1,7 +1,10 @@
 ---
 title: jQuery 实现异步队列模块 Deferred
 date: 2016-02-29
-tags: jquery,jquery 源码,JS
+tags: 
+- jquery
+- jquery 源码
+- JS
 ---
 
 jQuery 依赖 sizzle 选择器引擎，将 DOM 处理性能优化到了一个很极致的程度，,但 jQuery 还有另一个亮点的处理就是对于异步的处理封装，Deferred，异步队列模块。 异步队列模块最长用到的场景就是 jQuery 封装的 Ajax 模块，不过经常，我们是这么使用的

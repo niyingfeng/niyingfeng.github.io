@@ -1,7 +1,9 @@
 ---
 title: iframe自适应高度
 date: 2014-09-09
-tags: iframe,高度
+tags: 
+- iframe高度
+- iframe高度自适应
 ---
 
 iframe 自适应高度，目前最广泛的实现方式是以 JS 获取 iframe 所载入页面的 body 高度。（在本地 html 文件测试的时候 chrome 会有跨域错误，可以使用 IE 来测试）。其实质就是通过 offsetHeight 或者 scrollHeight 获取到 iframe 内部 body 的高度，再调整 iframe 高度即可。

@@ -1,7 +1,9 @@
 ---
 title: 【译】 JavaScript 之 this：看它为何让你斩不断理还乱
 date: 2014-05-15
-tags: JS,This
+tags: 
+- JS
+- This
 ---
 
 原文地址：[http://www.2ality.com/2014/05/this.html](http://www.2ality.com/2014/05/this.html)

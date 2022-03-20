@@ -1,7 +1,10 @@
 ---
 title: BackBone事件源码
 date: 2013-05-31
-tags: backbone,backbone事件源码,JS
+tags: 
+- backbone
+- backbone事件源码
+- JS
 ---
 
 ### backbone 简介

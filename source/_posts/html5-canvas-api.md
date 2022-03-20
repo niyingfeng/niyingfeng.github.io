@@ -1,7 +1,11 @@
 ---
 title: HTML5 Canvas API简介
 date: 2013-06-05
-tags: canvas,HTML5,html5 canvas,移动端开发
+tags: 
+- canvas
+- HTML5
+- html5 canvas
+- 移动端开发
 ---
 
 ### canvas

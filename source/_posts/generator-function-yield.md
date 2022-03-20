@@ -1,7 +1,10 @@
 ---
 title: 关于 Generator Function 简单介绍
 date: 2017-02-27
-tags: ES6,function*,yield
+tags: 
+- ES6
+- function*
+- yield
 ---
 ## 基本概念
 

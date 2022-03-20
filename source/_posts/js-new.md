@@ -1,7 +1,9 @@
 ---
 title: JS中的 new 操作符简单理解
 date: 2012-10-08
-tags: new,构造函数
+tags: 
+- new
+- 构造函数
 ---
 
 首先上一一个简单的 new 操作符实例

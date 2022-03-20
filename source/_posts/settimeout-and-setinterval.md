@@ -1,7 +1,9 @@
 ---
 title: setTimeout与setInterval
 date: 2012-11-27
-tags: setInterval,setTimeout
+tags: 
+- setInterval
+- setTimeout
 ---
 
 最近找了一些关于setTimeout与setInterval的一些资料，发现对于偏好各个都有。 但是我认为setTimeout与setInterval既然存在，总有他们自己的意义，过分的去深究到底孰优孰略是完全没有什么必要的，虽然本人更偏向setTimeout一些，但我绝对不会排斥setInterval。 我一般喜欢使用一段简单的代码来用 setTimeout 模拟 setInterval

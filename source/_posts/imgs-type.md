@@ -1,7 +1,13 @@
 ---
 title: 图片类型汇总介绍
 date: 2019-05-09
-tags: gif,lottie,svg,webp,图片格式,渐进式jpeg
+tags: 
+- gif
+- lottie
+- svg
+- webp
+- 图片格式
+- 渐进式jpeg
 ---
 
 > 图片按照生成类型可分为点阵图与矢量图两种大体的模式，压缩方式按照质量损耗分有损与无损压缩。

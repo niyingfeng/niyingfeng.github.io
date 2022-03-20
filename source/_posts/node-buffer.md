@@ -1,7 +1,9 @@
 ---
 title: node之Buffer 介绍
 date: 2014-03-05
-tags: node,buffer
+tags: 
+- node
+- buffer
 ---
 好吧，本以为node中的Buffer只是nodeJS中挺小的一块，仔细的翻阅了一些资料之后才发现，冰川总是将其巨大的屁股藏在海平面以下的，这次也是主要简单的讲一下关于Buffer比较浅的一些东西（针对Node初学者啦~）
 

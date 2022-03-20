@@ -1,7 +1,10 @@
 ---
 title: BFC 详解
 date: 2016-06-30
-tags: BFC,bfc,css
+tags: 
+- BFC
+- bfc
+- css
 ---
 
 ### 你想要处理以下问题时

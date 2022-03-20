@@ -1,7 +1,9 @@
 ---
 title: 《公正，该如何做是好》- 我们如何公正的看这个世界
 date: 2019-04-27
-tags: 公平,公正
+tags: 
+- 公平
+- 公正
 ---
 ![image](http://image.freefe.cc/blur-close-up-court-531970.jpg)
 

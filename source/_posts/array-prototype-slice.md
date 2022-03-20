@@ -1,7 +1,8 @@
 ---
 title: 关于Array.prototype.slice用途
 date: 2012-09-03
-tags: slice
+tags:
+- slice
 ---
 
 遇到Array.prototype.slice也是在jQuery中，其toArray()就是使用的Array.prototype.slice.call来进行的处理。 那到底他的用途是什么呢？ 其实很简单，将像arguments那种的类数组对象转换为数组的形式。

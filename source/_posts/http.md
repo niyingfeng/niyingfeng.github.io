@@ -1,7 +1,11 @@
 ---
 title: 前端视角上的HTTP知识
 date: 2017-07-21
-tags: http,http2,https,tcp
+tags: 
+- http
+- http2
+- https
+- tcp
 ---
 ## HTTP基础知识
 
