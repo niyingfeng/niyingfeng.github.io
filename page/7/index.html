@@ -154,6 +154,99 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2012/10/28/javascript-regexp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2012/10/28/javascript-regexp/" class="post-title-link" itemprop="url">JavaScript 正则简述</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2012-10-29 00:00:00" itemprop="dateCreated datePublished" datetime="2012-10-29T00:00:00+08:00">2012-10-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
+              </span>
+
+          
+            <span id="/2012/10/28/javascript-regexp/" class="post-meta-item leancloud_visitors" data-flag-title="JavaScript 正则简述" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>对于一种语言来讲，正则无疑是其中很重要的内容，由于正则对于新手来说并不是那么简单，它是较为复杂的模块。所以我们可以看到很多草率的正则表达式。所以很多情况我们在性能方面遇到的瓶颈问题都是由于并不理想的正则表达式引起的。 首先我们需要了解下正则表达式在<code>运行过程中的工作原理</code>：</p>
+<ol>
+<li>编译：当创建一个正则表达式时，浏览器会验证该模式，然后将其转化为一个原生的代码程序，用于执行匹配工作。</li>
+<li>设置起始位置：确认目标字符串起始的搜索位子，是由字符串的起始搜索位子或者正则表达式中的lastIndex属性决定的。</li>
+<li>匹配每个正则表达式字元：正则表达式会逐个检查文本和正则表达式模式，当摸一个匹配失败的时候会试着回溯到之前尝试匹配的位子上然后尝试其他匹配路径。</li>
+<li>匹配成功或者失败：如果正则表达式的所有可能路径都没有匹配到，那么会退回到第二步来从下个字符来进行匹配。</li>
+</ol>
+<p>对于正则性能理解的关键在于理解<code>回溯的概念</code>。 每当正则表达式在匹配过程中，回溯是基础的组成部分。很大程度上也是正则表达式是否优越性的判定条件。但是一旦失控，就会产生巨大的系统资源消耗，对于整体的性能有着很大的影响。 每当正则表达式扫描字符串的时候，它从左到右来进行逐个测试组成部分，对每一个量词与分支都决定下一次走向，如有必要会记住其他的选着，以备返回的时候使用。如果当前匹配成功，正则表达式会继续扫描模式，如果不成功那么将回 到上一次最近的一个决策点，从另一个分支或者量词来重新进行匹配，直到成功。如果所有的匹配项都尝试已经没有匹配到，那么返回正则表达式不匹配的结果。 实例： &#x2F;h(ello|appy) hippo&#x2F;.test(“hello there , happy hippo .”);</p>
+<ol>
+<li>提取 h 进行匹配。</li>
+<li>提取 ello 进行匹配。</li>
+<li>提取 hippo进行匹配（匹配失败）。</li>
+<li>回到上一个决策点， h 之后的位子，提取 appy（匹配失败）。</li>
+<li>从第二个字符开始重新匹配整个表达式， 匹配 h （往后一个一个字符匹配）。</li>
+<li>匹配 ello （匹配失败）。</li>
+<li>匹配 appy。</li>
+<li>匹配 hippo（整体匹配成功）。</li>
+</ol>
+<p>实例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line">var str = &quot;&lt;p&gt;p1&lt;/p&gt;&lt;div&gt;div1&lt;/div&gt;&lt;p&gt;p2&lt;/p&gt;&quot;;</span><br><span class="line">/&lt;p&gt;.*&lt;\/p&gt;/i.test(str);//由于会有贪婪匹配，所以会匹配到整个字符串</span><br><span class="line">/&lt;p&gt;.*？&lt;\/p&gt;/i.test(str);//非贪婪匹配，则会匹配 &lt;p&gt;p1&lt;/p&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">对于不了解贪婪匹配与非贪婪匹配的可以谷歌下。 然后是想一下回溯失控，</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><code>/[\s\S]\*?[\s\S]\*?</code><br>&#96;&#96;&#96;</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://freefe.cc/2012/10/08/js-this/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -185,7 +278,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -269,7 +362,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -359,7 +452,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -440,7 +533,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -521,7 +614,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -599,7 +692,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -690,7 +783,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -820,14 +913,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">68</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">137</span>
+        <span class="site-state-item-count">139</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -154,6 +154,220 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2013/06/25/javascript-note-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2013/06/25/javascript-note-1/" class="post-title-link" itemprop="url">编写可维护的JavaScript笔记（1-3章）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2013-06-26 00:00:00" itemprop="dateCreated datePublished" datetime="2013-06-26T00:00:00+08:00">2013-06-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
+              </span>
+
+          
+            <span id="/2013/06/25/javascript-note-1/" class="post-meta-item leancloud_visitors" data-flag-title="编写可维护的JavaScript笔记（1-3章）" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="第一部分-编程风格"><a href="#第一部分-编程风格" class="headerlink" title="第一部分 编程风格"></a>第一部分 编程风格</h3><p>每个人都有自己独特的编程风格，有情有独钟亦或恨之入骨的，每个人都希望用自己的方式制定规范来实施。这些应当被归为个人编程嗜好。我们需要的是在编程过程中尽早的确定统一的编程风格。 在团队开发中，编程风格一致性变得尤为重要，因为： 1 任何开发者都不在乎某个文件的作者是谁，也没有必要花费额外的精力去理解代码的逻辑并且重新排版，因为所有代码的排版风格都是非常一致的，因为风格不一致会导致我们打开代码文件的第一件事情不是立即工作，而是进行缩进的排版整理。 2 能很容易的辨别出有问题的代码并且发现错误，如果所有的代码风格很像，当看到一段与众不同的代码时，很肯能问题就出在这里。</p>
+<blockquote>
+<p>JSLint 和 JSHint 是两个检查编程风格的工作。不仅找出代码中潜在的错误，还能对潜在的风格问题给予提示警告。 “程序是写给人读的，只是偶尔让计算机执行一下” - Donald Knuth</p>
+</blockquote>
+<h3 id="第一章-基本的格式化"><a href="#第一章-基本的格式化" class="headerlink" title="第一章 基本的格式化"></a>第一章 基本的格式化</h3><p>编程风格的核心就是基本的格式化规范，这些规范决定着如何编写高水准的代码。</p>
+<h4 id="1-1-缩进层级"><a href="#1-1-缩进层级" class="headerlink" title="1.1 缩进层级"></a>1.1 缩进层级</h4><p>所有语言都是如此，都会讨论如何对代码缩进。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(wl &amp;&amp; wl.length)&#123;</span><br><span class="line">for(var i=0; i&lt;wl.length;i++)&#123;</span><br><span class="line">p = wl[i];</span><br><span class="line">        type=Y.Lang.type(wl[i]);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>稍微编写过程序的都不会使用上面的格式，害人害己。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(wl &amp;&amp; wl.length)&#123;</span><br><span class="line">        for(var i=0; i&lt;wl.length;i++)&#123;</span><br><span class="line">                p = wl[i];</span><br><span class="line">                type=Y.Lang.type(wl[i]);</span><br><span class="line">                ...</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码应该如何统一缩进其实一直没有统一的共识。</p>
+<ul>
+<li>使用制表符缩进 。</li>
+<li>使用空格缩进。</li>
+</ul>
+<blockquote>
+<p>jQuery 明确规定使用制表符缩进。 Dauglas Crockford 的 JavaScript 规定使用4个空格缩进。 Google 的 JavaScript规定使用2个空格缩进。 Dojo 编程风格指南使用制表符缩进。</p>
+</blockquote>
+<p>尼古拉斯（作者）建议4个空格，或在编辑器中设置一个 制表符 替换为 4个空格。为一个缩进层。</p>
+<h4 id="1-2-语句结尾"><a href="#1-2-语句结尾" class="headerlink" title="1.2 语句结尾"></a>1.2 语句结尾</h4><p>强制规定，语句结束插入分号。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function()&#123;</span><br><span class="line">        return</span><br><span class="line">        &#123;</span><br><span class="line">                ...</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码就会引起问题。</p>
+<h4 id="1-3-行的长度"><a href="#1-3-行的长度" class="headerlink" title="1.3 行的长度"></a>1.3 行的长度</h4><p>很少有JS的规范提及到行的长度的风格的，很多语言都建议行的字数不超过 80 字，因为很早以前的编辑器，这是最大的行长度。</p>
+<blockquote>
+<p>Java语言规范中 源码单行长不超过 70 字，文档中单行长不超过 80 字。 Android开发者规范中规定不超过 100 字。 非官方的Ruby规定不操过 80 字。 Python编程规范规定单行不超过 79 字。</p>
+</blockquote>
+<p>JavaScript 在 Crockford 代码规范中规定为 80 字符。</p>
+<h4 id="1-4-换行"><a href="#1-4-换行" class="headerlink" title="1.4 换行"></a>1.4 换行</h4><p>当一行字字符数超过了最大限制的时候就需要换行。通常会在运算符之后换行，下一行会增加2个层级的缩进。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">callFunction(document,&quot;aaaaaaaaaaaaaaa&quot;,&quot;bbbbbbbbbbbbbbbb&quot;,&quot;cccccccccccccccccccc&quot;,</span><br><span class="line">    &quot;bbbbbbbbbbbbbbbbbbb&quot;);//超出首字母c的2个层级</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是规范为在运算符之后换行，以及增加2个层级的缩进。 当然如果是赋值的话就保持赋值运算符对其。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var result = &quot;aaaaaaaaaaaaaaaa&quot; + &quot;bbbbbbbbbbbbbbbb&quot; + &quot;ccccccccccccccccccc&quot; +</span><br><span class="line">                         &quot;ddddddddddddddddddddddddd&quot;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-5-空行"><a href="#1-5-空行" class="headerlink" title="1.5 空行"></a>1.5 空行</h4><p>空行常常被忽略，但是空行也是提高代码可读性的强大武器。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">if(wl &amp;&amp; wl.length)&#123;</span><br><span class="line"></span><br><span class="line">        for(var i=0; i</span><br><span class="line"></span><br><span class="line">                p = wl[i];</span><br><span class="line">                type=Y.Lang.type(wl[i]);</span><br><span class="line"></span><br><span class="line">                if(a)&#123;</span><br><span class="line">                        ...</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>空行一般来说不是很好在规范中规定，</p>
+<ul>
+<li>方法之间</li>
+<li>方法中局部变量可第一条语句之间。</li>
+<li>多行或者单行注释之前。</li>
+<li>在方法内的逻辑片段之前。</li>
+</ul>
+<p>目前没有规范对空行进行明确的规定。</p>
+<h3 id="1-6-命名"><a href="#1-6-命名" class="headerlink" title="1.6 命名"></a>1.6 命名</h3><blockquote>
+<p>“计算机科学只存在两个难题：缓存失效和命名” - Phil Karlton</p>
+</blockquote>
+<p>只要写代码就会涉及到变量和函数，所以变量和函数的命名对于增强代码的可读性至关重要。 JavaScripe 遵循 ECMA ，即驼峰式大小写。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var myName;</span><br><span class="line">var anotherName;</span><br></pre></td></tr></table></figure>
+
+<p>google Dojo等规范都规定使用小驼峰命名法。，当然还有一种曾经风光一时的 匈牙利命名法。 <code>1.6.1 变量和函数</code> 变量名总是应该遵循驼峰大小写命名法，并且命名的前缀应当是名词，使得可以将变量和函数区分开。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 以下OK</span><br><span class="line">var count = 10;</span><br><span class="line">var myName = &quot;Ni&quot;;</span><br><span class="line">var found = true;</span><br></pre></td></tr></table></figure>
+
+<p>&#x2F;&#x2F; 以下就需要重新命名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var getCount = 10;</span><br><span class="line">var isFound = true;</span><br></pre></td></tr></table></figure>
+
+<p>&#x2F;&#x2F;函数应当以动词开头</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var getName  = function()&#123;</span><br><span class="line">        return myName;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>还有一点示范</p>
+<blockquote>
+<p>can 函数返回布尔值 has 函数返回布尔值 is 函数返回布尔值 get 函数返回非布尔值 set 函数用来保存值</p>
+</blockquote>
+<p><code>1.6.2 常量</code> JS中没有常量的概念。来自C语言的约定，常量使用大写字母并且使用下划线命名。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var MAX_COUNT = 10；</span><br><span class="line">var URL = &quot;http://www.guokr.com&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>google Dojo 等编程风格指南都规定如此。 <code>1.6.3 构造函数</code> JS中的构造函数只不过是冠以 new 运算符的函数而已。采用大驼峰命名法。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function Person( name )&#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-7-直接量"><a href="#1-7-直接量" class="headerlink" title="1.7 直接量"></a>1.7 直接量</h4><p>JS中的原始值：字符串、数字、布尔值、null和underfined。 <code>1.7.1 字符串</code> JS中的字符串使用双引号和单引号是完全相同的。对于规范只需要统一即可。 jQuery 和 Crockford规范为双引号来括住字符串，google规范为单引号括住字符串。 <code>1.7.2 数字</code> JS中整数和浮点数都存储为相同的数据类型。 不推荐使用 10. 和 .1 的写法。会产生歧义，是否是我们漏掉了数字。</p>
+<p><code>1.7.3 null</code> null 常会与 undefined 搞混淆。以下场景才应当使用null：</p>
+<ul>
+<li>用来初始化变量，该变量可能被赋值为对象。</li>
+<li>用来和一个已经初始化的变量进行比较，这个变量可以是非对象。</li>
+<li>当函数期望的参数是对象，用作参数传入。</li>
+<li>当函数的返回值期望是对象时，用作返回值传出。</li>
+</ul>
+<p>以下场景不应当使用 null：</p>
+<ul>
+<li>不要使用null来检测是否传入了参数。</li>
+<li>不要用null来检测一个未初始化的变量。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var person = null;</span><br><span class="line">function getPerson()&#123;</span><br><span class="line">    if( condition )&#123;</span><br><span class="line">        return new Person(&quot;ABC&quot;);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于 null 的理解最好是当做对象的占位符使用，主流的规范没有提及。 <code>1.7.4 undefined</code> 由于</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var person;</span><br><span class="line">typeof person; //  undefined</span><br><span class="line">typeof foo;   // undefined</span><br></pre></td></tr></table></figure>
+
+<p>以及<code>null == undefined</code>所以，禁止使用特殊值 undefined 可以有效地确保只在一种情况下 typeof 才返回 undefined。 <code>1.7.5 对象直接量 与 数组直接量（字面量）</code> 创建对象与数组最流行的方法为对象字面量和数组字面量，比相应的构造函数式创建更高效直接。</p>
+<h3 id="第二章-注释"><a href="#第二章-注释" class="headerlink" title="第二章 注释"></a>第二章 注释</h3><h4 id="2-1-单行注释"><a href="#2-1-单行注释" class="headerlink" title="2.1 单行注释"></a>2.1 单行注释</h4><p>三种使用方法：</p>
+<ul>
+<li>独占一行，用来解释下一行，并且这行注释之前总有一行空行，缩进的层级与下一行代码保持一致。</li>
+<li>在代码行的尾部注释。代码与注释之间至少有一个缩进。注释包括之前本行的代码不应该超过最大字符数限制。</li>
+<li>注释掉大块代码。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// 好的注释方法</span><br><span class="line">if( condition )&#123;</span><br><span class="line"></span><br><span class="line">    // 解释下一行代码</span><br><span class="line">    func();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 不好的注释方法</span><br><span class="line">if( condition )&#123;</span><br><span class="line">    // 解释下一行代码</span><br><span class="line">    func();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if( condition )&#123;</span><br><span class="line">    // 解释下一行代码</span><br><span class="line">    func();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-多行注释"><a href="#2-2-多行注释" class="headerlink" title="2.2 多行注释"></a>2.2 多行注释</h4><p>偏向使用 Java 风格的注释</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * 这里是注释</span><br><span class="line"> * 这里是注释</span><br><span class="line"> * 这里是注释</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
+
+<p>缩进的格式与单行注释表示一致。</p>
+<h4 id="2-3-使用注释"><a href="#2-3-使用注释" class="headerlink" title="2.3 使用注释"></a>2.3 使用注释</h4><p>当代码不够清晰的时候使用注释，当代码很明了的时候不应当添加注释。 并且注释不应该只是解释变量名称或者函数名称式的那种废话。 当代码很难理解或者代码可能被误认为错误的代码的时候，需要添加注释。</p>
+<h4 id="2-4-文档注释"><a href="#2-4-文档注释" class="headerlink" title="2.4 文档注释"></a>2.4 文档注释</h4><p>技术角度来说，文档注释并不是 JS 的组成部分，但是是一种普遍的实践。</p>
+<ul>
+<li>应当对所有的方法和可能的返回值添加描述。</li>
+<li>对自定义的构造函数类型和期望的参数添加描述。</li>
+<li>对于包含对象或者方法的对象进行描述。</li>
+</ul>
+<h3 id="第三章-语句和表达式"><a href="#第三章-语句和表达式" class="headerlink" title="第三章 语句和表达式"></a>第三章 语句和表达式</h3><p>JS中，诸如 if 和 for 之类的规定不管是单行代码还是多行代码，均使用 { }</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 好的写法</span><br><span class="line">if( contidion )&#123;</span><br><span class="line">        foo();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if( conidion )&#123;</span><br><span class="line">        foo();</span><br><span class="line">        foo();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 不好的写法</span><br><span class="line">if( contidion )&#123; foo(); &#125;</span><br><span class="line">if( contidion )  foo();</span><br></pre></td></tr></table></figure>
+
+<p>所有的语句块都应当使用 { }， if ， for ， while ，do while ， try catch finnally 。</p>
+<h4 id="3-1-花括号对齐方式"><a href="#3-1-花括号对齐方式" class="headerlink" title="3.1 花括号对齐方式"></a>3.1 花括号对齐方式</h4><p>有两种对齐方式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if( conidion )&#123;</span><br><span class="line">        foo();</span><br><span class="line">        foo();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>和</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if( conidion )</span><br><span class="line">&#123;</span><br><span class="line">        foo();</span><br><span class="line">        foo();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很显然由于第二种又时候会会让浏览器执行代码的时候产生不一样的解析，所以使用第一种花括号对齐方式。</p>
+<h4 id="3-2-块语句间隔"><a href="#3-2-块语句间隔" class="headerlink" title="3.2 块语句间隔"></a>3.2 块语句间隔</h4><p>语句块间隔有3中形式：</p>
+<ul>
+<li>语句名 圆括号 左花括号间没有空格间隔。</li>
+<li>左圆括号之前 右圆括号之后添加一个空格。</li>
+<li>左圆括号 右圆括号前后都添加一个空格。</li>
+</ul>
+<p>作者推荐一致使用第二种形式。</p>
+<h4 id="3-3-switch-语句"><a href="#3-3-switch-语句" class="headerlink" title="3.3 switch 语句"></a>3.3 switch 语句</h4><p>JS中任何表达式都可以合法的用于case从句中，其他语言必须使用原始值和常量。 <code>3.3.1 缩进</code> JS的switch缩进一致是有争议的话题。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">        case &quot;a&quot;:</span><br><span class="line">                //代码</span><br><span class="line">                break；</span><br><span class="line"></span><br><span class="line">        case &quot;b&quot;:</span><br><span class="line">                //代码</span><br><span class="line">                break;</span><br><span class="line"></span><br><span class="line">        default :</span><br><span class="line">                // 代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>每个case相对于switch都有一个缩进层。 第二个case开始之前都有一个空行。 另一种 Crockford 和Dojo编程风格为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">case &quot;a&quot;:</span><br><span class="line">        //代码</span><br><span class="line">        break；</span><br><span class="line">case &quot;b&quot;:</span><br><span class="line">        //代码</span><br><span class="line">        break;</span><br><span class="line">default :</span><br><span class="line">        // 代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>3.3.2 case语句的连续执行（贯穿）</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">        case &quot;a&quot;:</span><br><span class="line">        case &quot;b&quot;:</span><br><span class="line">                //代码</span><br><span class="line">                break;</span><br><span class="line"></span><br><span class="line">        default :</span><br><span class="line">                // 代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Douglas 在 Crockford中禁止出现贯穿现象， 但是Nichlas认为只要程序逻辑很清楚，贯穿完全是一个可以接受的编程方式。Jquery 编程风格中也是允许的。 <code>3.3.3 default</code> 是否在任何时候都需要 default。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">        case &quot;a&quot;:</span><br><span class="line">        case &quot;b&quot;:</span><br><span class="line">                //代码</span><br><span class="line">                break;</span><br><span class="line"></span><br><span class="line">     //没有 default :</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>更倾向于没有默认行为并且在注释中写入省略 default。</p>
+<h4 id="3-4-with"><a href="#3-4-with" class="headerlink" title="3.4 with"></a>3.4 with</h4><p>with 语句可以更改包含上下文解析变量的方式。通过with可以使用局部变量的方式和函数的形式来访问特定对象中的属性和方法。可以缩短代码的长度。 但是是的JS引擎与压缩工具无法压缩。严格模式中 with 是禁止的。 基本所有的规范中都禁止使用 with。</p>
+<h4 id="3-5-for-循环"><a href="#3-5-for-循环" class="headerlink" title="3.5 for 循环"></a>3.5 for 循环</h4><p>对于for循环中的 break 和 return 会改变循环的方向，尽量避免使用，但是不禁止。</p>
+<h4 id="3-6-for-in-循环"><a href="#3-6-for-in-循环" class="headerlink" title="3.6 for-in 循环"></a>3.6 for-in 循环</h4><p>for-in循环建议与 hasOwnProperty 一起检测属性，除非你需要检查原型。 for-in是用来遍历对象的，不要用其来遍历数组。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://freefe.cc/2013/06/04/html5-canvas-api/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -185,7 +399,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -278,7 +492,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -370,7 +584,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -472,7 +686,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -581,7 +795,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -694,7 +908,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -773,7 +987,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -875,7 +1089,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -950,7 +1164,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -994,99 +1208,6 @@
 <li>如果setInterval回调函数的执行时间将足够长（比指定的时间间隔长），它们将连续执行并且彼此之间没有时间间隔。</li>
 </ol>
 <p>举个例子： 我有一个需要执行1s的方法，我如果是 setTimeout 延时2s执行，那么从0开始 在 2 5 8···的时间点开始执行，而setInterval却在 2 4 6···时刻开始执行。 可以想象，当延时时间比执行时间短的时候 setInterval 会出现什么情况，当不断叠加不断消耗内存的风险。 总而言之，setTimeout 唯一存在的问题就是对于执行的时间点误差较大，但对于性能方面会比较友好，当然如果所需执行的为每一时间段，并且运行量较小，那就考虑选择 setIntervsl。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2012/10/28/javascript-regexp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="倪颖峰">
-      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="NiYingfeng 的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2012/10/28/javascript-regexp/" class="post-title-link" itemprop="url">JavaScript 正则简述</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2012-10-29 00:00:00" itemprop="dateCreated datePublished" datetime="2012-10-29T00:00:00+08:00">2012-10-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
-              </span>
-
-          
-            <span id="/2012/10/28/javascript-regexp/" class="post-meta-item leancloud_visitors" data-flag-title="JavaScript 正则简述" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>对于一种语言来讲，正则无疑是其中很重要的内容，由于正则对于新手来说并不是那么简单，它是较为复杂的模块。所以我们可以看到很多草率的正则表达式。所以很多情况我们在性能方面遇到的瓶颈问题都是由于并不理想的正则表达式引起的。 首先我们需要了解下正则表达式在<code>运行过程中的工作原理</code>：</p>
-<ol>
-<li>编译：当创建一个正则表达式时，浏览器会验证该模式，然后将其转化为一个原生的代码程序，用于执行匹配工作。</li>
-<li>设置起始位置：确认目标字符串起始的搜索位子，是由字符串的起始搜索位子或者正则表达式中的lastIndex属性决定的。</li>
-<li>匹配每个正则表达式字元：正则表达式会逐个检查文本和正则表达式模式，当摸一个匹配失败的时候会试着回溯到之前尝试匹配的位子上然后尝试其他匹配路径。</li>
-<li>匹配成功或者失败：如果正则表达式的所有可能路径都没有匹配到，那么会退回到第二步来从下个字符来进行匹配。</li>
-</ol>
-<p>对于正则性能理解的关键在于理解<code>回溯的概念</code>。 每当正则表达式在匹配过程中，回溯是基础的组成部分。很大程度上也是正则表达式是否优越性的判定条件。但是一旦失控，就会产生巨大的系统资源消耗，对于整体的性能有着很大的影响。 每当正则表达式扫描字符串的时候，它从左到右来进行逐个测试组成部分，对每一个量词与分支都决定下一次走向，如有必要会记住其他的选着，以备返回的时候使用。如果当前匹配成功，正则表达式会继续扫描模式，如果不成功那么将回 到上一次最近的一个决策点，从另一个分支或者量词来重新进行匹配，直到成功。如果所有的匹配项都尝试已经没有匹配到，那么返回正则表达式不匹配的结果。 实例： &#x2F;h(ello|appy) hippo&#x2F;.test(“hello there , happy hippo .”);</p>
-<ol>
-<li>提取 h 进行匹配。</li>
-<li>提取 ello 进行匹配。</li>
-<li>提取 hippo进行匹配（匹配失败）。</li>
-<li>回到上一个决策点， h 之后的位子，提取 appy（匹配失败）。</li>
-<li>从第二个字符开始重新匹配整个表达式， 匹配 h （往后一个一个字符匹配）。</li>
-<li>匹配 ello （匹配失败）。</li>
-<li>匹配 appy。</li>
-<li>匹配 hippo（整体匹配成功）。</li>
-</ol>
-<p>实例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line">var str = &quot;&lt;p&gt;p1&lt;/p&gt;&lt;div&gt;div1&lt;/div&gt;&lt;p&gt;p2&lt;/p&gt;&quot;;</span><br><span class="line">/&lt;p&gt;.*&lt;\/p&gt;/i.test(str);//由于会有贪婪匹配，所以会匹配到整个字符串</span><br><span class="line">/&lt;p&gt;.*？&lt;\/p&gt;/i.test(str);//非贪婪匹配，则会匹配 &lt;p&gt;p1&lt;/p&gt;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">对于不了解贪婪匹配与非贪婪匹配的可以谷歌下。 然后是想一下回溯失控，</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p><code>/[\s\S]\*?[\s\S]\*?</code><br>&#96;&#96;&#96;</p>
 
       
     </div>
@@ -1171,14 +1292,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">68</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">137</span>
+        <span class="site-state-item-count">139</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

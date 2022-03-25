@@ -154,6 +154,139 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2014/10/08/es6-module/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2014/10/08/es6-module/" class="post-title-link" itemprop="url">【译】 ECMAScript 6 模块化：最后的战役（上）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2014-10-09 00:00:00" itemprop="dateCreated datePublished" datetime="2014-10-09T00:00:00+08:00">2014-10-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
+              </span>
+
+          
+            <span id="/2014/10/08/es6-module/" class="post-meta-item leancloud_visitors" data-flag-title="【译】 ECMAScript 6 模块化：最后的战役（上）" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>原文地址：<a target="_blank" rel="noopener" href="http://www.2ality.com/2014/09/es6-modules-final.html">http://www.2ality.com/2014/09/es6-modules-final.html</a><br>原文作者：Dr. Axel Rauschmayer</p>
+<p>译者：倪颖峰<br>地址：<a href="http://freefe.cc/">freefe.cc</a></p>
+<p>在2014年7月底，TC39的另外一个会议，敲定了关于 ECMAScript 6 模块化语法的最后一些细节。本文完整的概述了关于 ES6 模块系统。</p>
+<h2 id="1-当前-JavaScript-的模块系统。"><a href="#1-当前-JavaScript-的模块系统。" class="headerlink" title="1. 当前 JavaScript 的模块系统。"></a>1. 当前 JavaScript 的模块系统。</h2><p>JavaScript 目前没有内置方法来支持模块化，不过社区创造了非常不错的变通方案。两个重要的（可惜相互不兼容）标准是：</p>
+<ol>
+<li>CommonJS 模块化：该标准主要被使用在 Node.js 中（Node.js 模块化中有一些超出 CommonJS 的语法的特性）。特点：语法简洁，为同步加载设计，主要使用在服务器端。</li>
+<li>异步模块定义（AMD）：该标准最流行的应用就是 RequireJS。    特点：略微复杂的语法使得 AMD 可以不使用 eval() 实现（或者说编译过程），为异步加载设计，主要在浏览器端使用。</li>
+</ol>
+<p>以上只是对目前的状况简单粗暴的解释了一下，如果你想更深入的了解一下可以读一下 Addy Osmani 的“使用AMD，CommonJS 和 ES Harmony 写模块化JavaScript”。</p>
+<h2 id="2-ECMAScript-6-模块化"><a href="#2-ECMAScript-6-模块化" class="headerlink" title="2. ECMAScript 6 模块化"></a>2. ECMAScript 6 模块化</h2><p>ECMAScript 6 模块化的目标是创建一种 CommonJS 和 AMD 使用者都乐意接受的方式：</p>
+<ol>
+<li>类似 CommonJS，拥有简洁的语法，倾向于单一的接口并且支持循环依赖。</li>
+<li>类似 AMD，直接支持异步加载和配置模块加载。</li>
+</ol>
+<p>内置语言允许 ES6 模块化超出 CommonJS 和 AMD 规范（之后会详细介绍）：</p>
+<ol>
+<li>语法将比 CommonJS 的更简洁。</li>
+<li>结构可以做静态分析（静态检测，优化等）。</li>
+<li>比 CommonJS 做的更好的循环依赖。</li>
+</ol>
+<p>ES6 模块化标准包括两部分：</p>
+<ol>
+<li>声明语法（引入与导出）。</li>
+<li>编程式加载接口：用来配置如何加载模块和按条件加载模块。</li>
+</ol>
+<h2 id="3-ES6-模块语法概述"><a href="#3-ES6-模块语法概述" class="headerlink" title="3. ES6 模块语法概述"></a>3. ES6 模块语法概述</h2><p>有两种导出方式：命名式导出（每个模块可以多个）和定义式导出（每个模块仅一个）。</p>
+<p>3.1. 命名式导出（每个模块可以多个）</p>
+<p>一个模块可以通过前缀关键词 export 声明来导出多个。</p>
+<p>这些导出以名字进行区分，称之为命名式导出。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// ----- lib.js ------</span><br><span class="line">export const sqrt = Math.sqrt;</span><br><span class="line">export function square( x )&#123;</span><br><span class="line">    return x*x;</span><br><span class="line">&#125;</span><br><span class="line">export function diag( x, y )&#123;</span><br><span class="line">    return sqrt( square( x ) + square( y ) );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// -------- main.js -------</span><br><span class="line">import&#123; square, diag &#125; from &#x27;lib&#x27;;</span><br><span class="line">console.log( square(11) ); // 121</span><br><span class="line">console.log( diag( 4, 3 ) ); // 5</span><br></pre></td></tr></table></figure>
+
+<p>也有其他方式带定义命名式导出（稍后介绍），但是我发现此方式是最方便的：如果没有外层环境，你可以很简单的书写代码，然后以你想要的关键词来标识所有的东西。</p>
+<p>如果需要，你也可以导入整一个模块，通过属性命名来指向命名式的导出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import * as lib grom &#x27;lib&#x27;;</span><br><span class="line">console.log( lib.square( 11 ) ); // 121</span><br><span class="line">console.log( lib.diag( 4, 3 ) ); // 5</span><br></pre></td></tr></table></figure>
+
+<p>在 CommonJS 语法下的相同代码：有段时间我在 Node.js 下尝试了几种不错的策略来减少我的模块导出时代码冗余。现在我比较喜欢下面这种简单但是略微冗长的风格，有点类似于模块模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">// ---- lib.js -----</span><br><span class="line">var sqrt = Math.sqrt;</span><br><span class="line">function square( x )&#123;</span><br><span class="line">    return x*x;</span><br><span class="line">&#125;</span><br><span class="line">function diag( x, y )&#123;</span><br><span class="line">    return sqrt( square( x ) + square( y ) );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = &#123;</span><br><span class="line">    sqrt : sqrt,</span><br><span class="line">    sqare : sqare,</span><br><span class="line">    diag : diag</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// ------ main.js ------</span><br><span class="line">var square = require( &#x27;lib&#x27; ).square;</span><br><span class="line">var diag = require( &#x27;lib&#x27; ).diag;</span><br><span class="line">console.log( square( 11 ) ); // 121</span><br><span class="line">console.log( diag( 4, 3 ) ); // 5</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-定义式导出（每个模块仅一个）"><a href="#3-2-定义式导出（每个模块仅一个）" class="headerlink" title="3.2. 定义式导出（每个模块仅一个）"></a>3.2. 定义式导出（每个模块仅一个）</h3><p>在 Node.js 社区很受欢迎的模块导出单一值。当然在需要经常有构造函数和类来创建模型的前端开发中也类一样，一模块一模型。一个 ECMAScript 6 模块可以采用定义式导出，导出最主要的值。定义式导出容易引用。</p>
+<p>以下为单函数的 ECMAScript 6 模块：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// ----- myFunc.js -------</span><br><span class="line">export default function()&#123; &#125;;</span><br><span class="line"></span><br><span class="line">// ------ main.js --------</span><br><span class="line">import myFunc from &#x27;myFunc&#x27;;</span><br><span class="line">myFunc();</span><br></pre></td></tr></table></figure>
+
+<p>定义式导出一个类的 ECMAScript 6 模块如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// ----- MyClass.js -------</span><br><span class="line">export default class()&#123; &#125;;</span><br><span class="line"></span><br><span class="line">// ------ main.js --------</span><br><span class="line">import MyClass from &#x27;MyClass&#x27;;</span><br><span class="line">let inst = new MyClass();</span><br></pre></td></tr></table></figure>
+
+<p>注：定义式导出声明的操作数是一个表达式，往往不需要名字。代替之的是通过模块的名称来确认。</p>
+<h3 id="3-3-同一模块中使用命名式导出和定义式导出"><a href="#3-3-同一模块中使用命名式导出和定义式导出" class="headerlink" title="3.3. 同一模块中使用命名式导出和定义式导出"></a>3.3. 同一模块中使用命名式导出和定义式导出</h3><p>一下模式在 JavaScript 中非常常见：一个库仅仅是单一的函数，不过通过该函数的属性来提供其他的支持。包括 jQuery 和Underscore.js。下面是简单的 Underscore 作为 CommonJS 模块的写法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// ----------underscore.js ----------</span><br><span class="line">var _ = function( obj )&#123;&#125;;</span><br><span class="line">var each = _.each = _forEach = function( obj, iterator, context )&#123;&#125;</span><br><span class="line"></span><br><span class="line">module.esports = _;</span><br><span class="line"></span><br><span class="line">// ---------- main.js ---------</span><br><span class="line">var _ = require(&#x27;underscore&#x27;);</span><br><span class="line">var each = _.each;</span><br></pre></td></tr></table></figure>
+
+<p>在ES6下，函数 _ 是定义式导出而 each 和 forEach 是命名式导出。 这证明事实上是可以同时进行命名式导出和定义式导出的。例如之前的 CommonJS 模块，以 ES6 来重写模块，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// --------underscore.js--------------</span><br><span class="line">export default function( obj )&#123; &#125;</span><br><span class="line">export function each( obj, itertor, context )&#123; &#125;</span><br><span class="line">export &#123; each as forEach &#125;</span><br><span class="line"></span><br><span class="line">// --------main.js ------------</span><br><span class="line">import _, &#123; each &#125; from &#x27;underscore&#x27;;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是 CommonJS 版本和 ECMAScript 6 版本仅仅是大致相同。后者为扁平式结构，而前者为嵌套式结构。喜欢哪一种风格有自己决定，不过扁平式结构具有做静态分析的优势（下面会提到优点）。CommonJS 风格看起来为了满足对象的需要部分被作为命名空间，可以通过 ES6 模块来实现这种需求并且导出实现。</p>
+<p>定义式导出仅仅是另一种形式的命名式导出。</p>
+<p>定义式导出事实上是命名式导出使用了特殊名称 default 。即，下面两个是等价的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import &#123; default as foo &#125; from &#x27;lib&#x27;;</span><br><span class="line">import foo from &#x27;lib&#x27;;</span><br></pre></td></tr></table></figure>
+
+<p>类似的，下面两者也是等价的定义式导出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// --------module1.js-----------</span><br><span class="line">export default 123;</span><br><span class="line">// --------module2.js-----------</span><br><span class="line">const D = 123;</span><br><span class="line">export &#123; D as default &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>那为何我们还需要命名式到导出呢？</p>
+<p>你可能会疑虑，为何我们还需要命名式导出，而不是类似于 CommonJS 形式的单一定义式导出对象？答案就是，你不能通过对象来强制执行一个静态结构并且会丢失相关的优势（下一节描述）。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://freefe.cc/2014/09/14/js-calculation-most-letter/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -185,7 +318,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -264,7 +397,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -343,7 +476,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -464,7 +597,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -653,7 +786,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -774,7 +907,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -933,7 +1066,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -1019,7 +1152,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -1113,7 +1246,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -1204,220 +1337,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2013/06/25/javascript-note-1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="倪颖峰">
-      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="NiYingfeng 的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2013/06/25/javascript-note-1/" class="post-title-link" itemprop="url">编写可维护的JavaScript笔记（1-3章）</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2013-06-26 00:00:00" itemprop="dateCreated datePublished" datetime="2013-06-26T00:00:00+08:00">2013-06-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
-              </span>
-
-          
-            <span id="/2013/06/25/javascript-note-1/" class="post-meta-item leancloud_visitors" data-flag-title="编写可维护的JavaScript笔记（1-3章）" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="第一部分-编程风格"><a href="#第一部分-编程风格" class="headerlink" title="第一部分 编程风格"></a>第一部分 编程风格</h3><p>每个人都有自己独特的编程风格，有情有独钟亦或恨之入骨的，每个人都希望用自己的方式制定规范来实施。这些应当被归为个人编程嗜好。我们需要的是在编程过程中尽早的确定统一的编程风格。 在团队开发中，编程风格一致性变得尤为重要，因为： 1 任何开发者都不在乎某个文件的作者是谁，也没有必要花费额外的精力去理解代码的逻辑并且重新排版，因为所有代码的排版风格都是非常一致的，因为风格不一致会导致我们打开代码文件的第一件事情不是立即工作，而是进行缩进的排版整理。 2 能很容易的辨别出有问题的代码并且发现错误，如果所有的代码风格很像，当看到一段与众不同的代码时，很肯能问题就出在这里。</p>
-<blockquote>
-<p>JSLint 和 JSHint 是两个检查编程风格的工作。不仅找出代码中潜在的错误，还能对潜在的风格问题给予提示警告。 “程序是写给人读的，只是偶尔让计算机执行一下” - Donald Knuth</p>
-</blockquote>
-<h3 id="第一章-基本的格式化"><a href="#第一章-基本的格式化" class="headerlink" title="第一章 基本的格式化"></a>第一章 基本的格式化</h3><p>编程风格的核心就是基本的格式化规范，这些规范决定着如何编写高水准的代码。</p>
-<h4 id="1-1-缩进层级"><a href="#1-1-缩进层级" class="headerlink" title="1.1 缩进层级"></a>1.1 缩进层级</h4><p>所有语言都是如此，都会讨论如何对代码缩进。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(wl &amp;&amp; wl.length)&#123;</span><br><span class="line">for(var i=0; i&lt;wl.length;i++)&#123;</span><br><span class="line">p = wl[i];</span><br><span class="line">        type=Y.Lang.type(wl[i]);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>稍微编写过程序的都不会使用上面的格式，害人害己。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(wl &amp;&amp; wl.length)&#123;</span><br><span class="line">        for(var i=0; i&lt;wl.length;i++)&#123;</span><br><span class="line">                p = wl[i];</span><br><span class="line">                type=Y.Lang.type(wl[i]);</span><br><span class="line">                ...</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>代码应该如何统一缩进其实一直没有统一的共识。</p>
-<ul>
-<li>使用制表符缩进 。</li>
-<li>使用空格缩进。</li>
-</ul>
-<blockquote>
-<p>jQuery 明确规定使用制表符缩进。 Dauglas Crockford 的 JavaScript 规定使用4个空格缩进。 Google 的 JavaScript规定使用2个空格缩进。 Dojo 编程风格指南使用制表符缩进。</p>
-</blockquote>
-<p>尼古拉斯（作者）建议4个空格，或在编辑器中设置一个 制表符 替换为 4个空格。为一个缩进层。</p>
-<h4 id="1-2-语句结尾"><a href="#1-2-语句结尾" class="headerlink" title="1.2 语句结尾"></a>1.2 语句结尾</h4><p>强制规定，语句结束插入分号。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function()&#123;</span><br><span class="line">        return</span><br><span class="line">        &#123;</span><br><span class="line">                ...</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面代码就会引起问题。</p>
-<h4 id="1-3-行的长度"><a href="#1-3-行的长度" class="headerlink" title="1.3 行的长度"></a>1.3 行的长度</h4><p>很少有JS的规范提及到行的长度的风格的，很多语言都建议行的字数不超过 80 字，因为很早以前的编辑器，这是最大的行长度。</p>
-<blockquote>
-<p>Java语言规范中 源码单行长不超过 70 字，文档中单行长不超过 80 字。 Android开发者规范中规定不超过 100 字。 非官方的Ruby规定不操过 80 字。 Python编程规范规定单行不超过 79 字。</p>
-</blockquote>
-<p>JavaScript 在 Crockford 代码规范中规定为 80 字符。</p>
-<h4 id="1-4-换行"><a href="#1-4-换行" class="headerlink" title="1.4 换行"></a>1.4 换行</h4><p>当一行字字符数超过了最大限制的时候就需要换行。通常会在运算符之后换行，下一行会增加2个层级的缩进。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">callFunction(document,&quot;aaaaaaaaaaaaaaa&quot;,&quot;bbbbbbbbbbbbbbbb&quot;,&quot;cccccccccccccccccccc&quot;,</span><br><span class="line">    &quot;bbbbbbbbbbbbbbbbbbb&quot;);//超出首字母c的2个层级</span><br></pre></td></tr></table></figure>
-
-<p>需要注意的是规范为在运算符之后换行，以及增加2个层级的缩进。 当然如果是赋值的话就保持赋值运算符对其。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var result = &quot;aaaaaaaaaaaaaaaa&quot; + &quot;bbbbbbbbbbbbbbbb&quot; + &quot;ccccccccccccccccccc&quot; +</span><br><span class="line">                         &quot;ddddddddddddddddddddddddd&quot;;</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-5-空行"><a href="#1-5-空行" class="headerlink" title="1.5 空行"></a>1.5 空行</h4><p>空行常常被忽略，但是空行也是提高代码可读性的强大武器。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">if(wl &amp;&amp; wl.length)&#123;</span><br><span class="line"></span><br><span class="line">        for(var i=0; i</span><br><span class="line"></span><br><span class="line">                p = wl[i];</span><br><span class="line">                type=Y.Lang.type(wl[i]);</span><br><span class="line"></span><br><span class="line">                if(a)&#123;</span><br><span class="line">                        ...</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>空行一般来说不是很好在规范中规定，</p>
-<ul>
-<li>方法之间</li>
-<li>方法中局部变量可第一条语句之间。</li>
-<li>多行或者单行注释之前。</li>
-<li>在方法内的逻辑片段之前。</li>
-</ul>
-<p>目前没有规范对空行进行明确的规定。</p>
-<h3 id="1-6-命名"><a href="#1-6-命名" class="headerlink" title="1.6 命名"></a>1.6 命名</h3><blockquote>
-<p>“计算机科学只存在两个难题：缓存失效和命名” - Phil Karlton</p>
-</blockquote>
-<p>只要写代码就会涉及到变量和函数，所以变量和函数的命名对于增强代码的可读性至关重要。 JavaScripe 遵循 ECMA ，即驼峰式大小写。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var myName;</span><br><span class="line">var anotherName;</span><br></pre></td></tr></table></figure>
-
-<p>google Dojo等规范都规定使用小驼峰命名法。，当然还有一种曾经风光一时的 匈牙利命名法。 <code>1.6.1 变量和函数</code> 变量名总是应该遵循驼峰大小写命名法，并且命名的前缀应当是名词，使得可以将变量和函数区分开。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 以下OK</span><br><span class="line">var count = 10;</span><br><span class="line">var myName = &quot;Ni&quot;;</span><br><span class="line">var found = true;</span><br></pre></td></tr></table></figure>
-
-<p>&#x2F;&#x2F; 以下就需要重新命名</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var getCount = 10;</span><br><span class="line">var isFound = true;</span><br></pre></td></tr></table></figure>
-
-<p>&#x2F;&#x2F;函数应当以动词开头</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var getName  = function()&#123;</span><br><span class="line">        return myName;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>还有一点示范</p>
-<blockquote>
-<p>can 函数返回布尔值 has 函数返回布尔值 is 函数返回布尔值 get 函数返回非布尔值 set 函数用来保存值</p>
-</blockquote>
-<p><code>1.6.2 常量</code> JS中没有常量的概念。来自C语言的约定，常量使用大写字母并且使用下划线命名。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var MAX_COUNT = 10；</span><br><span class="line">var URL = &quot;http://www.guokr.com&quot;;</span><br></pre></td></tr></table></figure>
-
-<p>google Dojo 等编程风格指南都规定如此。 <code>1.6.3 构造函数</code> JS中的构造函数只不过是冠以 new 运算符的函数而已。采用大驼峰命名法。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function Person( name )&#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-7-直接量"><a href="#1-7-直接量" class="headerlink" title="1.7 直接量"></a>1.7 直接量</h4><p>JS中的原始值：字符串、数字、布尔值、null和underfined。 <code>1.7.1 字符串</code> JS中的字符串使用双引号和单引号是完全相同的。对于规范只需要统一即可。 jQuery 和 Crockford规范为双引号来括住字符串，google规范为单引号括住字符串。 <code>1.7.2 数字</code> JS中整数和浮点数都存储为相同的数据类型。 不推荐使用 10. 和 .1 的写法。会产生歧义，是否是我们漏掉了数字。</p>
-<p><code>1.7.3 null</code> null 常会与 undefined 搞混淆。以下场景才应当使用null：</p>
-<ul>
-<li>用来初始化变量，该变量可能被赋值为对象。</li>
-<li>用来和一个已经初始化的变量进行比较，这个变量可以是非对象。</li>
-<li>当函数期望的参数是对象，用作参数传入。</li>
-<li>当函数的返回值期望是对象时，用作返回值传出。</li>
-</ul>
-<p>以下场景不应当使用 null：</p>
-<ul>
-<li>不要使用null来检测是否传入了参数。</li>
-<li>不要用null来检测一个未初始化的变量。</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var person = null;</span><br><span class="line">function getPerson()&#123;</span><br><span class="line">    if( condition )&#123;</span><br><span class="line">        return new Person(&quot;ABC&quot;);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对于 null 的理解最好是当做对象的占位符使用，主流的规范没有提及。 <code>1.7.4 undefined</code> 由于</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var person;</span><br><span class="line">typeof person; //  undefined</span><br><span class="line">typeof foo;   // undefined</span><br></pre></td></tr></table></figure>
-
-<p>以及<code>null == undefined</code>所以，禁止使用特殊值 undefined 可以有效地确保只在一种情况下 typeof 才返回 undefined。 <code>1.7.5 对象直接量 与 数组直接量（字面量）</code> 创建对象与数组最流行的方法为对象字面量和数组字面量，比相应的构造函数式创建更高效直接。</p>
-<h3 id="第二章-注释"><a href="#第二章-注释" class="headerlink" title="第二章 注释"></a>第二章 注释</h3><h4 id="2-1-单行注释"><a href="#2-1-单行注释" class="headerlink" title="2.1 单行注释"></a>2.1 单行注释</h4><p>三种使用方法：</p>
-<ul>
-<li>独占一行，用来解释下一行，并且这行注释之前总有一行空行，缩进的层级与下一行代码保持一致。</li>
-<li>在代码行的尾部注释。代码与注释之间至少有一个缩进。注释包括之前本行的代码不应该超过最大字符数限制。</li>
-<li>注释掉大块代码。</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// 好的注释方法</span><br><span class="line">if( condition )&#123;</span><br><span class="line"></span><br><span class="line">    // 解释下一行代码</span><br><span class="line">    func();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 不好的注释方法</span><br><span class="line">if( condition )&#123;</span><br><span class="line">    // 解释下一行代码</span><br><span class="line">    func();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if( condition )&#123;</span><br><span class="line">    // 解释下一行代码</span><br><span class="line">    func();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-多行注释"><a href="#2-2-多行注释" class="headerlink" title="2.2 多行注释"></a>2.2 多行注释</h4><p>偏向使用 Java 风格的注释</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * 这里是注释</span><br><span class="line"> * 这里是注释</span><br><span class="line"> * 这里是注释</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
-
-<p>缩进的格式与单行注释表示一致。</p>
-<h4 id="2-3-使用注释"><a href="#2-3-使用注释" class="headerlink" title="2.3 使用注释"></a>2.3 使用注释</h4><p>当代码不够清晰的时候使用注释，当代码很明了的时候不应当添加注释。 并且注释不应该只是解释变量名称或者函数名称式的那种废话。 当代码很难理解或者代码可能被误认为错误的代码的时候，需要添加注释。</p>
-<h4 id="2-4-文档注释"><a href="#2-4-文档注释" class="headerlink" title="2.4 文档注释"></a>2.4 文档注释</h4><p>技术角度来说，文档注释并不是 JS 的组成部分，但是是一种普遍的实践。</p>
-<ul>
-<li>应当对所有的方法和可能的返回值添加描述。</li>
-<li>对自定义的构造函数类型和期望的参数添加描述。</li>
-<li>对于包含对象或者方法的对象进行描述。</li>
-</ul>
-<h3 id="第三章-语句和表达式"><a href="#第三章-语句和表达式" class="headerlink" title="第三章 语句和表达式"></a>第三章 语句和表达式</h3><p>JS中，诸如 if 和 for 之类的规定不管是单行代码还是多行代码，均使用 { }</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 好的写法</span><br><span class="line">if( contidion )&#123;</span><br><span class="line">        foo();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if( conidion )&#123;</span><br><span class="line">        foo();</span><br><span class="line">        foo();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 不好的写法</span><br><span class="line">if( contidion )&#123; foo(); &#125;</span><br><span class="line">if( contidion )  foo();</span><br></pre></td></tr></table></figure>
-
-<p>所有的语句块都应当使用 { }， if ， for ， while ，do while ， try catch finnally 。</p>
-<h4 id="3-1-花括号对齐方式"><a href="#3-1-花括号对齐方式" class="headerlink" title="3.1 花括号对齐方式"></a>3.1 花括号对齐方式</h4><p>有两种对齐方式</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if( conidion )&#123;</span><br><span class="line">        foo();</span><br><span class="line">        foo();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>和</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if( conidion )</span><br><span class="line">&#123;</span><br><span class="line">        foo();</span><br><span class="line">        foo();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>很显然由于第二种又时候会会让浏览器执行代码的时候产生不一样的解析，所以使用第一种花括号对齐方式。</p>
-<h4 id="3-2-块语句间隔"><a href="#3-2-块语句间隔" class="headerlink" title="3.2 块语句间隔"></a>3.2 块语句间隔</h4><p>语句块间隔有3中形式：</p>
-<ul>
-<li>语句名 圆括号 左花括号间没有空格间隔。</li>
-<li>左圆括号之前 右圆括号之后添加一个空格。</li>
-<li>左圆括号 右圆括号前后都添加一个空格。</li>
-</ul>
-<p>作者推荐一致使用第二种形式。</p>
-<h4 id="3-3-switch-语句"><a href="#3-3-switch-语句" class="headerlink" title="3.3 switch 语句"></a>3.3 switch 语句</h4><p>JS中任何表达式都可以合法的用于case从句中，其他语言必须使用原始值和常量。 <code>3.3.1 缩进</code> JS的switch缩进一致是有争议的话题。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">        case &quot;a&quot;:</span><br><span class="line">                //代码</span><br><span class="line">                break；</span><br><span class="line"></span><br><span class="line">        case &quot;b&quot;:</span><br><span class="line">                //代码</span><br><span class="line">                break;</span><br><span class="line"></span><br><span class="line">        default :</span><br><span class="line">                // 代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>每个case相对于switch都有一个缩进层。 第二个case开始之前都有一个空行。 另一种 Crockford 和Dojo编程风格为</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">case &quot;a&quot;:</span><br><span class="line">        //代码</span><br><span class="line">        break；</span><br><span class="line">case &quot;b&quot;:</span><br><span class="line">        //代码</span><br><span class="line">        break;</span><br><span class="line">default :</span><br><span class="line">        // 代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>3.3.2 case语句的连续执行（贯穿）</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">        case &quot;a&quot;:</span><br><span class="line">        case &quot;b&quot;:</span><br><span class="line">                //代码</span><br><span class="line">                break;</span><br><span class="line"></span><br><span class="line">        default :</span><br><span class="line">                // 代码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Douglas 在 Crockford中禁止出现贯穿现象， 但是Nichlas认为只要程序逻辑很清楚，贯穿完全是一个可以接受的编程方式。Jquery 编程风格中也是允许的。 <code>3.3.3 default</code> 是否在任何时候都需要 default。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">switch (condition) &#123;</span><br><span class="line">        case &quot;a&quot;:</span><br><span class="line">        case &quot;b&quot;:</span><br><span class="line">                //代码</span><br><span class="line">                break;</span><br><span class="line"></span><br><span class="line">     //没有 default :</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>更倾向于没有默认行为并且在注释中写入省略 default。</p>
-<h4 id="3-4-with"><a href="#3-4-with" class="headerlink" title="3.4 with"></a>3.4 with</h4><p>with 语句可以更改包含上下文解析变量的方式。通过with可以使用局部变量的方式和函数的形式来访问特定对象中的属性和方法。可以缩短代码的长度。 但是是的JS引擎与压缩工具无法压缩。严格模式中 with 是禁止的。 基本所有的规范中都禁止使用 with。</p>
-<h4 id="3-5-for-循环"><a href="#3-5-for-循环" class="headerlink" title="3.5 for 循环"></a>3.5 for 循环</h4><p>对于for循环中的 break 和 return 会改变循环的方向，尽量避免使用，但是不禁止。</p>
-<h4 id="3-6-for-in-循环"><a href="#3-6-for-in-循环" class="headerlink" title="3.6 for-in 循环"></a>3.6 for-in 循环</h4><p>for-in循环建议与 hasOwnProperty 一起检测属性，除非你需要检查原型。 for-in是用来遍历对象的，不要用其来遍历数组。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1487,14 +1406,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">68</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">137</span>
+        <span class="site-state-item-count">139</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

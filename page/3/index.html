@@ -154,6 +154,108 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2016/11/01/es6-learn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="倪颖峰">
+      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="NiYingfeng 的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2016/11/01/es6-learn/" class="post-title-link" itemprop="url">ES6语法回顾</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-11-02 00:00:00" itemprop="dateCreated datePublished" datetime="2016-11-02T00:00:00+08:00">2016-11-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
+              </span>
+
+          
+            <span id="/2016/11/01/es6-learn/" class="post-meta-item leancloud_visitors" data-flag-title="ES6语法回顾" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>随着 Babel 在各类开源项目中的使用，ES6 已经进入日常生活。在此简单回顾一下 ES6 语法概念。 <code>箭头函数 =&gt;</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">var foo = function()&#123;return 1+1;&#125;;</span><br><span class="line">//等价于</span><br><span class="line">let foo = () =&gt; 1+1;</span><br><span class="line"></span><br><span class="line">var foo = function(a, b)&#123;</span><br><span class="line">    if (a !== undefined &amp;&amp; b !== undefined) &#123;</span><br><span class="line">        return a + b</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return 0</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">//等价于</span><br><span class="line">var add = (a, b) =&gt; &#123;</span><br><span class="line">    if (a !== undefined &amp;&amp; b !== undefined) &#123;</span><br><span class="line">        return a + b</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return 0</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>let,const</code> 与var具有函数级别作用域不同，let和const不同具有块级作用域，let定义变量，const定义常量。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var a = 1;</span><br><span class="line">&#123;</span><br><span class="line">  let a = 2;</span><br><span class="line">  console.log(a); //2</span><br><span class="line">&#125;</span><br><span class="line">console.log(a); //1</span><br></pre></td></tr></table></figure>
+
+<p><code>解构赋值</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var value = [1, 2, 3, 4, 5];</span><br><span class="line">var [el1, el2, el3] = value;</span><br><span class="line"></span><br><span class="line">var value = [1, 2, [3, 4, 5]];</span><br><span class="line">var [el1, el2, [el3, el4]] = value;</span><br><span class="line"></span><br><span class="line">var person = &#123;firstName: &quot;John&quot;, lastName: &quot;Doe&quot;&#125;;</span><br><span class="line">var &#123;firstName, lastName&#125; = person;</span><br><span class="line"></span><br><span class="line">function findUser(userId, &#123;includeProfile, includeHistory&#125;) &#123;</span><br><span class="line">    if (includeProfile) ...</span><br><span class="line">    if (includeHistory) ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>增强对象字面量</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var worker = &#123;</span><br><span class="line">    company: &#x27;freelancer&#x27;,</span><br><span class="line">    work() &#123;</span><br><span class="line">        console.log(&#x27;working...&#x27;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>参数默认值</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function findClosestShape( x=0, y=0 )&#123;</span><br><span class="line">    // ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>余参</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function format( pattern, ...params )&#123;</span><br><span class="line">    // return params;</span><br><span class="line">&#125;</span><br><span class="line">console.log( formart( &#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27; ) );</span><br></pre></td></tr></table></figure>
+
+<p><code>class</code> 增加类的概念</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">class Person &#123;</span><br><span class="line">    constructor( nane )&#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    describe()&#123;</span><br><span class="line">        return &quot;Person called&quot; + this.name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">// 子类</span><br><span class="line">class Employee extends Person&#123;</span><br><span class="line">    constructor ( name, title )&#123;</span><br><span class="line">        // super.constructor( name )</span><br><span class="line">        super( name );</span><br><span class="line">        this.title = title; </span><br><span class="line">    &#125;</span><br><span class="line">    describe()&#123;</span><br><span class="line">        // super.describe()</span><br><span class="line">        return super() + &quot;(&quot; + this.title + &quot;)&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>扩展操作符</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let arr = [ -1, 7, 2 ];</span><br><span class="line">let highest = Math.max( ...arr ); // 7</span><br><span class="line">new Date( ...[ 2011, 11, 24 ] );</span><br><span class="line">// 非破坏性的链接单个元素</span><br><span class="line">let arr2 = [ ...arr, 9, -6 ]; // [ -1, 7, 2, 9, -6 ]</span><br></pre></td></tr></table></figure>
+
+<p><code>for-of 循环（对于所有遵守 ES6 迭代规则的对象均有效）</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">let arr = [ &#x27;foo&#x27;, &#x27;bar&#x27;, &#x27;baz&#x27; ];</span><br><span class="line">for( let element of arr )&#123;</span><br><span class="line">    console.log( element );</span><br><span class="line">&#125;</span><br><span class="line">// foo</span><br><span class="line">// bar</span><br><span class="line">// baz</span><br><span class="line">for( let [ index, element ] of arr.entries() )&#123;</span><br><span class="line">    console.log( index + &quot;.&quot; + element );</span><br><span class="line">&#125;</span><br><span class="line">// foo</span><br><span class="line">// bar</span><br><span class="line">// baz</span><br></pre></td></tr></table></figure>
+
+<p><code>模块化</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// lib.js</span><br><span class="line">export const sqet = Math.sqrt;</span><br><span class="line">export function square( x )&#123;</span><br><span class="line">    return x * x ;</span><br><span class="line">&#125;</span><br><span class="line">export function diag( x, y )&#123;</span><br><span class="line">    return sqrt( square(x) + square( y ) );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// main.js</span><br><span class="line">import &#123; square, diag &#125; from &#x27;lib&#x27;;</span><br><span class="line">console.log( square( 11 ) ); // 121</span><br><span class="line">console.log( diag( 4, 3 ) ); // 5</span><br></pre></td></tr></table></figure>
+
+<p><code>模板字符串</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">let str = String.raw`This is a text </span><br><span class="line">with multiple lines.</span><br><span class="line"> Escapes are not interpreted,</span><br><span class="line"> \n is not a newline.`</span><br><span class="line"></span><br><span class="line">var parts = &#x27;/2012/10/Page.html&#x27;.match(XRegExp.rx`</span><br><span class="line">        ^ # match at start of string only</span><br><span class="line">        / (?&lt;year&gt; [^/]+ ) # capture top dir name as year</span><br><span class="line">        / (?&lt;month&gt; [^/]+ ) # capture subdir name as month</span><br><span class="line">        / (?&lt;title&gt; [^/]+ ) # capture base name as title</span><br><span class="line">        \.html? $ # .htm or .html file ext at end of path</span><br><span class="line">    `);</span><br><span class="line">console.log( parts.year ); // 2012</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://freefe.cc/2016/10/24/meta/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -185,7 +287,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -306,7 +408,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -388,7 +490,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -465,7 +567,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -558,7 +660,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -720,7 +822,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -864,7 +966,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -983,7 +1085,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -1119,7 +1221,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
+                <time title="修改时间：2022-03-25 11:27:33" itemprop="dateModified" datetime="2022-03-25T11:27:33+08:00">2022-03-25</time>
               </span>
 
           
@@ -1177,97 +1279,6 @@
 <p>&#96;&#96;&#96;</p>
 <p><img src="http://freefe.cc/blog/wp-content/uploads/2016/06/20160630195342.png"> 上面div的margin-bottom为20px,下面div的margin-top为30px，其内部的div的margin-top为40px，最后的最后，两个div之前的间距为 - 40px！这便是块级元素margin叠加与塌陷的问题，可以理解为改三个div均属于同一个BFC下的元素，所以垂直的margin会发生重叠和塌陷。当将下面的div进行BFC话之后你会看到： <img src="http://freefe.cc/blog/wp-content/uploads/2016/06/20160630195733.png"> 所以BFC为页面独立区域，内外元素不会相互影响。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>个人认为，了解BFC的渲染特性，有助于在我们平时开发时遇到的一些样式问题的解决，布局。将其作为一个知识点进行了解对我们CSS的开发具有比较大的帮助。包括对于清楚浮动，边距布局等控制与了解。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://freefe.cc/2016/05/28/sublime-set/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="倪颖峰">
-      <meta itemprop="description" content="曾在果壳、百度蹦哒，目前在B站活跃">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="NiYingfeng 的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2016/05/28/sublime-set/" class="post-title-link" itemprop="url">sublime 前端配置详解</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-05-29 00:00:00" itemprop="dateCreated datePublished" datetime="2016-05-29T00:00:00+08:00">2016-05-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 17:39:22" itemprop="dateModified" datetime="2022-03-20T17:39:22+08:00">2022-03-20</time>
-              </span>
-
-          
-            <span id="/2016/05/28/sublime-set/" class="post-meta-item leancloud_visitors" data-flag-title="sublime 前端配置详解" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>\前两天 sublime 出了莫名其妙的BUG，只得重新安装，可谓是惨不忍睹啊。一切屌屌的配置都要从新配起。虽说网上一大堆文献，可惜天下文章一大抄，夸张的说，如果某一篇文章出现文章，整个关键词的文章就废掉了。。。一怒之下，自己整理一篇小记，废话不多说，装起先。</p>
-<h3 id="package-control"><a href="#package-control" class="headerlink" title="package control"></a>package control</h3><p>一般 sublime 插件都需要基于 package control，所以首先需要先安装 package control。 两种方法： <code>Ctrl + \</code> 或者 View - Show Console 打开 sublime 的控制台，网上好多同一版本的链接都已经失效，导致无法安装。这边提供最新有效的控制台安装代码。<code> </code>sublime 3 输入：&#96;</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import urllib.request,os,hashlib; h = &#x27;2915d1851351e5ee549c20394736b442&#x27; + &#x27;8bc59f460fa1548d1514676163dafc88&#x27;; pf = &#x27;Package Control.sublime-package&#x27;; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( &#x27;http://packagecontrol.io/&#x27; + pf.replace(&#x27; &#x27;, &#x27;%20&#x27;)).read(); dh = hashlib.sha256(by).hexdigest(); print(&#x27;Error validating download (got %s instead of %s), please try manual install&#x27; % (dh, h)) if dh != h else open(os.path.join( ipp, pf), &#x27;wb&#x27; ).write(by)</span><br></pre></td></tr></table></figure>
-
-<p><code>sublime 2 输入：</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import urllib2,os,hashlib; h = &#x27;2915d1851351e5ee549c20394736b442&#x27; + &#x27;8bc59f460fa1548d1514676163dafc88&#x27;; pf = &#x27;Package Control.sublime-package&#x27;; ipp = sublime.installed_packages_path(); os.makedirs( ipp ) if not os.path.exists(ipp) else None; urllibinstall_opener( urllibbuild_opener( urllibProxyHandler()) ); by = urlliburlopen( &#x27;http://packagecontrol.io/&#x27; + pf.replace(&#x27; &#x27;, &#x27;%20&#x27;)).read(); dh = hashlib.sha256(by).hexdigest(); open( os.path.join( ipp, pf), &#x27;wb&#x27; ).write(by) if dh == h else None; print(&#x27;Error validating download (got %s instead of %s), please try manual install&#x27; % (dh, h) if dh != h else &#x27;Please restart Sublime Text to finish installation&#x27;)</span><br></pre></td></tr></table></figure>
-
-<p><code>若安装不成功，则先下载 https://github.com/lovenyf/file/blob/master/Package%20Control.sublime-package 将文件放置于 Preferences - Browse Packages 上一级目录的 Installed Packages 中，就ok了。</code> 然后是一大波前端实用的 sublime 插件（均可以在 package control 下安装）</p>
-<ul>
-<li>HTMLBeautify，CSS Format，JS Format 代码规范格式化插件，功能虽小，但是相当实用。</li>
-<li>Git 如果你们是基于 git 开发环境的，sublime 的这个小玩意也会让你爱不释手，无需切回 shell控制台来执行一些 git 命令了。</li>
-<li>Git Gutter 非常爽的玩意，能在编辑器内看到diff的内容等</li>
-<li>Emmet 无需多说，极速编写html与css， Ctrl + e 搞定一切。（<a target="_blank" rel="noopener" href="http://emmet.io/%EF%BC%89">http://emmet.io/）</a></li>
-<li>SublimeCodeIntel 代码提示插件，支持多种编程语言。（<a target="_blank" rel="noopener" href="https://github.com/SublimeCodeIntel/SublimeCodeIntel%EF%BC%89">https://github.com/SublimeCodeIntel/SublimeCodeIntel）</a></li>
-<li>CssComb 将杂乱无章的 css 规范 近似一类的样式 归结在一起。</li>
-<li>MarkdownEditing 如果没有使用过Markdown，建议可以去使用使用。 MarkdownEditing是一个Sublime Text的Markdown插件。提供了一种合适的Markdown着色方案(light 与 dark)，包含强大的语法高亮，和实用的Markdown编辑功能。支持3种风格：Standard Markdown, GitHub flavored Markdown, MultiMarkdown。</li>
-<li>SASS Bulid SASS Build 是一个编写CSS的预处理器。这个特别的插件将帮助你妥善构建包括压缩选项在内的SASS文件。一旦你安装了这个插件</li>
-<li>SideBarEnhancements 侧栏右键菜单增强插件，添加大量实用功能。</li>
-<li>DocBlockr ( <a target="_blank" rel="noopener" href="https://github.com/spadgos/sublime-jsdocs">https://github.com/spadgos/sublime-jsdocs</a> ) , 规范代码注释，编写可维护的代码。</li>
-</ul>
 
       
     </div>
@@ -1352,14 +1363,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">68</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">137</span>
+        <span class="site-state-item-count">139</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
